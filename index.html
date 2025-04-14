@@ -109,6 +109,15 @@
     .symbol-success {
       fill: #10B981; /* 초록색 성공 아이콘 */
     }
+
+    .content-box {
+      background-color: white;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 0 auto;
+      max-width: 90%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -260,22 +269,30 @@
       previewElement.innerHTML = `
         <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
           ${symbolType !== 'none' ? `<div class="symbol-preview">${symbolSvg}</div>` : ''}
-          <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
-          <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
-          <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-            ${buttonText}
-          </a>
+          <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #00855B;">${title}</h2>
+          <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+            <p style="font-size: 14px; color: #333; margin: 0; white-space: pre-line;">${content}</p>
+          </div>
+          <div style="margin-top: 24px;">
+            <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
+              ${buttonText}
+            </a>
+          </div>
         </div>
       `;
       
       // Update code output - using formatted content for HTML output
       codeOutput.value = `<div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard Variable', sans-serif;">
   ${symbolType !== 'none' ? `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;">${symbolSvg}</div>` : ''}
-  <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
-  <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
-  <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-    ${buttonText}
-  </a>
+  <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #00855B;">${title}</h2>
+  <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+    <p style="font-size: 14px; color: #333; margin: 0; white-space: pre-line;">${content}</p>
+  </div>
+  <div style="margin-top: 24px;">
+    <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
+      ${buttonText}
+    </a>
+  </div>
 </div>`;
     }
     
@@ -319,4 +336,5 @@
   </script>
 </body>
 </html>
+
 
