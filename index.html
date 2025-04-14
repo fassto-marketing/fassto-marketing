@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Textarea } from "./components/ui/textarea";
+import { Card, CardContent } from "./components/ui/card";
 
 export default function NoticeGenerator() {
   const [title, setTitle] = useState("반품 주문 관리 안내");
@@ -11,7 +11,8 @@ export default function NoticeGenerator() {
   const [buttonLink, setButtonLink] = useState("https://guide-kr.fassto.ai/1c736b86-bfba-80a3-ba3f-eefbe6a4143e");
   const [bgColor, setBgColor] = useState("#E6F3EF");
 
-  const htmlCode = `
+  const getHtmlCode = () => {
+    return `
 <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard Variable', sans-serif;">
   <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
   <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
@@ -19,6 +20,19 @@ export default function NoticeGenerator() {
     ${buttonText}
   </a>
 </div>`;
+  };
+
+  const copyToClipboard = () => {
+    const htmlCode = getHtmlCode();
+    navigator.clipboard.writeText(htmlCode)
+      .then(() => {
+        alert("코드가 클립보드에 복사되었습니다!");
+      })
+      .catch(err => {
+        console.error('복사 실패:', err);
+        alert("복사 중 오류가 발생했습니다.");
+      });
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
@@ -33,16 +47,16 @@ export default function NoticeGenerator() {
         <Card className="mb-4">
           <CardContent>
             <div style={{ textAlign: "center", padding: "40px 0", backgroundColor: bgColor, fontFamily: "Pretendard Variable, sans-serif" }}>
-              <h2 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>{title}</h2>
-              <p style={{ fontSize: 14, color: "#333", marginBottom: 24, whiteSpace: "pre-line" }}>{content}</p>
-              <a href={buttonLink} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "14px 32px", backgroundColor: "#00855B", color: "white", borderRadius: "9999px", fontWeight: "bold", textDecoration: "none", fontSize: 16 }}>
+              <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "16px" }}>{title}</h2>
+              <p style={{ fontSize: "14px", color: "#333", marginBottom: "24px", whiteSpace: "pre-line" }}>{content}</p>
+              <a href={buttonLink} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "14px 32px", backgroundColor: "#00855B", color: "white", borderRadius: "9999px", fontWeight: "bold", textDecoration: "none", fontSize: "16px" }}>
                 {buttonText}
               </a>
             </div>
           </CardContent>
         </Card>
-        <Textarea value={htmlCode} readOnly rows={10} className="font-mono text-xs" />
-        <Button className="mt-2" onClick={() => navigator.clipboard.writeText(htmlCode)}>
+        <Textarea value={getHtmlCode()} readOnly rows={10} className="font-mono text-xs" />
+        <Button className="mt-2" onClick={copyToClipboard}>
           코드 복사하기
         </Button>
       </div>
