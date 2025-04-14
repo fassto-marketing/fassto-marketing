@@ -1,21 +1,51 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>파스토 공지 도구</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Pretendard Variable', sans-serif; background-color: #E6F3EF; text-align: center; padding-top: 40px;">
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 
-  <img src="https://via.placeholder.com/361x240.png?text=공지+이미지" 
-       alt="공지 이미지 예시" 
-       style="width: 100%; max-width: 361px; height: auto; margin-bottom: 24px; border-radius: 12px;" />
+export default function NoticeGenerator() {
+  const [title, setTitle] = useState("반품 주문 관리 안내");
+  const [content, setContent] = useState("반품 요청 처리 절차가 변경되었습니다. 자세한 내용은 아래 버튼을 클릭해 확인해 주세요.");
+  const [buttonText, setButtonText] = useState("가이드 보기");
+  const [buttonLink, setButtonLink] = useState("https://guide-kr.fassto.ai/1c736b86-bfba-80a3-ba3f-eefbe6a4143e");
+  const [bgColor, setBgColor] = useState("#E6F3EF");
 
-  <a href="https://guide-kr.fassto.ai/" 
-     target="_blank" 
-     style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-    반품 주문 관리 가이드 확인하기
+  const htmlCode = `
+<div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard Variable', sans-serif;">
+  <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
+  <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
+  <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
+    ${buttonText}
   </a>
+</div>`;
 
-</body>
-</html>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+      <div className="space-y-4">
+        <Input placeholder="제목 입력" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Textarea placeholder="본문 입력" value={content} onChange={(e) => setContent(e.target.value)} rows={6} />
+        <Input placeholder="버튼 텍스트 입력" value={buttonText} onChange={(e) => setButtonText(e.target.value)} />
+        <Input placeholder="버튼 링크 입력" value={buttonLink} onChange={(e) => setButtonLink(e.target.value)} />
+        <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} title="배경색 선택" />
+      </div>
+      <div>
+        <Card className="mb-4">
+          <CardContent>
+            <div style={{ textAlign: "center", padding: "40px 0", backgroundColor: bgColor, fontFamily: "Pretendard Variable, sans-serif" }}>
+              <h2 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>{title}</h2>
+              <p style={{ fontSize: 14, color: "#333", marginBottom: 24, whiteSpace: "pre-line" }}>{content}</p>
+              <a href={buttonLink} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "14px 32px", backgroundColor: "#00855B", color: "white", borderRadius: "9999px", fontWeight: "bold", textDecoration: "none", fontSize: 16 }}>
+                {buttonText}
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+        <Textarea value={htmlCode} readOnly rows={10} className="font-mono text-xs" />
+        <Button className="mt-2" onClick={() => navigator.clipboard.writeText(htmlCode)}>
+          코드 복사하기
+        </Button>
+      </div>
+    </div>
+  );
+}
