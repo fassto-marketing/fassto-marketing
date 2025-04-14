@@ -31,6 +31,7 @@
       border-radius: 0.375rem;
       min-height: 150px;
       margin-bottom: 1rem;
+      white-space: pre-line;
     }
     
     .custom-button {
@@ -71,6 +72,43 @@
       resize: none;
       margin-bottom: 1rem;
     }
+
+    .symbol-selection {
+      margin-bottom: 1rem;
+    }
+
+    .symbol-option {
+      display: inline-block;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .symbol-option input {
+      margin-right: 5px;
+    }
+
+    .symbol-preview {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px auto;
+    }
+
+    /* 심볼 스타일 */
+    .symbol-info {
+      fill: #2563EB; /* 파란색 정보 아이콘 */
+    }
+    
+    .symbol-warning {
+      fill: #F59E0B; /* 노란색 경고 아이콘 */
+    }
+    
+    .symbol-error {
+      fill: #DC2626; /* 빨간색 에러 아이콘 */
+    }
+    
+    .symbol-success {
+      fill: #10B981; /* 초록색 성공 아이콘 */
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -83,11 +121,32 @@
         <h2 class="text-xl font-bold mb-4">설정</h2>
         
         <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">심볼 선택</label>
+          <div class="symbol-selection">
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="none" checked> 없음
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="info"> 정보
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="warning"> 경고
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="error"> 오류
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="success"> 성공
+            </label>
+          </div>
+        </div>
+        
+        <div class="mb-4">
           <label class="block text-sm font-medium mb-1">제목</label>
           <input 
             type="text" 
             id="title" 
-            value="제목 입력" 
+            value="반품 주문 관리 안내" 
             class="custom-input"
             placeholder="제목 입력"
           >
@@ -99,7 +158,7 @@
             id="content" 
             class="custom-textarea"
             placeholder="본문 입력"
-          >본문 입력</textarea>
+          >반품 요청 처리 절차가 변경되었습니다. 자세한 내용은 아래 버튼을 클릭해 확인해 주세요.</textarea>
         </div>
         
         <div class="mb-4">
@@ -107,7 +166,7 @@
           <input 
             type="text" 
             id="buttonText" 
-            value="버튼명 입력" 
+            value="가이드 보기" 
             class="custom-input"
             placeholder="버튼 텍스트 입력"
           >
@@ -118,7 +177,7 @@
           <input 
             type="text" 
             id="buttonLink" 
-            value="버튼 링크" 
+            value="https://guide-kr.fassto.ai/1c736b86-bfba-80a3-ba3f-eefbe6a4143e" 
             class="custom-input"
             placeholder="버튼 링크 입력"
           >
@@ -153,6 +212,15 @@
   </div>
 
   <script>
+    // 심볼 SVG 정의
+    const symbols = {
+      info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-info"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+      warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-warning"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
+      error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-error"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+      success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-success"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+      none: ``
+    };
+    
     // Elements
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
@@ -162,6 +230,18 @@
     const previewElement = document.getElementById('preview');
     const codeOutput = document.getElementById('codeOutput');
     const copyButton = document.getElementById('copyButton');
+    const symbolRadios = document.querySelectorAll('input[name="symbol"]');
+    
+    // 현재 선택된 심볼 가져오기
+    function getSelectedSymbol() {
+      let selected = 'none';
+      symbolRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
     
     // Update preview and code
     function updatePreview() {
@@ -170,10 +250,16 @@
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
+      const symbolType = getSelectedSymbol();
+      const symbolSvg = symbols[symbolType];
+      
+      // 본문의 줄바꿈을 HTML에서 표현
+      const formattedContent = content.replace(/\n/g, '<br>');
       
       // Update preview
       previewElement.innerHTML = `
         <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
+          ${symbolType !== 'none' ? `<div class="symbol-preview">${symbolSvg}</div>` : ''}
           <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
           <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
           <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
@@ -182,8 +268,9 @@
         </div>
       `;
       
-      // Update code output
+      // Update code output - using formatted content for HTML output
       codeOutput.value = `<div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard Variable', sans-serif;">
+  ${symbolType !== 'none' ? `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;">${symbolSvg}</div>` : ''}
   <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">${title}</h2>
   <p style="font-size: 14px; color: #333; margin-bottom: 24px; white-space: pre-line;">${content}</p>
   <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
@@ -222,8 +309,14 @@
     buttonLinkInput.addEventListener('input', updatePreview);
     bgColorInput.addEventListener('input', updatePreview);
     
+    // Add event listeners to symbol radio buttons
+    symbolRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
+    
     // Initialize preview
     updatePreview();
   </script>
 </body>
 </html>
+
