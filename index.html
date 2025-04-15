@@ -146,7 +146,9 @@
       btn.innerText = buttonText;
       btn.href = buttonLink;
 
-      symbol.src = noticeType === 'system' ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Green_check.svg/2048px-Green_check.svg.png' : '/mnt/data/Vector.png';
+      symbol.src = noticeType === 'system'
+        ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Green_check.svg/2048px-Green_check.svg.png'
+        : 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Blue_information_icon.svg/1024px-Blue_information_icon.svg.png';
     }
 
     titleInput.addEventListener('input', updatePreview);
@@ -154,19 +156,6 @@
     buttonTextInput.addEventListener('input', updatePreview);
     buttonLinkInput.addEventListener('input', updatePreview);
     noticeTypeSelect.addEventListener('change', updatePreview);
-
-    function getButtonCoords(button, canvas) {
-      const rect = button.getBoundingClientRect();
-      const containerRect = document.getElementById('preview').getBoundingClientRect();
-      const scale = canvas.width / containerRect.width;
-
-      const x1 = Math.round((rect.left - containerRect.left) * scale);
-      const y1 = Math.round((rect.top - containerRect.top) * scale);
-      const x2 = Math.round((rect.right - containerRect.left) * scale);
-      const y2 = Math.round((rect.bottom - containerRect.top) * scale);
-
-      return `${x1},${y1},${x2},${y2}`;
-    }
 
     function getDownloadFilename() {
       const date = new Date();
@@ -180,11 +169,34 @@
 
     function downloadImage() {
       html2canvas(document.querySelector("#preview")).then(canvas => {
+        const btn = document.getElementById("preview-button");
+        const coords = getButtonCoords(btn, canvas);
+
+        const image = canvas.toDataURL();
+
+        const map = `&lt;map name="buttonMap"&gt;\n  &lt;area shape="rect" coords="${coords}" href="${btn.href}" alt="버튼" /&gt;\n&lt;/map&gt;`;
+        const imgTag = `&lt;img src="${image}" usemap="#buttonMap" /&gt;`;
+
+        document.getElementById("generatedCode").value = imgTag + "\n" + map;
+
         const link = document.createElement("a");
         link.download = getDownloadFilename();
-        link.href = canvas.toDataURL();
+        link.href = image;
         link.click();
       });
+    }
+
+    function getButtonCoords(button, canvas) {
+      const rect = button.getBoundingClientRect();
+      const containerRect = document.getElementById('preview').getBoundingClientRect();
+      const scale = canvas.width / containerRect.width;
+
+      const x1 = Math.round((rect.left - containerRect.left) * scale);
+      const y1 = Math.round((rect.top - containerRect.top) * scale);
+      const x2 = Math.round((rect.right - containerRect.left) * scale);
+      const y2 = Math.round((rect.bottom - containerRect.top) * scale);
+
+      return `${x1},${y1},${x2},${y2}`;
     }
 
     updatePreview();
