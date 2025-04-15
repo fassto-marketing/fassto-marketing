@@ -2,128 +2,126 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>공지 이미지 생성기</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     body {
-      font-family: 'Pretendard', sans-serif;
+      font-family: sans-serif;
       padding: 2rem;
-      background-color: #f8f9fa;
+      background: #f5f5f5;
     }
-    .preview-container {
-      position: relative;
-      display: inline-block;
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: auto;
     }
-    #preview-image {
-      width: 361px;
-      height: auto;
-      border: 1px solid #ccc;
-    }
-    .coords-display {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #555;
-    }
-    textarea {
+    input, textarea {
       width: 100%;
-      height: 150px;
-      margin-top: 1rem;
-      font-family: monospace;
-      padding: 1rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
     }
     button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background-color: #0066ff;
+      padding: 0.7rem 1.2rem;
+      background: #007bff;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 0.5rem;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #004fcc;
+    #preview {
+      margin-top: 2rem;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      background: white;
+      position: relative;
+      text-align: center;
+    }
+    .btn-area {
+      text-align: center;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>📢 공지 이미지 생성기 (이미지맵 포함)</h1>
+  <div class="container">
+    <h2>공지 이미지 생성기</h2>
+    <label>제목:</label>
+    <input type="text" id="title" placeholder="공지 제목을 입력하세요" />
 
-  <div>
-    <label for="image-upload">이미지 업로드:</label>
-    <input type="file" id="image-upload" accept="image/*" />
+    <label>본문 내용:</label>
+    <textarea id="body" rows="4" placeholder="공지 내용을 입력하세요"></textarea>
+
+    <label>버튼명:</label>
+    <input type="text" id="buttonText" placeholder="버튼 텍스트" />
+
+    <label>버튼 링크:</label>
+    <input type="text" id="buttonLink" placeholder="https://" />
+
+    <div class="btn-area">
+      <button onclick="generatePreview()">미리보기 생성</button>
+      <button onclick="downloadImage()">이미지 다운로드</button>
+    </div>
+
+    <div id="preview">
+      <h2 id="preview-title"></h2>
+      <p id="preview-body"></p>
+      <a id="preview-button" href="#" target="_blank" style="display:inline-block;margin-top:1rem;padding:0.5rem 1rem;background:#007bff;color:#fff;text-decoration:none;border-radius:0.5rem;">버튼</a>
+    </div>
+
+    <textarea id="generatedCode" rows="8" readonly style="margin-top:2rem;width:100%;"></textarea>
   </div>
 
-  <div class="preview-container">
-    <img id="preview-image" src="" alt="업로드된 이미지" usemap="#noticeMap" />
-    <map name="noticeMap" id="noticeMap"></map>
-  </div>
-
-  <p class="coords-display">클릭하여 링크 영역을 생성하세요.</p>
-
-  <div>
-    <label for="link">링크 주소:</label>
-    <input type="text" id="link" placeholder="https://example.com" />
-  </div>
-
-  <button onclick="downloadImage()">🖼 이미지 다운로드</button>
-
-  <textarea id="html-output" readonly></textarea>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    const imageUpload = document.getElementById('image-upload');
-    const previewImage = document.getElementById('preview-image');
-    const map = document.getElementById('noticeMap');
-    const htmlOutput = document.getElementById('html-output');
-    const linkInput = document.getElementById('link');
+    function generatePreview() {
+      const title = document.getElementById('title').value;
+      const body = document.getElementById('body').value;
+      const buttonText = document.getElementById('buttonText').value;
+      const buttonLink = document.getElementById('buttonLink').value;
 
-    let coordsList = [];
+      document.getElementById('preview-title').innerText = title;
+      document.getElementById('preview-body').innerText = body;
+      const btn = document.getElementById('preview-button');
+      btn.innerText = buttonText;
+      btn.href = buttonLink;
 
-    imageUpload.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        previewImage.src = reader.result;
-        coordsList = [];
-        map.innerHTML = '';
-        htmlOutput.value = '';
-      };
-      if (file) reader.readAsDataURL(file);
-    });
+      setTimeout(() => {
+        html2canvas(document.querySelector("#preview")).then(canvas => {
+          const base64image = canvas.toDataURL("image/png");
+          const coords = getButtonCoords(btn, canvas);
+          const mapId = "map01";
 
-    previewImage.addEventListener('click', (e) => {
-      const rect = previewImage.getBoundingClientRect();
-      const x = Math.round(e.clientX - rect.left);
-      const y = Math.round(e.clientY - rect.top);
-
-      const width = 200;
-      const height = 40;
-      const coords = `${x},${y},${x + width},${y + height}`;
-      const href = linkInput.value || '#';
-      const area = document.createElement('area');
-      area.shape = 'rect';
-      area.coords = coords;
-      area.href = href;
-      area.target = '_blank';
-      map.appendChild(area);
-      coordsList.push(`<area shape="rect" coords="${coords}" href="${href}" target="_blank" />`);
-      updateHTML();
-    });
-
-    function updateHTML() {
-      const html = `
-<img src="[업로드된 이미지 경로]" usemap="#noticeMap" alt="공지 이미지" />
-<map name="noticeMap">
-  ${coordsList.join('\n  ')}
+          const htmlCode = `
+<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/notice_20250415_1.png" style="width: ${canvas.width}px; height: auto;" usemap="#${mapId}"/>
+<map name="${mapId}" id="${mapId}">
+  <area shape="rect" coords="${coords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">
 </map>`;
-      htmlOutput.value = html;
+          document.getElementById("generatedCode").value = htmlCode;
+        });
+      }, 100);
+    }
+
+    function getButtonCoords(button, canvas) {
+      const rect = button.getBoundingClientRect();
+      const containerRect = document.getElementById('preview').getBoundingClientRect();
+      const scale = canvas.width / containerRect.width;
+
+      const x1 = Math.round((rect.left - containerRect.left) * scale);
+      const y1 = Math.round((rect.top - containerRect.top) * scale);
+      const x2 = Math.round((rect.right - containerRect.left) * scale);
+      const y2 = Math.round((rect.bottom - containerRect.top) * scale);
+
+      return `${x1},${y1},${x2},${y2}`;
     }
 
     function downloadImage() {
-      html2canvas(document.querySelector('.preview-container')).then((canvas) => {
-        const link = document.createElement('a');
-        link.download = 'notice-image.png';
+      html2canvas(document.querySelector("#preview")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "notice.png";
         link.href = canvas.toDataURL();
         link.click();
       });
