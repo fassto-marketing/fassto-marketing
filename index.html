@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fassto 공지 이미지 생성기</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     
@@ -153,6 +154,44 @@
       max-width: 100%;
       height: auto;
     }
+
+    /* 정렬 옵션 스타일 */
+    .alignment-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .alignment-option {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .alignment-option input {
+      margin-right: 5px;
+    }
+
+    /* Quill 에디터 스타일 */
+    .ql-editor {
+      min-height: 150px;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    .ql-toolbar {
+      border-top-left-radius: 0.375rem;
+      border-top-right-radius: 0.375rem;
+    }
+
+    .ql-container {
+      border-bottom-left-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    #editor-container {
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -202,13 +241,27 @@
         
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">본문</label>
-          <textarea 
-            id="content" 
-            class="custom-textarea"
-            placeholder="본문 입력"
-          >내용을 입력해 주세요.</textarea>
+          
+          <!-- 본문 정렬 옵션 -->
+          <div class="alignment-options mb-2">
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="left" checked> 왼쪽 정렬
+            </label>
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="center"> 가운데 정렬
+            </label>
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="right"> 오른쪽 정렬
+            </label>
+          </div>
+
+          <!-- Quill 에디터로 대체 -->
+          <div id="editor-container">
+            <div id="editor">내용을 입력해 주세요.</div>
+          </div>
+          
           <div class="color-picker-container">
-            <label class="text-sm">본문 색상:</label>
+            <label class="text-sm">기본 텍스트 색상:</label>
             <input type="color" id="contentColor" value="#333333" class="color-input">
           </div>
         </div>
@@ -283,6 +336,8 @@
     </div>
   </div>
 
+  <!-- Quill 에디터 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
   <script>
     // 심볼 SVG 정의
     const symbols = {
@@ -302,9 +357,21 @@
       none: ''
     };
     
+    // Quill 에디터 초기화
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }],
+          ['clean']
+        ]
+      },
+      placeholder: '내용을 입력해 주세요.'
+    });
+    
     // Elements
     const titleInput = document.getElementById('title');
-    const contentInput = document.getElementById('content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
     const bgColorInput = document.getElementById('bgColor');
@@ -317,15 +384,28 @@
     const copyButton = document.getElementById('copyButton');
     const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
+    const alignmentRadios = document.querySelectorAll('input[name="content-alignment"]');
     
-    // 이미지 고정 크기
-    const imageWidth = 722;
+    // 이미지 크기 설정
+    const imageWidth = 722; // 원본 이미지 너비
+    const htmlImageWidth = 361; // HTML 코드에 사용될 이미지 너비
     let buttonCoords = [63, 689, 298, 727]; // 기본 좌표값
     
     // 현재 선택된 심볼 가져오기
     function getSelectedSymbol() {
       let selected = 'none';
       symbolRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
+    
+    // 현재 선택된 정렬 가져오기
+    function getSelectedAlignment() {
+      let selected = 'left';
+      alignmentRadios.forEach(radio => {
         if (radio.checked) {
           selected = radio.value;
         }
@@ -343,7 +423,6 @@
     // 미리보기 업데이트
     function updatePreview() {
       const title = titleInput.value;
-      const content = contentInput.value;
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
@@ -351,9 +430,10 @@
       const contentColor = contentColorInput.value;
       const buttonColor = buttonColorInput.value;
       const symbolType = getSelectedSymbol();
+      const contentAlignment = getSelectedAlignment();
       
-      // 본문의 줄바꿈을 HTML에서 표현
-      const formattedContent = content.replace(/\n/g, '<br>');
+      // Quill 에디터의 내용 가져오기 (HTML 형식)
+      const contentHtml = quill.root.innerHTML;
       
       let symbolHtml = '';
       if (symbolType !== 'none') {
@@ -362,14 +442,17 @@
         symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;"><img src="${symbolImage}" alt="${symbolType} 심볼" width="48" height="48"></div>`;
       }
       
-      // 미리보기 생성 - Canvas 대신 HTML로 렌더링 (더 정확한 미리보기)
+      // 정렬 스타일 설정
+      const alignStyle = `text-align: ${contentAlignment};`;
+      
+      // 미리보기 생성
       previewElement.innerHTML = `
         <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
           <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
             ${symbolHtml}
             <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
             <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-              <p style="font-size: 14px; color: ${contentColor}; margin: 0; white-space: pre-line;">${formattedContent}</p>
+              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0;">${contentHtml}</div>
             </div>
             <div style="margin-top: 24px; margin-bottom: 24px;">
               <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: ${buttonColor}; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
@@ -418,7 +501,6 @@
       
       // 미리보기 HTML에서 필요한 정보 추출
       const title = titleInput.value;
-      const content = contentInput.value;
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
@@ -426,6 +508,15 @@
       const contentColor = contentColorInput.value;
       const buttonColor = buttonColorInput.value;
       const symbolType = getSelectedSymbol();
+      const contentAlignment = getSelectedAlignment();
+      
+      // Quill 에디터의 내용 HTML
+      const contentHtml = quill.root.innerHTML;
+      
+      // 임시 요소 생성하여 실제 텍스트 내용 계산
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contentHtml;
+      document.body.appendChild(tempDiv);
       
       // 캔버스 생성
       const canvas = document.createElement('canvas');
@@ -433,7 +524,7 @@
       canvas.width = imageWidth;
       
       // 컨텐츠 높이 계산
-      const contentLines = content.split('\n').length;
+      const contentLines = tempDiv.offsetHeight / 20; // 대략적인 라인 수 계산
       const symbolHeight = symbolType !== 'none' ? 70 : 0;
       const titleHeight = 40;
       const contentBoxPadding = 40;
@@ -446,6 +537,9 @@
       // 전체 높이 계산
       const totalHeight = symbolHeight + titleHeight + contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
       canvas.height = totalHeight;
+      
+      // 임시 요소 제거
+      document.body.removeChild(tempDiv);
       
       // 캔버스에 그리기
       const ctx = canvas.getContext('2d');
@@ -487,16 +581,40 @@
         ctx.fillStyle = 'white';
         roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
         
-        // 본문 텍스트 그리기
+        // 본문 텍스트 그리기 (기본 스타일)
         ctx.font = '14px Pretendard';
         ctx.fillStyle = contentColor;
-        ctx.textAlign = 'left';
         
-        const contentLines = content.split('\n');
+        // 정렬 방식 설정
+        switch(contentAlignment) {
+          case 'left':
+            ctx.textAlign = 'left';
+            break;
+          case 'center':
+            ctx.textAlign = 'center';
+            break;
+          case 'right':
+            ctx.textAlign = 'right';
+            break;
+        }
+        
+        // HTML을 텍스트로 변환 (간단한 방식으로 처리)
+        const tempDiv2 = document.createElement('div');
+        tempDiv2.innerHTML = contentHtml;
+        const plainText = tempDiv2.textContent || tempDiv2.innerText || '';
+        
+        const contentLines = plainText.split('\n');
         let contentY = yPos + 20; // 패딩
         
+        let textX = contentBoxX + 15;
+        if (contentAlignment === 'center') {
+          textX = contentBoxX + (contentBoxWidth / 2);
+        } else if (contentAlignment === 'right') {
+          textX = contentBoxX + contentBoxWidth - 15;
+        }
+        
         for (let i = 0; i < contentLines.length; i++) {
-          ctx.fillText(contentLines[i], contentBoxX + 15, contentY);
+          ctx.fillText(contentLines[i], textX, contentY);
           contentY += contentLineHeight;
         }
         
@@ -559,18 +677,18 @@
       }
     }
     
-    // HTML 코드 업데이트
+    // HTML 코드 업데이트 (이미지 크기 수정 적용)
     function updateHtmlCode() {
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
       const buttonLink = buttonLinkInput.value;
       const buttonText = buttonTextInput.value;
       
-      // 이미지 맵 좌표
-      const coords = buttonCoords.map(Math.round).join(',');
+      // 이미지 맵 좌표 (반으로 축소)
+      const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
       
-      codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 722px; height: auto;" usemap="#map01"/>
+      codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
 <map name="map01" id="map01">
-<area shape="rect" coords="${coords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
+<area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
 </map>`;
     }
     
@@ -614,7 +732,6 @@
     
     // 모든 입력 요소에 이벤트 리스너 추가
     titleInput.addEventListener('input', updatePreview);
-    contentInput.addEventListener('input', updatePreview);
     buttonTextInput.addEventListener('input', updatePreview);
     buttonLinkInput.addEventListener('input', updatePreview);
     bgColorInput.addEventListener('input', updatePreview);
@@ -623,8 +740,16 @@
     buttonColorInput.addEventListener('input', updatePreview);
     fileNameInput.addEventListener('input', updatePreview);
     
+    // Quill 에디터에 변경 이벤트 리스너 추가
+    quill.on('text-change', updatePreview);
+    
     // 심볼 라디오 버튼에 이벤트 리스너 추가
     symbolRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
+    
+    // 정렬 라디오 버튼에 이벤트 리스너 추가
+    alignmentRadios.forEach(radio => {
       radio.addEventListener('change', updatePreview);
     });
     
@@ -633,6 +758,3 @@
   </script>
 </body>
 </html>
-
-
-
