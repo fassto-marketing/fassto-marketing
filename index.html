@@ -53,15 +53,20 @@
       position: relative;
       font-size: 16px;
     }
+    #preview-symbol {
+      text-align: center;
+    }
+    #preview-symbol img {
+      width: 40px;
+      height: 40px;
+      display: inline-block;
+    }
     #preview-title {
       color: #00855B;
       font-size: 24px;
       font-weight: bold;
       margin-top: 10px;
       text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     #preview-body {
       margin: 20px 0;
@@ -112,7 +117,8 @@
 
   <div id="preview-area">
     <div id="preview">
-      <div id="preview-title"><img id="symbol" src="" alt="symbol" width="24" /> <span></span></div>
+      <div id="preview-symbol"><img id="symbol" src="" alt="symbol" /></div>
+      <div id="preview-title"></div>
       <div id="preview-body"></div>
       <a id="preview-button" href="#" target="_blank">버튼</a>
     </div>
@@ -137,15 +143,15 @@
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const noticeType = noticeTypeSelect.value;
-      const titleEl = document.querySelector('#preview-title span');
-      const symbol = document.getElementById('symbol');
 
-      titleEl.innerText = title;
+      document.getElementById('preview-title').innerText = title;
       document.getElementById('preview-body').innerHTML = body;
+
       const btn = document.getElementById('preview-button');
       btn.innerText = buttonText;
       btn.href = buttonLink;
 
+      const symbol = document.getElementById('symbol');
       symbol.src = noticeType === 'system'
         ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Green_check.svg/2048px-Green_check.svg.png'
         : 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Blue_information_icon.svg/1024px-Blue_information_icon.svg.png';
