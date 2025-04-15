@@ -14,7 +14,6 @@
     
     .preview-box {
       transition: background-color 0.3s ease;
-      position: relative;
     }
     
     .custom-input {
@@ -45,7 +44,6 @@
       transition: background-color 0.3s ease;
       border: none;
       width: 100%;
-      margin-bottom: 0.5rem;
     }
     
     .custom-button:hover {
@@ -121,41 +119,39 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
-    /* 캔버스 스타일 */
-    #previewCanvas {
-      width: 722px;
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      border: 1px solid #e2e8f0;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .image-map-info {
-      font-size: 12px;
-      color: #666;
-      margin-top: 8px;
-      text-align: center;
-    }
-    
-    .download-section {
+    .color-picker-container {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 10px;
-      margin-top: 10px;
     }
     
-    /* 파일명 입력 필드 */
+    .color-input {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 0;
+      cursor: pointer;
+    }
+    
     .file-name-input {
       width: 100%;
       padding: 0.5rem;
       border: 1px solid #e2e8f0;
       border-radius: 0.375rem;
       margin-bottom: 0.5rem;
+    }
+    
+    .button-section {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    canvas {
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -198,6 +194,10 @@
             class="custom-input"
             placeholder="제목 입력"
           >
+          <div class="color-picker-container">
+            <label class="text-sm">제목 색상:</label>
+            <input type="color" id="titleColor" value="#00855B" class="color-input">
+          </div>
         </div>
         
         <div class="mb-4">
@@ -207,6 +207,10 @@
             class="custom-textarea"
             placeholder="본문 입력"
           >내용을 입력해 주세요.</textarea>
+          <div class="color-picker-container">
+            <label class="text-sm">본문 색상:</label>
+            <input type="color" id="contentColor" value="#333333" class="color-input">
+          </div>
         </div>
         
         <div class="mb-4">
@@ -229,6 +233,10 @@
             class="custom-input"
             placeholder="버튼 링크 입력"
           >
+          <div class="color-picker-container">
+            <label class="text-sm">버튼 색상:</label>
+            <input type="color" id="buttonColor" value="#00855B" class="color-input">
+          </div>
         </div>
         
         <div class="mb-4">
@@ -260,12 +268,11 @@
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
-          <canvas id="previewCanvas"></canvas>
-          <div class="image-map-info mt-2 text-xs text-gray-500 text-center">이미지 미리보기 - 버튼 영역은 자동으로 맵핑됩니다</div>
+          <!-- 미리보기 여기에 표시 -->
         </div>
         
-        <div class="download-section">
-          <button id="downloadButton" class="custom-button">이미지 다운로드</button>
+        <div class="button-section">
+          <button id="downloadButton" class="custom-button mb-2">이미지 다운로드</button>
         </div>
         
         <h3 class="text-lg font-bold mb-2 mt-4">HTML 코드</h3>
@@ -295,16 +302,15 @@
       none: ''
     };
     
-    // 캔버스 요소
-    const canvas = document.getElementById('previewCanvas');
-    const ctx = canvas.getContext('2d');
-    
     // Elements
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
     const bgColorInput = document.getElementById('bgColor');
+    const titleColorInput = document.getElementById('titleColor');
+    const contentColorInput = document.getElementById('contentColor');
+    const buttonColorInput = document.getElementById('buttonColor');
     const fileNameInput = document.getElementById('fileName');
     const previewElement = document.getElementById('preview');
     const codeOutput = document.getElementById('codeOutput');
@@ -312,9 +318,8 @@
     const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
     
-    // 고정 값
-    const canvasWidth = 722;
-    let canvasHeight = 800; // 초기 높이, 내용에 따라 조정됨
+    // 이미지 고정 크기
+    const imageWidth = 722;
     let buttonCoords = [63, 689, 298, 727]; // 기본 좌표값
     
     // 현재 선택된 심볼 가져오기
@@ -329,112 +334,228 @@
     }
     
     // SVG를 이미지로 변환
-    function svgToImage(svgString, color, callback) {
+    function svgToImage(svgString, color) {
       // 색상 적용
       const coloredSvg = svgString.replace(/class="[^"]*"/, `fill="${color}"`);
-      
-      const svgBlob = new Blob([coloredSvg], {type: 'image/svg+xml'});
-      const url = URL.createObjectURL(svgBlob);
-      const img = new Image();
-      
-      img.onload = function() {
-        callback(img);
-        URL.revokeObjectURL(url);
-      };
-      
-      img.src = url;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
     }
     
-    // 캔버스 업데이트 및 렌더링
-    function updateCanvas() {
+    // 미리보기 업데이트
+    function updatePreview() {
       const title = titleInput.value;
       const content = contentInput.value;
       const buttonText = buttonTextInput.value;
+      const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
+      const titleColor = titleColorInput.value;
+      const contentColor = contentColorInput.value;
+      const buttonColor = buttonColorInput.value;
       const symbolType = getSelectedSymbol();
       
-      // 캔버스 크기 설정 - 내용 길이에 따라 동적 조정
-      const contentLines = content.split('\n').length;
-      const estimatedHeight = 450 + (contentLines * 25); // 기본 높이 + 라인당 추가 높이
-      canvasHeight = Math.max(800, estimatedHeight); // 최소 높이 800px
+      // 본문의 줄바꿈을 HTML에서 표현
+      const formattedContent = content.replace(/\n/g, '<br>');
       
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      let symbolHtml = '';
+      if (symbolType !== 'none') {
+        const symbolColor = symbolColors[symbolType];
+        const symbolImage = svgToImage(symbols[symbolType], symbolColor);
+        symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;"><img src="${symbolImage}" alt="${symbolType} 심볼" width="48" height="48"></div>`;
+      }
+      
+      // 미리보기 생성 - Canvas 대신 HTML로 렌더링 (더 정확한 미리보기)
+      previewElement.innerHTML = `
+        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+          <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
+            ${symbolHtml}
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
+            <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+              <p style="font-size: 14px; color: ${contentColor}; margin: 0; white-space: pre-line;">${formattedContent}</p>
+            </div>
+            <div style="margin-top: 24px; margin-bottom: 24px;">
+              <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: ${buttonColor}; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
+                ${buttonText}
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 버튼 좌표 계산 (미리보기에서 버튼 위치 기반)
+      const button = previewElement.querySelector('a');
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        const previewRect = previewElement.getBoundingClientRect();
+        const scale = imageWidth / previewElement.offsetWidth;
+        
+        // 상대적 위치 계산
+        const left = (rect.left - previewRect.left) * scale;
+        const top = (rect.top - previewRect.top) * scale;
+        const right = left + (rect.width * scale);
+        const bottom = top + (rect.height * scale);
+        
+        buttonCoords = [
+          Math.round(left),
+          Math.round(top),
+          Math.round(right),
+          Math.round(bottom)
+        ];
+      }
+      
+      // HTML 코드 업데이트
+      updateHtmlCode();
+      
+      // 미리보기용 캔버스 생성 (다운로드용)
+      createCanvasForDownload();
+    }
+    
+    // 다운로드용 캔버스 생성 (숨겨진 상태)
+    function createCanvasForDownload() {
+      // 기존 캔버스 제거
+      const existingCanvas = document.getElementById('hiddenCanvas');
+      if (existingCanvas) {
+        existingCanvas.remove();
+      }
+      
+      // 미리보기 HTML에서 필요한 정보 추출
+      const title = titleInput.value;
+      const content = contentInput.value;
+      const buttonText = buttonTextInput.value;
+      const buttonLink = buttonLinkInput.value;
+      const bgColor = bgColorInput.value;
+      const titleColor = titleColorInput.value;
+      const contentColor = contentColorInput.value;
+      const buttonColor = buttonColorInput.value;
+      const symbolType = getSelectedSymbol();
+      
+      // 캔버스 생성
+      const canvas = document.createElement('canvas');
+      canvas.id = 'hiddenCanvas';
+      canvas.width = imageWidth;
+      
+      // 컨텐츠 높이 계산
+      const contentLines = content.split('\n').length;
+      const symbolHeight = symbolType !== 'none' ? 70 : 0;
+      const titleHeight = 40;
+      const contentBoxPadding = 40;
+      const contentLineHeight = 20;
+      const contentBoxHeight = contentLines * contentLineHeight + contentBoxPadding;
+      const buttonHeight = 70;
+      const paddingTop = 40;
+      const paddingBottom = 40;
+      
+      // 전체 높이 계산
+      const totalHeight = symbolHeight + titleHeight + contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
+      canvas.height = totalHeight;
+      
+      // 캔버스에 그리기
+      const ctx = canvas.getContext('2d');
       
       // 배경 그리기
       ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // 중앙 정렬을 위한 설정
+      // 폰트 설정
       ctx.textAlign = 'center';
       
-      // 심볼 추가 (있는 경우)
+      let yPos = paddingTop;
+      
+      // 심볼 그리기
       if (symbolType !== 'none') {
-        const symbolColor = symbolColors[symbolType];
-        svgToImage(symbols[symbolType], symbolColor, function(img) {
-          ctx.drawImage(img, canvasWidth / 2 - 24, 40, 48, 48);
-          continueDrawing(symbolType !== 'none');
-        });
+        const symbolImg = new Image();
+        symbolImg.onload = function() {
+          ctx.drawImage(symbolImg, canvas.width/2 - 24, yPos, 48, 48);
+          
+          // 나머지 요소 그리기
+          drawRemainingElements();
+        };
+        symbolImg.src = svgToImage(symbols[symbolType], symbolColors[symbolType]);
+        yPos += symbolHeight;
       } else {
-        continueDrawing(false);
+        drawRemainingElements();
       }
       
-      function continueDrawing(hasSymbol) {
+      function drawRemainingElements() {
         // 제목 그리기
-        const titleY = hasSymbol ? 120 : 80;
-        ctx.font = 'bold 24px Pretendard';
-        ctx.fillStyle = '#00855B';
-        ctx.fillText(title, canvasWidth / 2, titleY);
+        ctx.font = 'bold 18px Pretendard';
+        ctx.fillStyle = titleColor;
+        ctx.fillText(title, canvas.width/2, yPos);
+        yPos += titleHeight;
         
         // 본문 박스 그리기
-        const contentBoxY = titleY + 30;
-        const contentBoxWidth = canvasWidth * 0.9;
-        const contentBoxHeight = contentLines * 24 + 40; // 라인 수에 따른 높이 + 패딩
-        const contentBoxX = (canvasWidth - contentBoxWidth) / 2;
-        
-        ctx.fillStyle = '#FFFFFF';
-        ctx.roundRect(contentBoxX, contentBoxY, contentBoxWidth, contentBoxHeight, 8);
-        ctx.fill();
+        const contentBoxWidth = canvas.width * 0.9;
+        const contentBoxX = (canvas.width - contentBoxWidth) / 2;
+        ctx.fillStyle = 'white';
+        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
         
         // 본문 텍스트 그리기
-        ctx.font = '16px Pretendard';
-        ctx.fillStyle = '#333333';
+        ctx.font = '14px Pretendard';
+        ctx.fillStyle = contentColor;
         ctx.textAlign = 'left';
         
         const contentLines = content.split('\n');
-        let y = contentBoxY + 30;
+        let contentY = yPos + 20; // 패딩
         
         for (let i = 0; i < contentLines.length; i++) {
-          ctx.fillText(contentLines[i], contentBoxX + 20, y);
-          y += 24;
+          ctx.fillText(contentLines[i], contentBoxX + 15, contentY);
+          contentY += contentLineHeight;
         }
         
+        yPos += contentBoxHeight + 20;
+        
         // 버튼 그리기
-        const buttonY = contentBoxY + contentBoxHeight + 40;
-        const buttonWidth = buttonText.length * 12 + 60;
-        const buttonHeight = 50;
-        const buttonX = (canvasWidth - buttonWidth) / 2;
+        const buttonWidth = Math.min(buttonText.length * 12 + 60, contentBoxWidth * 0.8);
+        const buttonX = (canvas.width - buttonWidth) / 2;
         
-        // 버튼 좌표 업데이트
-        buttonCoords = [
-          buttonX, 
-          buttonY, 
-          buttonX + buttonWidth, 
-          buttonY + buttonHeight
-        ];
-        
-        ctx.fillStyle = '#00855B';
-        ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, 24);
-        ctx.fill();
+        ctx.fillStyle = buttonColor;
+        roundRect(ctx, buttonX, yPos, buttonWidth, 50, 24, true);
         
         // 버튼 텍스트
         ctx.font = 'bold 16px Pretendard';
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = 'white';
         ctx.textAlign = 'center';
-        ctx.fillText(buttonText, canvasWidth / 2, buttonY + buttonHeight / 2 + 6);
+        ctx.fillText(buttonText, canvas.width/2, yPos + 30);
+        
+        // 버튼 좌표 업데이트
+        buttonCoords = [buttonX, yPos, buttonX + buttonWidth, yPos + 50];
         
         // HTML 코드 업데이트
         updateHtmlCode();
+      }
+      
+      // 캔버스를 숨김
+      canvas.style.display = 'none';
+      document.body.appendChild(canvas);
+    }
+    
+    // 라운드 사각형 그리기 함수
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'undefined') {
+        radius = 5;
+      }
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+          radius[side] = radius[side] || defaultRadius[side];
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) {
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.stroke();
       }
     }
     
@@ -444,7 +565,7 @@
       const buttonLink = buttonLinkInput.value;
       const buttonText = buttonTextInput.value;
       
-      // 이미지 맵 좌표 (정수로 반올림)
+      // 이미지 맵 좌표
       const coords = buttonCoords.map(Math.round).join(',');
       
       codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 722px; height: auto;" usemap="#map01"/>
@@ -452,28 +573,6 @@
 <area shape="rect" coords="${coords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
 </map>`;
     }
-    
-    // 초기 캔버스 로드
-    window.onload = function() {
-      // roundRect 폴리필 (모든 브라우저 지원)
-      if (!CanvasRenderingContext2D.prototype.roundRect) {
-        CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
-          if (width < 2 * radius) radius = width / 2;
-          if (height < 2 * radius) radius = height / 2;
-          this.beginPath();
-          this.moveTo(x + radius, y);
-          this.arcTo(x + width, y, x + width, y + height, radius);
-          this.arcTo(x + width, y + height, x, y + height, radius);
-          this.arcTo(x, y + height, x, y, radius);
-          this.arcTo(x, y, x + width, y, radius);
-          this.closePath();
-          return this;
-        };
-      }
-      
-      // 초기 렌더링
-      updateCanvas();
-    };
     
     // 복사 기능
     copyButton.addEventListener('click', () => {
@@ -500,6 +599,12 @@
     
     // 이미지 다운로드 기능
     downloadButton.addEventListener('click', () => {
+      const canvas = document.getElementById('hiddenCanvas');
+      if (!canvas) {
+        alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        return;
+      }
+      
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
       const link = document.createElement('a');
       link.download = `${fileName}.png`;
@@ -508,19 +613,26 @@
     });
     
     // 모든 입력 요소에 이벤트 리스너 추가
-    titleInput.addEventListener('input', updateCanvas);
-    contentInput.addEventListener('input', updateCanvas);
-    buttonTextInput.addEventListener('input', updateCanvas);
-    buttonLinkInput.addEventListener('input', updateCanvas);
-    bgColorInput.addEventListener('input', updateCanvas);
-    fileNameInput.addEventListener('input', updateHtmlCode);
+    titleInput.addEventListener('input', updatePreview);
+    contentInput.addEventListener('input', updatePreview);
+    buttonTextInput.addEventListener('input', updatePreview);
+    buttonLinkInput.addEventListener('input', updatePreview);
+    bgColorInput.addEventListener('input', updatePreview);
+    titleColorInput.addEventListener('input', updatePreview);
+    contentColorInput.addEventListener('input', updatePreview);
+    buttonColorInput.addEventListener('input', updatePreview);
+    fileNameInput.addEventListener('input', updatePreview);
     
     // 심볼 라디오 버튼에 이벤트 리스너 추가
     symbolRadios.forEach(radio => {
-      radio.addEventListener('change', updateCanvas);
+      radio.addEventListener('change', updatePreview);
     });
+    
+    // 초기 미리보기 업데이트
+    window.onload = updatePreview;
   </script>
 </body>
 </html>
+
 
 
