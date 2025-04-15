@@ -14,6 +14,7 @@
     
     .preview-box {
       transition: background-color 0.3s ease;
+      position: relative;
     }
     
     .custom-input {
@@ -44,6 +45,7 @@
       transition: background-color 0.3s ease;
       border: none;
       width: 100%;
+      margin-bottom: 0.5rem;
     }
     
     .custom-button:hover {
@@ -118,6 +120,43 @@
       max-width: 90%;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+    
+    /* 캔버스 스타일 */
+    #previewCanvas {
+      width: 722px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .image-map-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      text-align: center;
+    }
+    
+    .download-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    /* 파일명 입력 필드 */
+    .file-name-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -186,7 +225,7 @@
           <input 
             type="text" 
             id="buttonLink" 
-            value="버튼 링크를 입력해 주세요." 
+            value="https://guide-kr.fassto.ai/example" 
             class="custom-input"
             placeholder="버튼 링크 입력"
           >
@@ -202,6 +241,18 @@
             title="배경색 선택"
           >
         </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">이미지 파일명</label>
+          <input 
+            type="text" 
+            id="fileName" 
+            value="notice_20250415_1" 
+            class="file-name-input"
+            placeholder="파일명 입력(확장자 제외)"
+          >
+          <p class="text-xs text-gray-500">예: notice_20250415_1 (.png는 자동으로 추가됩니다)</p>
+        </div>
       </div>
       
       <!-- Preview Section -->
@@ -209,10 +260,15 @@
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
-          <!-- Preview content will be inserted here by JavaScript -->
+          <canvas id="previewCanvas"></canvas>
+          <div class="image-map-info mt-2 text-xs text-gray-500 text-center">이미지 미리보기 - 버튼 영역은 자동으로 맵핑됩니다</div>
         </div>
         
-        <h3 class="text-lg font-bold mb-2">HTML 코드</h3>
+        <div class="download-section">
+          <button id="downloadButton" class="custom-button">이미지 다운로드</button>
+        </div>
+        
+        <h3 class="text-lg font-bold mb-2 mt-4">HTML 코드</h3>
         <textarea id="codeOutput" class="code-box" readonly></textarea>
         
         <button id="copyButton" class="custom-button">코드 복사하기</button>
@@ -230,16 +286,36 @@
       none: ``
     };
     
+    // SVG 색상 맵핑
+    const symbolColors = {
+      info: '#2563EB',
+      warning: '#F59E0B',
+      error: '#DC2626',
+      success: '#10B981',
+      none: ''
+    };
+    
+    // 캔버스 요소
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    
     // Elements
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
     const bgColorInput = document.getElementById('bgColor');
+    const fileNameInput = document.getElementById('fileName');
     const previewElement = document.getElementById('preview');
     const codeOutput = document.getElementById('codeOutput');
     const copyButton = document.getElementById('copyButton');
+    const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
+    
+    // 고정 값
+    const canvasWidth = 722;
+    let canvasHeight = 800; // 초기 높이, 내용에 따라 조정됨
+    let buttonCoords = [63, 689, 298, 727]; // 기본 좌표값
     
     // 현재 선택된 심볼 가져오기
     function getSelectedSymbol() {
@@ -252,51 +328,154 @@
       return selected;
     }
     
-    // Update preview and code
-    function updatePreview() {
+    // SVG를 이미지로 변환
+    function svgToImage(svgString, color, callback) {
+      // 색상 적용
+      const coloredSvg = svgString.replace(/class="[^"]*"/, `fill="${color}"`);
+      
+      const svgBlob = new Blob([coloredSvg], {type: 'image/svg+xml'});
+      const url = URL.createObjectURL(svgBlob);
+      const img = new Image();
+      
+      img.onload = function() {
+        callback(img);
+        URL.revokeObjectURL(url);
+      };
+      
+      img.src = url;
+    }
+    
+    // 캔버스 업데이트 및 렌더링
+    function updateCanvas() {
       const title = titleInput.value;
       const content = contentInput.value;
       const buttonText = buttonTextInput.value;
-      const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
       const symbolType = getSelectedSymbol();
-      const symbolSvg = symbols[symbolType];
       
-      // 본문의 줄바꿈을 HTML에서 표현
-      const formattedContent = content.replace(/\n/g, '<br>');
+      // 캔버스 크기 설정 - 내용 길이에 따라 동적 조정
+      const contentLines = content.split('\n').length;
+      const estimatedHeight = 450 + (contentLines * 25); // 기본 높이 + 라인당 추가 높이
+      canvasHeight = Math.max(800, estimatedHeight); // 최소 높이 800px
       
-      // Update preview
-      previewElement.innerHTML = `
-        <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
-          ${symbolType !== 'none' ? `<div class="symbol-preview">${symbolSvg}</div>` : ''}
-          <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #00855B;">${title}</h2>
-          <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-            <p style="font-size: 14px; color: #333; margin: 0; white-space: pre-line;">${content}</p>
-          </div>
-          <div style="margin-top: 24px;">
-            <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-              ${buttonText}
-            </a>
-          </div>
-        </div>
-      `;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
       
-      // Update code output - using formatted content for HTML output
-      codeOutput.value = `<div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard Variable', sans-serif;">
-  ${symbolType !== 'none' ? `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;">${symbolSvg}</div>` : ''}
-  <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #00855B;">${title}</h2>
-  <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-    <p style="font-size: 14px; color: #333; margin: 0; white-space: pre-line;">${content}</p>
-  </div>
-  <div style="margin-top: 24px;">
-    <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #00855B; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-      ${buttonText}
-    </a>
-  </div>
-</div>`;
+      // 배경 그리기
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      
+      // 중앙 정렬을 위한 설정
+      ctx.textAlign = 'center';
+      
+      // 심볼 추가 (있는 경우)
+      if (symbolType !== 'none') {
+        const symbolColor = symbolColors[symbolType];
+        svgToImage(symbols[symbolType], symbolColor, function(img) {
+          ctx.drawImage(img, canvasWidth / 2 - 24, 40, 48, 48);
+          continueDrawing(symbolType !== 'none');
+        });
+      } else {
+        continueDrawing(false);
+      }
+      
+      function continueDrawing(hasSymbol) {
+        // 제목 그리기
+        const titleY = hasSymbol ? 120 : 80;
+        ctx.font = 'bold 24px Pretendard';
+        ctx.fillStyle = '#00855B';
+        ctx.fillText(title, canvasWidth / 2, titleY);
+        
+        // 본문 박스 그리기
+        const contentBoxY = titleY + 30;
+        const contentBoxWidth = canvasWidth * 0.9;
+        const contentBoxHeight = contentLines * 24 + 40; // 라인 수에 따른 높이 + 패딩
+        const contentBoxX = (canvasWidth - contentBoxWidth) / 2;
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.roundRect(contentBoxX, contentBoxY, contentBoxWidth, contentBoxHeight, 8);
+        ctx.fill();
+        
+        // 본문 텍스트 그리기
+        ctx.font = '16px Pretendard';
+        ctx.fillStyle = '#333333';
+        ctx.textAlign = 'left';
+        
+        const contentLines = content.split('\n');
+        let y = contentBoxY + 30;
+        
+        for (let i = 0; i < contentLines.length; i++) {
+          ctx.fillText(contentLines[i], contentBoxX + 20, y);
+          y += 24;
+        }
+        
+        // 버튼 그리기
+        const buttonY = contentBoxY + contentBoxHeight + 40;
+        const buttonWidth = buttonText.length * 12 + 60;
+        const buttonHeight = 50;
+        const buttonX = (canvasWidth - buttonWidth) / 2;
+        
+        // 버튼 좌표 업데이트
+        buttonCoords = [
+          buttonX, 
+          buttonY, 
+          buttonX + buttonWidth, 
+          buttonY + buttonHeight
+        ];
+        
+        ctx.fillStyle = '#00855B';
+        ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, 24);
+        ctx.fill();
+        
+        // 버튼 텍스트
+        ctx.font = 'bold 16px Pretendard';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.fillText(buttonText, canvasWidth / 2, buttonY + buttonHeight / 2 + 6);
+        
+        // HTML 코드 업데이트
+        updateHtmlCode();
+      }
     }
     
-    // Copy to clipboard function
+    // HTML 코드 업데이트
+    function updateHtmlCode() {
+      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+      const buttonLink = buttonLinkInput.value;
+      const buttonText = buttonTextInput.value;
+      
+      // 이미지 맵 좌표 (정수로 반올림)
+      const coords = buttonCoords.map(Math.round).join(',');
+      
+      codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 722px; height: auto;" usemap="#map01"/>
+<map name="map01" id="map01">
+<area shape="rect" coords="${coords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
+</map>`;
+    }
+    
+    // 초기 캔버스 로드
+    window.onload = function() {
+      // roundRect 폴리필 (모든 브라우저 지원)
+      if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+          if (width < 2 * radius) radius = width / 2;
+          if (height < 2 * radius) radius = height / 2;
+          this.beginPath();
+          this.moveTo(x + radius, y);
+          this.arcTo(x + width, y, x + width, y + height, radius);
+          this.arcTo(x + width, y + height, x, y + height, radius);
+          this.arcTo(x, y + height, x, y, radius);
+          this.arcTo(x, y, x + width, y, radius);
+          this.closePath();
+          return this;
+        };
+      }
+      
+      // 초기 렌더링
+      updateCanvas();
+    };
+    
+    // 복사 기능
     copyButton.addEventListener('click', () => {
       codeOutput.select();
       try {
@@ -305,7 +484,7 @@
       } catch (err) {
         console.error('복사 실패:', err);
         
-        // Try the modern approach if available
+        // 모던 방식 시도
         if (navigator.clipboard) {
           navigator.clipboard.writeText(codeOutput.value)
             .then(() => alert('코드가 클립보드에 복사되었습니다!'))
@@ -319,20 +498,27 @@
       }
     });
     
-    // Add event listeners to all inputs
-    titleInput.addEventListener('input', updatePreview);
-    contentInput.addEventListener('input', updatePreview);
-    buttonTextInput.addEventListener('input', updatePreview);
-    buttonLinkInput.addEventListener('input', updatePreview);
-    bgColorInput.addEventListener('input', updatePreview);
-    
-    // Add event listeners to symbol radio buttons
-    symbolRadios.forEach(radio => {
-      radio.addEventListener('change', updatePreview);
+    // 이미지 다운로드 기능
+    downloadButton.addEventListener('click', () => {
+      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+      const link = document.createElement('a');
+      link.download = `${fileName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     });
     
-    // Initialize preview
-    updatePreview();
+    // 모든 입력 요소에 이벤트 리스너 추가
+    titleInput.addEventListener('input', updateCanvas);
+    contentInput.addEventListener('input', updateCanvas);
+    buttonTextInput.addEventListener('input', updateCanvas);
+    buttonLinkInput.addEventListener('input', updateCanvas);
+    bgColorInput.addEventListener('input', updateCanvas);
+    fileNameInput.addEventListener('input', updateHtmlCode);
+    
+    // 심볼 라디오 버튼에 이벤트 리스너 추가
+    symbolRadios.forEach(radio => {
+      radio.addEventListener('change', updateCanvas);
+    });
   </script>
 </body>
 </html>
