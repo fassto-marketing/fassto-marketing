@@ -5,8 +5,10 @@
   <title>공지 이미지 생성기</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
     body {
-      font-family: sans-serif;
+      font-family: 'Pretendard', sans-serif;
       padding: 2rem;
       background: #f5f5f5;
       display: flex;
@@ -104,7 +106,6 @@
     <input type="text" id="buttonLink" placeholder="https://" />
 
     <div class="btn-area">
-      <button onclick="generatePreview()">미리보기 생성</button>
       <button onclick="downloadImage()">이미지 다운로드</button>
     </div>
   </div>
@@ -119,17 +120,23 @@
   </div>
 
   <script>
+    const titleInput = document.getElementById('title');
+    const bodyInput = document.getElementById('body');
+    const buttonTextInput = document.getElementById('buttonText');
+    const buttonLinkInput = document.getElementById('buttonLink');
+    const noticeTypeSelect = document.getElementById('noticeType');
+
     function parseBodyText(text) {
       return text.replace(/\[(#[A-Fa-f0-9]{6})\](.*?)\[\/\1\]/g, '<span style="color:$1">$2</span>');
     }
 
-    function generatePreview() {
-      const title = document.getElementById('title').value;
-      const bodyRaw = document.getElementById('body').value;
+    function updatePreview() {
+      const title = titleInput.value;
+      const bodyRaw = bodyInput.value;
       const body = parseBodyText(bodyRaw);
-      const buttonText = document.getElementById('buttonText').value;
-      const buttonLink = document.getElementById('buttonLink').value;
-      const noticeType = document.getElementById('noticeType').value;
+      const buttonText = buttonTextInput.value;
+      const buttonLink = buttonLinkInput.value;
+      const noticeType = noticeTypeSelect.value;
       const titleEl = document.querySelector('#preview-title span');
       const symbol = document.getElementById('symbol');
 
@@ -140,23 +147,13 @@
       btn.href = buttonLink;
 
       symbol.src = noticeType === 'system' ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Green_check.svg/2048px-Green_check.svg.png' : '/mnt/data/Vector.png';
-
-      setTimeout(() => {
-        html2canvas(document.querySelector("#preview")).then(canvas => {
-          const base64image = canvas.toDataURL("image/png");
-          const coords = getButtonCoords(btn, canvas);
-          const mapId = "map01";
-
-          const htmlCode = `
-<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/notice_20250415_1.png" style="width: 361px; height: auto;" usemap="#${mapId}"/>
-<map name="${mapId}" id="${mapId}">
-  <area shape="rect" coords="${coords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">
-</map>`;
-
-          document.getElementById("generatedCode").value = htmlCode;
-        });
-      }, 100);
     }
+
+    titleInput.addEventListener('input', updatePreview);
+    bodyInput.addEventListener('input', updatePreview);
+    buttonTextInput.addEventListener('input', updatePreview);
+    buttonLinkInput.addEventListener('input', updatePreview);
+    noticeTypeSelect.addEventListener('change', updatePreview);
 
     function getButtonCoords(button, canvas) {
       const rect = button.getBoundingClientRect();
@@ -171,14 +168,26 @@
       return `${x1},${y1},${x2},${y2}`;
     }
 
+    function getDownloadFilename() {
+      const date = new Date();
+      const y = date.getFullYear();
+      const m = ('0' + (date.getMonth() + 1)).slice(-2);
+      const d = ('0' + date.getDate()).slice(-2);
+      let index = 1;
+      let filename = `notice_${y}${m}${d}_${index}.png`;
+      return filename;
+    }
+
     function downloadImage() {
       html2canvas(document.querySelector("#preview")).then(canvas => {
         const link = document.createElement("a");
-        link.download = "notice.png";
+        link.download = getDownloadFilename();
         link.href = canvas.toDataURL();
         link.click();
       });
     }
+
+    updatePreview();
   </script>
 </body>
 </html>
