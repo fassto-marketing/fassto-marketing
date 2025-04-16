@@ -640,7 +640,39 @@
       createCanvasForDownload();
     }
     
-    // 다운로드용 캔버스 생성 (숨겨진 상태)
+    // 라운드 사각형 그리기 함수
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'undefined') {
+        radius = 5;
+      }
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+          radius[side] = radius[side] || defaultRadius[side];
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) {
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.stroke();
+      }
+    }
+    
+    // 다운로드용 캔버스 생성 함수
     function createCanvasForDownload() {
       // 기존 캔버스 제거
       const existingCanvas = document.getElementById('hiddenCanvas');
@@ -648,10 +680,9 @@
         existingCanvas.remove();
       }
       
-      // 미리보기 HTML에서 필요한 정보 추출
+      // 필요한 정보 추출
       const title = titleInput.value;
       const buttonText = buttonTextInput.value;
-      const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
       const titleColor = titleColorInput.value;
       const contentColor = contentColorInput.value;
@@ -683,43 +714,4 @@
       // 템플릿 타입에 따른 높이 계산
       let symbolHeight = 0;
       let titleHeight = 40;
-      let buttonHeight = showButton ? 70 : 0;
-      let paddingTop = 40;
-      let paddingBottom = 40;
-      let systemHeaderHeight = 0;
-      let dividerHeight = 0;
-      
-      if (templateType === 'normal') {
-        symbolHeight = symbolType !== 'none' ? 70 : 0;
-      } else {
-        // 시스템 공지문의 경우
-        systemHeaderHeight = 30; // "공지사항" 텍스트 영역
-        dividerHeight = 20; // 구분선 영역
-      }
-      
-      // 전체 높이 계산
-      const totalHeight = symbolHeight + systemHeaderHeight + titleHeight + dividerHeight + 
-                          contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
-      canvas.height = totalHeight;
-      
-      // 임시 요소 제거
-      document.body.removeChild(tempDiv);
-      
-      // 캔버스에 그리기
-      const ctx = canvas.getContext('2d');
-      
-      // 배경 그리기
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      let yPos = paddingTop;
-      
-      if (templateType === 'normal') {
-        // 일반 공지문 그리기
-        
-        // 폰트 설정
-        ctx.textAlign = 'center';
-        
-        // 심볼 그리기
-        if (symbolType !== 'none') {
-          const symbolImg
+      let buttonHeight = showButton
