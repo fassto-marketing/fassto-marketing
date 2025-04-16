@@ -234,6 +234,26 @@
       background-color: #f9f9f9;
       border-radius: 8px;
     }
+
+    /* 모바일 화면 대응 스타일 */
+    @media (max-width: 768px) {
+      .custom-button {
+        font-size: 14px;
+        padding: 0.4rem 0.8rem;
+      }
+  
+      .preview-box {
+        overflow-x: auto;
+      }
+  
+      #preview {
+        max-width: 100%;
+      }
+  
+      #preview img {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -313,7 +333,7 @@
 
           <!-- Quill 에디터로 대체 -->
           <div id="editor-container">
-            <div id="editor">내용을 입력해 주세요.</div>
+            <div id="editor"></div>
           </div>
           
           <div class="color-picker-container">
@@ -485,7 +505,6 @@
     // SVG를 이미지로 변환
     function svgToImage(svgString, color) {
       // 색상 적용
-      const coloredSvg = svgString.replace(/class="[^"]*"/, `fill="${color}"`);
       return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
     }
     
@@ -764,39 +783,62 @@
     // 복사 기능
     copyButton.addEventListener('click', () => {
       codeOutput.select();
+  
+    // 최신 방식 먼저 시도
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(codeOutput.value)
+        .then(() => alert('코드가 클립보드에 복사되었습니다!'))
+        .catch(err => {
+          console.error('복사 실패 (최신 방식):', err);
+          // 최신 방식 실패 시 구형 방식 시도
+          tryLegacyCopy();
+        });
+    } else {
+      // navigator.clipboard가 지원되지 않는 경우 구형 방식 시도
+      tryLegacyCopy();
+    }
+  
+    // 구형 방식 복사 함수
+    function tryLegacyCopy() {
       try {
-        document.execCommand('copy');
-        alert('코드가 클립보드에 복사되었습니다!');
-      } catch (err) {
-        console.error('복사 실패:', err);
-        
-        // 모던 방식 시도
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(codeOutput.value)
-            .then(() => alert('코드가 클립보드에 복사되었습니다!'))
-            .catch(err => {
-              console.error('복사 실패:', err);
-              alert('복사 중 오류가 발생했습니다. 코드를 직접 선택해서 복사해 주세요.');
-            });
+        const successful = document.execCommand('copy');
+        if (successful) {
+          alert('코드가 클립보드에 복사되었습니다!');
         } else {
           alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
         }
+      } catch (err) {
+        console.error('복사 실패 (구형 방식):', err);
+        alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
       }
-    });
+    }
+  });
     
     // 이미지 다운로드 기능
     downloadButton.addEventListener('click', () => {
-      const canvas = document.getElementById('hiddenCanvas');
-      if (!canvas) {
-        alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
-        return;
-      }
-      
-      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
-      const link = document.createElement('a');
-      link.download = `${fileName}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      // 버튼 텍스트 변경하여 로딩 중임을 표시
+      downloadButton.textContent = '이미지 생성 중...';
+      downloadButton.disabled = true;
+  
+      setTimeout(() => {
+        const canvas = document.getElementById('hiddenCanvas');
+        if (!canvas) {
+          alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+          downloadButton.textContent = '이미지 다운로드';
+          downloadButton.disabled = false;
+          return;
+        }
+    
+        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+        const link = document.createElement('a');
+        link.download = `${fileName}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    
+        // 다운로드 완료 후 버튼 원래 상태로 복원
+        downloadButton.textContent = '이미지 다운로드';
+        downloadButton.disabled = false;
+      }, 100);
     });
     
     // 모든 입력 요소에 이벤트 리스너 추가
@@ -928,7 +970,7 @@
         // 시스템 공지문 템플릿
         previewHtml = `
           <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
-            <div style="padding: 40px; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
+            <div style="padding: 40px; background-color: #FFFFFF; font-family: 'Pretendard', sans-serif;">
               <div style="text-align: left; font-weight: bold; font-size: 14px; color: #000; margin-bottom: 10px;">공지사항</div>
               <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: ${titleColor};">${title}</h2>
               <div style="height: 2px; background-color: #000; margin-bottom: 16px;"></div>
@@ -1043,8 +1085,13 @@
       const ctx = canvas.getContext('2d');
       
       // 배경 그리기
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (templateType === 'normal') {
+        ctx.fillStyle = bgColor;
+      } else {
+        ctx.fillStyle = '#FFFFFF'; // 시스템 공지문은 항상 흰색 배경
+      }
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       
       let yPos = paddingTop;
       
@@ -1074,7 +1121,7 @@
           ctx.fillText(title, canvas.width/2, yPos);
           yPos += titleHeight;
           
-          // 본문 박스 그리기
+          // 본문 박스스 그리기
           const contentBoxWidth = canvas.width * 0.9;
           const contentBoxX = (canvas.width - contentBoxWidth) / 2;
           ctx.fillStyle = 'white';
@@ -1111,11 +1158,9 @@
         ctx.fillRect(40, yPos - 10, canvas.width - 80, 2);
         yPos += dividerHeight - 10;
         
-        // 본문 박스 그리기
+        // 본문 바로 그리기
         const contentBoxWidth = canvas.width - 80; // 좌우 여백 40px씩
         const contentBoxX = 40;
-        ctx.fillStyle = 'white';
-        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
         
         // 본문 텍스트 그리기
         drawContentText(contentBoxX, contentBoxWidth, yPos);
@@ -1216,7 +1261,9 @@
 <area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
 </map>`;
       } else {
-        codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;"/>`;
+        codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;"usemap="#map01"/>
+<map name="map01" id="map01">
+</map>`;
       }
     }
     
