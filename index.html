@@ -254,6 +254,18 @@
         max-width: 100%;
       }
     }
+
+    /* 좌우 정렬 명확하게 설정 */
+    .input-area {
+      min-width: 300px;
+    }
+
+    .preview-area {
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -262,7 +274,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Input Section -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="input-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">설정</h2>
         
          <!-- 템플릿 타입 선택 추가 -->
@@ -406,7 +418,7 @@
       </div>
       
       <!-- Preview Section -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="preview-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
