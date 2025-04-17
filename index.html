@@ -94,6 +94,23 @@
       margin: 0 auto 16px auto;
     }
 
+    /* 심볼 스타일 */
+    .symbol-info {
+      fill: #2563EB; /* 파란색 정보 아이콘 */
+    }
+    
+    .symbol-warning {
+      fill: #F59E0B; /* 노란색 경고 아이콘 */
+    }
+    
+    .symbol-error {
+      fill: #DC2626; /* 빨간색 에러 아이콘 */
+    }
+    
+    .symbol-success {
+      fill: #10B981; /* 초록색 성공 아이콘 */
+    }
+
     .content-box {
       background-color: white;
       border-radius: 8px;
@@ -176,7 +193,7 @@
       margin-bottom: 1rem;
     }
 
-     /* 템플릿 선택 스타일 추가 */
+    /* 템플릿 선택 스타일 추가 */
     .template-options {
       display: flex;
       gap: 10px;
@@ -218,9 +235,21 @@
       border-radius: 8px;
     }
 
-    /* 반응형 레이아웃을 위한 수정된 CSS */
+    /* 좌우 정렬 명확하게 설정 */
+    .input-area {
+      min-width: 300px;
+    }
+
+    .preview-area {
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    /* 반응형 레이아웃 수정 */
     @media (min-width: 768px) {
-      .layout-container {
+      .content-container {
         display: flex;
         flex-direction: row;
         gap: 24px;
@@ -228,17 +257,17 @@
       
       .input-area {
         flex: 1;
-        width: 48%;
+        max-width: 50%;
       }
       
       .preview-area {
         flex: 1;
-        width: 48%;
+        max-width: 50%;
       }
     }
     
     @media (max-width: 767px) {
-      .layout-container {
+      .content-container {
         display: flex;
         flex-direction: column;
       }
@@ -248,39 +277,18 @@
         margin-bottom: 20px;
       }
     }
-    
-    /* 모바일 화면 대응 스타일 */
-    @media (max-width: 768px) {
-      .custom-button {
-        font-size: 14px;
-        padding: 0.4rem 0.8rem;
-      }
-  
-      .preview-box {
-        overflow-x: auto;
-      }
-  
-      #preview {
-        max-width: 100%;
-      }
-  
-      #preview img {
-        max-width: 100%;
-      }
-    }
   </style>
-</head>
+  </head>
 <body class="bg-gray-50">
   <div class="container mx-auto p-4 max-w-6xl">
     <h1 class="text-2xl font-bold text-center my-6">Fassto 공지 이미지 생성기</h1>
     
-    <!-- 변경된 레이아웃 컨테이너 -->
-    <div class="layout-container">
+    <div class="content-container">
       <!-- Input Section -->
       <div class="input-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">설정</h2>
         
-         <!-- 템플릿 타입 선택 추가 -->
+        <!-- 템플릿 타입 선택 추가 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">템플릿 타입</label>
           <div class="template-options">
@@ -357,7 +365,7 @@
           </div>
         </div>
 
-        <!-- 버튼 표시 옵션 추가 - 기본값 체크 해제로 변경 -->
+        <!-- 버튼 표시 옵션 추가 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">버튼 표시</label>
           <div class="button-display-option">
@@ -370,29 +378,30 @@
 
         <!-- 버튼 관련 옵션들 - 버튼 표시 설정에 따라 표시/숨김 -->
         <div id="button-options-container">
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-1">버튼 텍스트</label>
-          <input 
-            type="text" 
-            id="buttonText" 
-            value="버튼 텍스트 입력" 
-            class="custom-input"
-            placeholder="버튼 텍스트 입력"
-          >
-        </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">버튼 텍스트</label>
+            <input 
+              type="text" 
+              id="buttonText" 
+              value="버튼 텍스트 입력" 
+              class="custom-input"
+              placeholder="버튼 텍스트 입력"
+            >
+          </div>
         
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-1">버튼 링크</label>
-          <input 
-            type="text" 
-            id="buttonLink" 
-            value="버튼 링크 입력" 
-            class="custom-input"
-            placeholder="버튼 링크 입력"
-          >
-          <div class="color-picker-container">
-            <label class="text-sm">버튼 색상:</label>
-            <input type="color" id="buttonColor" value="#00855B" class="color-input">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">버튼 링크</label>
+            <input 
+              type="text" 
+              id="buttonLink" 
+              value="버튼 링크 입력" 
+              class="custom-input"
+              placeholder="버튼 링크 입력"
+            >
+            <div class="color-picker-container">
+              <label class="text-sm">버튼 색상:</label>
+              <input type="color" id="buttonColor" value="#00855B" class="color-input">
+            </div>
           </div>
         </div>
         
@@ -443,7 +452,7 @@
   <!-- Quill 에디터 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
   <script>
-    // 심볼 SVG 정의 - 클래스 속성 제거됨
+    // 심볼 SVG 정의
     const symbols = {
       info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
       warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
@@ -473,8 +482,8 @@
       },
       placeholder: '내용을 입력해 주세요.'
     });
-    
-    // Elements
+
+     // Elements
     const titleInput = document.getElementById('title');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
@@ -489,15 +498,26 @@
     const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
     const alignmentRadios = document.querySelectorAll('input[name="content-alignment"]');
+    const templateRadios = document.querySelectorAll('input[name="template-type"]');
+    const symbolSelectionContainer = document.getElementById('symbol-selection-container');
     const showButtonCheckbox = document.getElementById('showButton');
     const buttonOptionsContainer = document.getElementById('button-options-container');
-    const symbolSelectionContainer = document.getElementById('symbol-selection-container');
-    const templateRadios = document.querySelectorAll('input[name="template-type"]');
     
     // 이미지 크기 설정
     const imageWidth = 722; // 원본 이미지 너비
     const htmlImageWidth = 361; // HTML 코드에 사용될 이미지 너비
     let buttonCoords = [63, 689, 298, 727]; // 기본 좌표값
+    
+    // SVG를 이미지로 변환 - 수정된 함수
+    function svgToImage(svgString, color) {
+      // SVG 문자열에 색상 적용
+      let coloredSvg = svgString;
+      if (color) {
+        // fill 속성 추가
+        coloredSvg = svgString.replace('<svg', `<svg fill="${color}"`);
+      }
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
+    }
     
     // 현재 선택된 심볼 가져오기
     function getSelectedSymbol() {
@@ -532,17 +552,6 @@
       return selected;
     }
     
-    // SVG를 이미지로 변환 - 색상 적용 기능 추가
-    function svgToImage(svgString, color) {
-      // 색상을 직접 적용한 새 SVG 문자열 생성
-      let coloredSvg = svgString;
-      if (color) {
-        // fill 속성 추가
-        coloredSvg = svgString.replace('<svg', `<svg fill="${color}"`);
-      }
-      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
-    }
-    
     // 템플릿 타입 변경 시 UI 업데이트
     function updateTemplateUI() {
       const templateType = getSelectedTemplate();
@@ -552,10 +561,16 @@
         symbolSelectionContainer.style.display = 'block';
         // 일반 공지문일 때 기본 색상 설정
         titleColorInput.value = '#00855B';
+        // 일반 공지문은 버튼 표시 기본값 체크
+        showButtonCheckbox.checked = true;
+        buttonOptionsContainer.style.display = 'block';
       } else {
         symbolSelectionContainer.style.display = 'none';
         // 시스템 공지문일 때 기본 색상 설정
         titleColorInput.value = '#191F28';
+        // 시스템 공지문은 버튼 표시 기본값 해제
+        showButtonCheckbox.checked = false;
+        buttonOptionsContainer.style.display = 'none';
         // 시스템 공지문에서는 심볼 선택 초기화
         document.querySelector('input[name="symbol"][value="none"]').checked = true;
       }
@@ -604,7 +619,7 @@
       let buttonHtml = '';
       if (showButton) {
         buttonHtml = `
-          <div style="margin-top: 24px; margin-bottom: 24px;">
+          <div style="margin-top: 24px; margin-bottom: 24px; text-align: center;">
             <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: ${buttonColor}; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
               ${buttonText}
             </a>
@@ -941,7 +956,7 @@
       }
     }
     
-    // HTML 코드 업데이트
+    // HTML 코드 업데이트 (이미지 크기 수정 적용)
     function updateHtmlCode() {
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
       const buttonLink = buttonLinkInput.value;
@@ -981,7 +996,7 @@
         // navigator.clipboard가 지원되지 않는 경우 구형 방식 시도
         tryLegacyCopy();
       }
-    
+  
       // 구형 방식 복사 함수
       function tryLegacyCopy() {
         try {
@@ -1025,6 +1040,14 @@
       }, 100);
     });
     
+    // 템플릿 타입 변경 이벤트 리스너
+    templateRadios.forEach(radio => {
+      radio.addEventListener('change', updateTemplateUI);
+    });
+    
+    // 버튼 표시 옵션 변경 이벤트 리스너
+    showButtonCheckbox.addEventListener('change', updateButtonUI);
+    
     // 모든 입력 요소에 이벤트 리스너 추가
     titleInput.addEventListener('input', updatePreview);
     buttonTextInput.addEventListener('input', updatePreview);
@@ -1048,37 +1071,14 @@
       radio.addEventListener('change', updatePreview);
     });
     
-    // 템플릿 타입 변경 이벤트 리스너
-    templateRadios.forEach(radio => {
-      radio.addEventListener('change', updateTemplateUI);
-    });
-    
-    // 버튼 표시 옵션 변경 이벤트 리스너
-    showButtonCheckbox.addEventListener('change', updateButtonUI);
-    
-    // 페이지 로드 시 초기 설정
+    // 페이지 로드 완료 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
-      // 버튼 표시 기본값 해제
-      document.getElementById('showButton').checked = false;
-      
-      // 버튼 옵션 숨기기
-      document.getElementById('button-options-container').style.display = 'none';
-      
-      // 템플릿 타입에 따른 초기 설정
+      // 초기 템플릿 UI 업데이트
       updateTemplateUI();
       
       // 초기 미리보기 업데이트
       updatePreview();
     });
-    
-    // 초기 미리보기 업데이트
-    window.onload = function() {
-      // 초기 설정
-      showButtonCheckbox.checked = false;
-      buttonOptionsContainer.style.display = 'none';
-      updateTemplateUI();
-      updatePreview();
-    };
   </script>
 </body>
 </html>
