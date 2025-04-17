@@ -278,7 +278,8 @@
       }
     }
   </style>
-  </head>
+
+   </head>
 <body class="bg-gray-50">
   <div class="container mx-auto p-4 max-w-6xl">
     <h1 class="text-2xl font-bold text-center my-6">Fassto 공지 이미지 생성기</h1>
@@ -365,6 +366,25 @@
           </div>
         </div>
 
+        <!-- 행간 조절 옵션 추가 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">행간 간격 (px)</label>
+          <input 
+            type="range" 
+            id="lineHeightSlider" 
+            min="14" 
+            max="28" 
+            step="1" 
+            value="16" 
+            class="w-full"
+          >
+          <div class="flex justify-between">
+            <span class="text-xs">좁게 (14px)</span>
+            <span id="lineHeightValue" class="text-xs font-bold">16px</span>
+            <span class="text-xs">넓게 (28px)</span>
+          </div>
+        </div>
+
         <!-- 버튼 표시 옵션 추가 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">버튼 표시</label>
@@ -428,8 +448,8 @@
           <p class="text-xs text-gray-500">예: notice_20250415_1 (.png는 자동으로 추가됩니다)</p>
         </div>
       </div>
-      
-      <!-- Preview Section -->
+
+       <!-- Preview Section -->
       <div class="preview-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
@@ -516,6 +536,8 @@
     const symbolSelectionContainer = document.getElementById('symbol-selection-container');
     const showButtonCheckbox = document.getElementById('showButton');
     const buttonOptionsContainer = document.getElementById('button-options-container');
+    const lineHeightSlider = document.getElementById('lineHeightSlider');
+    const lineHeightValue = document.getElementById('lineHeightValue');
     
     // 이미지 크기 설정
     const imageWidth = 722; // 원본 이미지 너비
@@ -565,6 +587,11 @@
       });
       return selected;
     }
+
+    // 현재 행간 간격 값 가져오기
+    function getLineHeight() {
+      return parseInt(lineHeightSlider.value);
+    }
     
     // 템플릿 타입 변경 시 UI 업데이트
     function updateTemplateUI() {
@@ -588,7 +615,7 @@
         // 시스템 공지문에서는 심볼 선택 초기화
         document.querySelector('input[name="symbol"][value="none"]').checked = true;
       }
-      
+
       // 미리보기 업데이트
       updatePreview();
     }
@@ -599,6 +626,15 @@
       
       // 버튼 옵션 표시/숨김
       buttonOptionsContainer.style.display = showButton ? 'block' : 'none';
+      
+      // 미리보기 업데이트
+      updatePreview();
+    }
+
+    // 행간 슬라이더 변경 시 UI 업데이트
+    function updateLineHeightUI() {
+      const lineHeight = getLineHeight();
+      lineHeightValue.textContent = `${lineHeight}px`;
       
       // 미리보기 업데이트
       updatePreview();
@@ -617,6 +653,7 @@
       const contentAlignment = getSelectedAlignment();
       const templateType = getSelectedTemplate();
       const showButton = showButtonCheckbox.checked;
+      const lineHeight = getLineHeight();
       
       // Quill 에디터의 내용 가져오기 (HTML 형식)
       const contentHtml = quill.root.innerHTML;
@@ -654,8 +691,8 @@
             <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
               ${symbolHtml}
               <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
-              <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0;">${contentHtml}</div>
+              <div style="background-color: white; border-radius: 8px; padding: 16px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
               </div>
               ${buttonHtml}
             </div>
@@ -669,8 +706,8 @@
               <div style="text-align: left; font-weight: bold; font-size: 14px; color: #000; margin-bottom: 10px;">공지사항</div>
               <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: ${titleColor};">${title}</h2>
               <div style="height: 2px; background-color: #000; margin-bottom: 16px;"></div>
-              <div style="background-color: white; border-radius: 8px; padding: 10px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0;">${contentHtml}</div>
+              <div style="background-color: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
               </div>
               ${buttonHtml}
             </div>
@@ -718,7 +755,7 @@
       if (existingCanvas) {
         existingCanvas.remove();
       }
-      
+
       // 필요한 정보 추출
       const title = titleInput.value;
       const buttonText = buttonTextInput.value;
@@ -731,35 +768,47 @@
       const contentAlignment = getSelectedAlignment();
       const templateType = getSelectedTemplate();
       const showButton = showButtonCheckbox.checked;
-      
+      const lineHeight = getLineHeight();
+
       // Quill 에디터의 내용 HTML
       const contentHtml = quill.root.innerHTML;
-      
-      // 임시 요소 생성하여 실제 텍스트 내용 계산
+
+      // HTML 처리하여 텍스트 및 줄바꿈 정보 추출
+      const processedHtml = processHtml(contentHtml);
+
+      // 임시 요소 생성하여 실제 텍스트 내용 계산 - 더 정확한 방식으로 구현
       const tempDiv = document.createElement('div');
+      tempDiv.style.width = (imageWidth * 0.8) + 'px'; // 본문 영역의 실제 너비 고려
+      tempDiv.style.font = '14px Pretendard';
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.visibility = 'hidden';
+      tempDiv.style.padding = '15px'; // 패딩 추가
+      tempDiv.style.lineHeight = lineHeight + 'px'; // 설정된 줄간격 적용
+      tempDiv.style.wordBreak = 'break-word';
       tempDiv.innerHTML = contentHtml;
       document.body.appendChild(tempDiv);
-      
+
+      // 실제 높이 측정 (줄바꿈 및 줄간격 고려)
+      const actualContentHeight = tempDiv.offsetHeight;
+
       // 캔버스 생성
       const canvas = document.createElement('canvas');
       canvas.id = 'hiddenCanvas';
       canvas.width = imageWidth;
-      
+
       // 컨텐츠 높이 계산
-      const contentLines = tempDiv.offsetHeight / 20; // 대략적인 라인 수 계산
-      const contentLineHeight = 20;
-      const contentBoxPadding = 40;
-      
+      const contentBoxPadding = 32; // 패딩값 축소 (위아래 16px씩)
+
       // 템플릿 타입에 따른 높이 계산
       let symbolHeight = 0;
       let titleHeight = 40;
-      let contentBoxHeight = contentLines * contentLineHeight + contentBoxPadding;
+      let contentBoxHeight = actualContentHeight + contentBoxPadding;
       let buttonHeight = showButton ? 70 : 0;
       let paddingTop = 40;
-      let paddingBottom = 40;
+      let paddingBottom = 40; // 아래쪽 패딩 축소
       let systemHeaderHeight = 0;
       let dividerHeight = 0;
-      
+
       if (templateType === 'normal') {
         symbolHeight = symbolType !== 'none' ? 70 : 0;
       } else {
@@ -767,18 +816,18 @@
         systemHeaderHeight = 30; // "공지사항" 텍스트 영역
         dividerHeight = 20; // 구분선 영역
       }
-      
-      // 전체 높이 계산
+
+      // 전체 높이 계산 - 여유 공간 최적화
       const totalHeight = symbolHeight + systemHeaderHeight + titleHeight + dividerHeight + 
                         contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
       canvas.height = totalHeight;
-      
+
       // 임시 요소 제거
       document.body.removeChild(tempDiv);
-      
+
       // 캔버스에 그리기
       const ctx = canvas.getContext('2d');
-      
+
       // 배경 그리기
       if (templateType === 'normal') {
         ctx.fillStyle = bgColor;
@@ -786,15 +835,15 @@
         ctx.fillStyle = '#FFFFFF'; // 시스템 공지문은 항상 흰색 배경
       }
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
+
       let yPos = paddingTop;
-      
+
       if (templateType === 'normal') {
         // 일반 공지문 그리기
-        
+
         // 폰트 설정
         ctx.textAlign = 'center';
-        
+
         // 심볼 그리기
         if (symbolType !== 'none') {
           const symbolImg = new Image();
@@ -807,25 +856,25 @@
         } else {
           drawNormalContent();
         }
-        
+
         function drawNormalContent() {
           // 제목 그리기
           ctx.font = 'bold 18px Pretendard';
           ctx.fillStyle = titleColor;
           ctx.fillText(title, canvas.width/2, yPos);
           yPos += titleHeight;
-          
+
           // 본문 박스 그리기
           const contentBoxWidth = canvas.width * 0.9;
           const contentBoxX = (canvas.width - contentBoxWidth) / 2;
           ctx.fillStyle = 'white';
           roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
-          
-          // 본문 텍스트 그리기
-          drawContentText(contentBoxX, contentBoxWidth, yPos);
-          
+
+          // 본문 텍스트 그리기 - 개선된 함수 사용
+          drawContentText(contentBoxX, contentBoxWidth, yPos, lineHeight, processedHtml);
+
           yPos += contentBoxHeight + 20;
-          
+
           // 버튼 그리기 (버튼 표시 설정 시)
           if (showButton) {
             drawButton();
@@ -833,46 +882,90 @@
         }
       } else {
         // 시스템 공지문 그리기
-        
+
         // "공지사항" 텍스트 그리기
         ctx.textAlign = 'left';
         ctx.font = 'bold 14px Pretendard';
         ctx.fillStyle = '#000';
         ctx.fillText('공지사항', 40, yPos + 15);
         yPos += systemHeaderHeight;
-        
+
         // 제목 그리기
         ctx.font = 'bold 18px Pretendard';
         ctx.fillStyle = titleColor;
         ctx.fillText(title, 40, yPos);
         yPos += titleHeight;
-        
+
         // 구분선 그리기
         ctx.fillStyle = '#000';
         ctx.fillRect(40, yPos - 10, canvas.width - 80, 2);
         yPos += dividerHeight - 10;
-        
+
         // 본문 바로 그리기
         const contentBoxWidth = canvas.width - 80; // 좌우 여백 40px씩
         const contentBoxX = 40;
-        
-        // 본문 텍스트 그리기
-        drawContentText(contentBoxX, contentBoxWidth, yPos);
-        
+
+        // 본문 텍스트 그리기 - 개선된 함수 사용
+        drawContentText(contentBoxX, contentBoxWidth, yPos, lineHeight, processedHtml);
+
         yPos += contentBoxHeight + 20;
-        
+
         // 버튼 그리기 (버튼 표시 설정 시)
         if (showButton) {
           drawButton();
         }
       }
-      
-      // 본문 텍스트 그리기 함수
-      function drawContentText(boxX, boxWidth, boxY) {
+
+       // HTML 처리 함수 - 줄바꿈 정보 보존
+      function processHtml(html) {
+        // 임시 div 생성
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // 줄바꿈이 필요한 태그를 \n으로 변환
+        replaceTagsWithNewlines(tempDiv);
+        
+        // 텍스트 추출 (줄바꿈 유지)
+        return tempDiv.innerText || tempDiv.textContent || '';
+      }
+
+      // HTML 태그를 줄바꿈으로 변환하는 함수
+      function replaceTagsWithNewlines(element) {
+        // 자식 노드들을 순회
+        for (let i = 0; i < element.childNodes.length; i++) {
+          const node = element.childNodes[i];
+          
+          // 텍스트 노드가 아닌 경우
+          if (node.nodeType !== Node.TEXT_NODE) {
+            // <br>, <p>, <div> 등의 태그 처리
+            if (node.nodeName === 'BR') {
+              const newline = document.createTextNode('\n');
+              element.replaceChild(newline, node);
+              i--; // 인덱스 조정
+            } else if (['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI'].includes(node.nodeName)) {
+              // 블록 요소 뒤에 줄바꿈 추가
+              replaceTagsWithNewlines(node); // 재귀적으로 자식 요소 처리
+              
+              // 요소 뒤에 줄바꿈 추가 (마지막 요소가 아닌 경우에만)
+              if (i < element.childNodes.length - 1) {
+                const newline = document.createTextNode('\n');
+                element.insertBefore(newline, node.nextSibling);
+                i++; // 추가된 노드 고려하여 인덱스 조정
+              }
+            } else {
+              // 다른 태그들에 대해서도 재귀적으로 처리
+              replaceTagsWithNewlines(node);
+            }
+          }
+        }
+      }
+
+      // 개선된 본문 텍스트 그리기 함수
+      function drawContentText(boxX, boxWidth, boxY, lineHeight, processedText) {
         // 본문 텍스트 스타일
         ctx.font = '14px Pretendard';
         ctx.fillStyle = contentColor;
-        
+
         // 정렬 방식 설정
         switch(contentAlignment) {
           case 'left':
@@ -885,33 +978,72 @@
             ctx.textAlign = 'right';
             break;
         }
+
+        const textPadding = 15;
+        const maxLineWidth = boxWidth - textPadding * 2;
         
-        // HTML을 텍스트로 변환
-        const tempDiv2 = document.createElement('div');
-        tempDiv2.innerHTML = contentHtml;
-        const plainText = tempDiv2.textContent || tempDiv2.innerText || '';
+        // 텍스트 줄바꿈 처리
+        let contentLines = [];
+        processedText.split('\n').forEach(paragraph => {
+          if (paragraph.trim() === '') {
+            contentLines.push(''); // 빈 줄 유지
+            return;
+          }
+          
+          // 각 단락 내에서 줄바꿈 처리
+          const wrappedLines = wrapText(ctx, paragraph, maxLineWidth);
+          contentLines = contentLines.concat(wrappedLines);
+        });
+
+        // 텍스트 그리기
+        let contentY = boxY + 20; // 시작 위치 패딩
         
-        const contentLines = plainText.split('\n');
-        let contentY = boxY + 20; // 패딩
-        
-        let textX = boxX + 15;
+        let textX = boxX + textPadding;
         if (contentAlignment === 'center') {
           textX = boxX + (boxWidth / 2);
         } else if (contentAlignment === 'right') {
-          textX = boxX + boxWidth - 15;
+          textX = boxX + boxWidth - textPadding;
         }
         
         for (let i = 0; i < contentLines.length; i++) {
           ctx.fillText(contentLines[i], textX, contentY);
-          contentY += contentLineHeight;
+          contentY += lineHeight; // 사용자가 설정한 줄간격 적용
         }
       }
-      
+
+      // 텍스트 줄바꿈 함수
+      function wrapText(ctx, text, maxWidth) {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = words[0] || '';
+        
+        for (let i = 1; i < words.length; i++) {
+          const word = words[i];
+          const testLine = currentLine + ' ' + word;
+          const metrics = ctx.measureText(testLine);
+          const testWidth = metrics.width;
+          
+          if (testWidth > maxWidth) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        
+        // 마지막 줄 추가
+        if (currentLine.length > 0) {
+          lines.push(currentLine);
+        }
+        
+        return lines;
+      }
+
       // 버튼 그리기 함수
       function drawButton() {
         const buttonWidth = Math.min(buttonText.length * 12 + 60, canvas.width * 0.7);
         let buttonX;
-        
+
         if (templateType === 'normal') {
           // 일반 공지문의 버튼은 중앙 정렬
           buttonX = (canvas.width - buttonWidth) / 2;
@@ -919,20 +1051,20 @@
           // 시스템 공지문의 버튼은 본문과 동일한 너비로 정렬
           buttonX = 40;
         }
-        
+
         ctx.fillStyle = buttonColor;
         roundRect(ctx, buttonX, yPos, buttonWidth, 50, 24, true);
-        
+
         // 버튼 텍스트
         ctx.font = 'bold 16px Pretendard';
         ctx.fillStyle = 'white';
         ctx.textAlign = 'center';
         ctx.fillText(buttonText, buttonX + buttonWidth/2, yPos + 30);
-        
+
         // 버튼 좌표 업데이트
         buttonCoords = [buttonX, yPos, buttonX + buttonWidth, yPos + 50];
       }
-      
+
       // 캔버스를 숨김
       canvas.style.display = 'none';
       document.body.appendChild(canvas);
@@ -969,7 +1101,7 @@
         ctx.stroke();
       }
     }
-    
+
     // HTML 코드 업데이트 (이미지 크기 수정 적용)
     function updateHtmlCode() {
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
@@ -1063,6 +1195,9 @@
     
     // 버튼 표시 옵션 변경 이벤트 리스너
     showButtonCheckbox.addEventListener('change', updateButtonUI);
+
+    // 행간 슬라이더 변경 이벤트 리스너
+    lineHeightSlider.addEventListener('input', updateLineHeightUI);
     
     // 모든 입력 요소에 이벤트 리스너 추가
     titleInput.addEventListener('input', updatePreview);
@@ -1094,6 +1229,9 @@
       
       // 파일명에 현재 날짜 설정
       fileNameInput.value = getCurrentDateFilename();
+      
+      // 초기 행간 값 표시
+      updateLineHeightUI();
       
       // 초기 미리보기 업데이트
       updatePreview();
