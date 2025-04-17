@@ -421,7 +421,7 @@
           <input 
             type="text" 
             id="fileName" 
-            value="notice_20250415_1" 
+            value="n" 
             class="file-name-input"
             placeholder="파일명 입력(확장자 제외)"
           >
@@ -452,6 +452,20 @@
   <!-- Quill 에디터 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
   <script>
+    // 한국 시간 기준으로 현재 날짜를 "notice_YYYYMMDD_1" 형식으로 반환하는 함수
+    function getCurrentDateFilename() {
+      // 현재 시간을 한국 시간(KST)으로 가져오기
+      const now = new Date();
+      const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9 (한국 시간)
+  
+      // 날짜 형식 추출 (YYYYMMDD)
+      const year = koreaTime.getUTCFullYear();
+      const month = (koreaTime.getUTCMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1
+      const day = koreaTime.getUTCDate().toString().padStart(2, '0');
+  
+      // "notice_YYYYMMDD_1" 형식으로 반환
+      return `notice_${year}${month}${day}_1`;
+    }
     // 심볼 SVG 정의
     const symbols = {
       info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
@@ -1075,6 +1089,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       // 초기 템플릿 UI 업데이트
       updateTemplateUI();
+      
+      // 파일명에 현재 날짜 설정
+      fileNameInput.value = getCurrentDateFilename();
       
       // 초기 미리보기 업데이트
       updatePreview();
