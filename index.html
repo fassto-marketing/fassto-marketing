@@ -272,9 +272,9 @@
   <div class="container mx-auto p-4 max-w-6xl">
     <h1 class="text-2xl font-bold text-center my-6">Fassto 공지 이미지 생성기</h1>
     
-    <div class="flex flex-col md:flex-row gap-6 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Input Section -->
-      <div class="input-area w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+      <div class="input-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">설정</h2>
         
          <!-- 템플릿 타입 선택 추가 -->
@@ -421,7 +421,7 @@
       <div class="preview-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
-        <div class="preview-area w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+        <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
           <!-- 미리보기 여기에 표시 -->
         </div>
         
