@@ -94,23 +94,6 @@
       margin: 0 auto 16px auto;
     }
 
-    /* 심볼 스타일 */
-    .symbol-info {
-      fill: #2563EB; /* 파란색 정보 아이콘 */
-    }
-    
-    .symbol-warning {
-      fill: #F59E0B; /* 노란색 경고 아이콘 */
-    }
-    
-    .symbol-error {
-      fill: #DC2626; /* 빨간색 에러 아이콘 */
-    }
-    
-    .symbol-success {
-      fill: #10B981; /* 초록색 성공 아이콘 */
-    }
-
     .content-box {
       background-color: white;
       border-radius: 8px;
@@ -235,6 +218,37 @@
       border-radius: 8px;
     }
 
+    /* 반응형 레이아웃을 위한 수정된 CSS */
+    @media (min-width: 768px) {
+      .layout-container {
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+      }
+      
+      .input-area {
+        flex: 1;
+        width: 48%;
+      }
+      
+      .preview-area {
+        flex: 1;
+        width: 48%;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .layout-container {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .input-area, .preview-area {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+    
     /* 모바일 화면 대응 스타일 */
     @media (max-width: 768px) {
       .custom-button {
@@ -254,25 +268,14 @@
         max-width: 100%;
       }
     }
-
-    /* 좌우 정렬 명확하게 설정 */
-    .input-area {
-      min-width: 300px;
-    }
-
-    .preview-area {
-      min-width: 300px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
   </style>
 </head>
 <body class="bg-gray-50">
   <div class="container mx-auto p-4 max-w-6xl">
     <h1 class="text-2xl font-bold text-center my-6">Fassto 공지 이미지 생성기</h1>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- 변경된 레이아웃 컨테이너 -->
+    <div class="layout-container">
       <!-- Input Section -->
       <div class="input-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">설정</h2>
@@ -354,12 +357,12 @@
           </div>
         </div>
 
-        <!-- 버튼 표시 옵션 추가 -->
+        <!-- 버튼 표시 옵션 추가 - 기본값 체크 해제로 변경 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">버튼 표시</label>
           <div class="button-display-option">
             <label class="inline-flex items-center mr-4">
-              <input type="checkbox" id="showButton" checked class="mr-2">
+              <input type="checkbox" id="showButton" class="mr-2">
               버튼 표시하기
             </label>
           </div>
@@ -440,12 +443,12 @@
   <!-- Quill 에디터 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
   <script>
-    // 심볼 SVG 정의
+    // 심볼 SVG 정의 - 클래스 속성 제거됨
     const symbols = {
-      info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-info"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
-      warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-warning"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
-      error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-error"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
-      success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="symbol-success"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+      info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+      warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
+      error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+      success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
       none: ``
     };
     
@@ -486,6 +489,10 @@
     const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
     const alignmentRadios = document.querySelectorAll('input[name="content-alignment"]');
+    const showButtonCheckbox = document.getElementById('showButton');
+    const buttonOptionsContainer = document.getElementById('button-options-container');
+    const symbolSelectionContainer = document.getElementById('symbol-selection-container');
+    const templateRadios = document.querySelectorAll('input[name="template-type"]');
     
     // 이미지 크기 설정
     const imageWidth = 722; // 원본 이미지 너비
@@ -514,373 +521,27 @@
       return selected;
     }
     
-    // SVG를 이미지로 변환
+    // 현재 선택된 템플릿 타입 가져오기
+    function getSelectedTemplate() {
+      let selected = 'normal';
+      templateRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
+    
+    // SVG를 이미지로 변환 - 색상 적용 기능 추가
     function svgToImage(svgString, color) {
-      // 색상 적용
-      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+      // 색상을 직접 적용한 새 SVG 문자열 생성
+      let coloredSvg = svgString;
+      if (color) {
+        // fill 속성 추가
+        coloredSvg = svgString.replace('<svg', `<svg fill="${color}"`);
+      }
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
     }
-    
-    // 미리보기 업데이트
-    function updatePreview() {
-      const title = titleInput.value;
-      const buttonText = buttonTextInput.value;
-      const buttonLink = buttonLinkInput.value;
-      const bgColor = bgColorInput.value;
-      const titleColor = titleColorInput.value;
-      const contentColor = contentColorInput.value;
-      const buttonColor = buttonColorInput.value;
-      const symbolType = getSelectedSymbol();
-      const contentAlignment = getSelectedAlignment();
-      
-      // Quill 에디터의 내용 가져오기 (HTML 형식)
-      const contentHtml = quill.root.innerHTML;
-      
-      let symbolHtml = '';
-      if (symbolType !== 'none') {
-        const symbolColor = symbolColors[symbolType];
-        const symbolImage = svgToImage(symbols[symbolType], symbolColor);
-        symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;"><img src="${symbolImage}" alt="${symbolType} 심볼" width="48" height="48"></div>`;
-      }
-      
-      // 정렬 스타일 설정
-      const alignStyle = `text-align: ${contentAlignment};`;
-      
-      // 미리보기 생성
-      previewElement.innerHTML = `
-        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
-          <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
-            ${symbolHtml}
-            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
-            <div style="background-color: white; border-radius: 8px; padding: 10px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0;">${contentHtml}</div>
-            </div>
-            <div style="margin-top: 24px; margin-bottom: 24px;">
-              <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: ${buttonColor}; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
-                ${buttonText}
-              </a>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // 버튼 좌표 계산 (미리보기에서 버튼 위치 기반)
-      const button = previewElement.querySelector('a');
-      if (button) {
-        const rect = button.getBoundingClientRect();
-        const previewRect = previewElement.getBoundingClientRect();
-        const scale = imageWidth / previewElement.offsetWidth;
-        
-        // 상대적 위치 계산
-        const left = (rect.left - previewRect.left) * scale;
-        const top = (rect.top - previewRect.top) * scale;
-        const right = left + (rect.width * scale);
-        const bottom = top + (rect.height * scale);
-        
-        buttonCoords = [
-          Math.round(left),
-          Math.round(top),
-          Math.round(right),
-          Math.round(bottom)
-        ];
-      }
-      
-      // HTML 코드 업데이트
-      updateHtmlCode();
-      
-      // 미리보기용 캔버스 생성 (다운로드용)
-      createCanvasForDownload();
-    }
-    
-    // 다운로드용 캔버스 생성 (숨겨진 상태)
-    function createCanvasForDownload() {
-      // 기존 캔버스 제거
-      const existingCanvas = document.getElementById('hiddenCanvas');
-      if (existingCanvas) {
-        existingCanvas.remove();
-      }
-      
-      // 미리보기 HTML에서 필요한 정보 추출
-      const title = titleInput.value;
-      const buttonText = buttonTextInput.value;
-      const buttonLink = buttonLinkInput.value;
-      const bgColor = bgColorInput.value;
-      const titleColor = titleColorInput.value;
-      const contentColor = contentColorInput.value;
-      const buttonColor = buttonColorInput.value;
-      const symbolType = getSelectedSymbol();
-      const contentAlignment = getSelectedAlignment();
-      
-      // Quill 에디터의 내용 HTML
-      const contentHtml = quill.root.innerHTML;
-      
-      // 임시 요소 생성하여 실제 텍스트 내용 계산
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = contentHtml;
-      document.body.appendChild(tempDiv);
-      
-      // 캔버스 생성
-      const canvas = document.createElement('canvas');
-      canvas.id = 'hiddenCanvas';
-      canvas.width = imageWidth;
-      
-      // 컨텐츠 높이 계산
-      const contentLines = tempDiv.offsetHeight / 20; // 대략적인 라인 수 계산
-      const symbolHeight = symbolType !== 'none' ? 70 : 0;
-      const titleHeight = 40;
-      const contentBoxPadding = 40;
-      const contentLineHeight = 20;
-      const contentBoxHeight = contentLines * contentLineHeight + contentBoxPadding;
-      const buttonHeight = 70;
-      const paddingTop = 40;
-      const paddingBottom = 40;
-      
-      // 전체 높이 계산
-      const totalHeight = symbolHeight + titleHeight + contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
-      canvas.height = totalHeight;
-      
-      // 임시 요소 제거
-      document.body.removeChild(tempDiv);
-      
-      // 캔버스에 그리기
-      const ctx = canvas.getContext('2d');
-      
-      // 배경 그리기
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // 폰트 설정
-      ctx.textAlign = 'center';
-      
-      let yPos = paddingTop;
-      
-      // 심볼 그리기
-      if (symbolType !== 'none') {
-        const symbolImg = new Image();
-        symbolImg.onload = function() {
-          ctx.drawImage(symbolImg, canvas.width/2 - 24, yPos, 48, 48);
-          
-          // 나머지 요소 그리기
-          drawRemainingElements();
-        };
-        symbolImg.src = svgToImage(symbols[symbolType], symbolColors[symbolType]);
-        yPos += symbolHeight;
-      } else {
-        drawRemainingElements();
-      }
-      
-      function drawRemainingElements() {
-        // 제목 그리기
-        ctx.font = 'bold 18px Pretendard';
-        ctx.fillStyle = titleColor;
-        ctx.fillText(title, canvas.width/2, yPos);
-        yPos += titleHeight;
-        
-        // 본문 박스 그리기
-        const contentBoxWidth = canvas.width * 0.9;
-        const contentBoxX = (canvas.width - contentBoxWidth) / 2;
-        ctx.fillStyle = 'white';
-        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
-        
-        // 본문 텍스트 그리기 (기본 스타일)
-        ctx.font = '14px Pretendard';
-        ctx.fillStyle = contentColor;
-        
-        // 정렬 방식 설정
-        switch(contentAlignment) {
-          case 'left':
-            ctx.textAlign = 'left';
-            break;
-          case 'center':
-            ctx.textAlign = 'center';
-            break;
-          case 'right':
-            ctx.textAlign = 'right';
-            break;
-        }
-        
-        // HTML을 텍스트로 변환 (간단한 방식으로 처리)
-        const tempDiv2 = document.createElement('div');
-        tempDiv2.innerHTML = contentHtml;
-        const plainText = tempDiv2.textContent || tempDiv2.innerText || '';
-        
-        const contentLines = plainText.split('\n');
-        let contentY = yPos + 20; // 패딩
-        
-        let textX = contentBoxX + 15;
-        if (contentAlignment === 'center') {
-          textX = contentBoxX + (contentBoxWidth / 2);
-        } else if (contentAlignment === 'right') {
-          textX = contentBoxX + contentBoxWidth - 15;
-        }
-        
-        for (let i = 0; i < contentLines.length; i++) {
-          ctx.fillText(contentLines[i], textX, contentY);
-          contentY += contentLineHeight;
-        }
-        
-        yPos += contentBoxHeight + 20;
-        
-        // 버튼 그리기
-        const buttonWidth = Math.min(buttonText.length * 12 + 60, contentBoxWidth * 0.8);
-        const buttonX = (canvas.width - buttonWidth) / 2;
-        
-        ctx.fillStyle = buttonColor;
-        roundRect(ctx, buttonX, yPos, buttonWidth, 50, 24, true);
-        
-        // 버튼 텍스트
-        ctx.font = 'bold 16px Pretendard';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.fillText(buttonText, canvas.width/2, yPos + 30);
-        
-        // 버튼 좌표 업데이트
-        buttonCoords = [buttonX, yPos, buttonX + buttonWidth, yPos + 50];
-        
-        // HTML 코드 업데이트
-        updateHtmlCode();
-      }
-      
-      // 캔버스를 숨김
-      canvas.style.display = 'none';
-      document.body.appendChild(canvas);
-    }
-    
-    // 라운드 사각형 그리기 함수
-    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-      if (typeof radius === 'undefined') {
-        radius = 5;
-      }
-      if (typeof radius === 'number') {
-        radius = {tl: radius, tr: radius, br: radius, bl: radius};
-      } else {
-        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
-        for (var side in defaultRadius) {
-          radius[side] = radius[side] || defaultRadius[side];
-        }
-      }
-      ctx.beginPath();
-      ctx.moveTo(x + radius.tl, y);
-      ctx.lineTo(x + width - radius.tr, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-      ctx.lineTo(x + width, y + height - radius.br);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-      ctx.lineTo(x + radius.bl, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-      ctx.lineTo(x, y + radius.tl);
-      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
-      ctx.closePath();
-      if (fill) {
-        ctx.fill();
-      }
-      if (stroke) {
-        ctx.stroke();
-      }
-    }
-    
-    // HTML 코드 업데이트 (이미지 크기 수정 적용)
-    function updateHtmlCode() {
-      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
-      const buttonLink = buttonLinkInput.value;
-      const buttonText = buttonTextInput.value;
-      
-      // 이미지 맵 좌표 (반으로 축소)
-      const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
-      
-      codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
-<map name="map01" id="map01">
-<area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
-</map>`;
-    }
-    
-    // 복사 기능
-    copyButton.addEventListener('click', () => {
-      codeOutput.select();
-  
-    // 최신 방식 먼저 시도
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(codeOutput.value)
-        .then(() => alert('코드가 클립보드에 복사되었습니다!'))
-        .catch(err => {
-          console.error('복사 실패 (최신 방식):', err);
-          // 최신 방식 실패 시 구형 방식 시도
-          tryLegacyCopy();
-        });
-    } else {
-      // navigator.clipboard가 지원되지 않는 경우 구형 방식 시도
-      tryLegacyCopy();
-    }
-  
-    // 구형 방식 복사 함수
-    function tryLegacyCopy() {
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          alert('코드가 클립보드에 복사되었습니다!');
-        } else {
-          alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
-        }
-      } catch (err) {
-        console.error('복사 실패 (구형 방식):', err);
-        alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
-      }
-    }
-  });
-    
-    // 이미지 다운로드 기능
-    downloadButton.addEventListener('click', () => {
-      // 버튼 텍스트 변경하여 로딩 중임을 표시
-      downloadButton.textContent = '이미지 생성 중...';
-      downloadButton.disabled = true;
-  
-      setTimeout(() => {
-        const canvas = document.getElementById('hiddenCanvas');
-        if (!canvas) {
-          alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
-          downloadButton.textContent = '이미지 다운로드';
-          downloadButton.disabled = false;
-          return;
-        }
-    
-        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
-        const link = document.createElement('a');
-        link.download = `${fileName}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    
-        // 다운로드 완료 후 버튼 원래 상태로 복원
-        downloadButton.textContent = '이미지 다운로드';
-        downloadButton.disabled = false;
-      }, 100);
-    });
-    
-    // 모든 입력 요소에 이벤트 리스너 추가
-    titleInput.addEventListener('input', updatePreview);
-    buttonTextInput.addEventListener('input', updatePreview);
-    buttonLinkInput.addEventListener('input', updatePreview);
-    bgColorInput.addEventListener('input', updatePreview);
-    titleColorInput.addEventListener('input', updatePreview);
-    contentColorInput.addEventListener('input', updatePreview);
-    buttonColorInput.addEventListener('input', updatePreview);
-    fileNameInput.addEventListener('input', updatePreview);
-    
-    // Quill 에디터에 변경 이벤트 리스너 추가
-    quill.on('text-change', updatePreview);
-    
-    // 심볼 라디오 버튼에 이벤트 리스너 추가
-    symbolRadios.forEach(radio => {
-      radio.addEventListener('change', updatePreview);
-    });
-    
-    // 정렬 라디오 버튼에 이벤트 리스너 추가
-    alignmentRadios.forEach(radio => {
-      radio.addEventListener('change', updatePreview);
-    });
-
-     // 추가 요소 선택
-    const templateRadios = document.querySelectorAll('input[name="template-type"]');
-    const symbolSelectionContainer = document.getElementById('symbol-selection-container');
-    const showButtonCheckbox = document.getElementById('showButton');
-    const buttonOptionsContainer = document.getElementById('button-options-container');
     
     // 템플릿 타입 변경 시 UI 업데이트
     function updateTemplateUI() {
@@ -889,8 +550,12 @@
       // 심볼 옵션은 일반 공지문에만 표시
       if (templateType === 'normal') {
         symbolSelectionContainer.style.display = 'block';
+        // 일반 공지문일 때 기본 색상 설정
+        titleColorInput.value = '#00855B';
       } else {
         symbolSelectionContainer.style.display = 'none';
+        // 시스템 공지문일 때 기본 색상 설정
+        titleColorInput.value = '#191F28';
         // 시스템 공지문에서는 심볼 선택 초기화
         document.querySelector('input[name="symbol"][value="none"]').checked = true;
       }
@@ -910,18 +575,7 @@
       updatePreview();
     }
     
-    // 현재 선택된 템플릿 타입 가져오기
-    function getSelectedTemplate() {
-      let selected = 'normal';
-      templateRadios.forEach(radio => {
-        if (radio.checked) {
-          selected = radio.value;
-        }
-      });
-      return selected;
-    }
-    
-    // 미리보기 업데이트 함수 확장
+    // 미리보기 업데이트
     function updatePreview() {
       const title = titleInput.value;
       const buttonText = buttonTextInput.value;
@@ -943,7 +597,7 @@
       if (templateType === 'normal' && symbolType !== 'none') {
         const symbolColor = symbolColors[symbolType];
         const symbolImage = svgToImage(symbols[symbolType], symbolColor);
-        symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;"><img src="${symbolImage}" alt="${symbolType} 심볼" width="48" height="48"></div>`;
+        symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;"><img src="${symbolImage}" alt="${symbolType} 심볼" width="48" height="48" style="display: block; margin: 0 auto;"></div>`;
       }
       
       // 버튼 HTML
@@ -1028,7 +682,7 @@
       createCanvasForDownload();
     }
     
-    // 다운로드용 캔버스 생성 함수 확장
+    // 다운로드용 캔버스 생성 함수
     function createCanvasForDownload() {
       // 기존 캔버스 제거
       const existingCanvas = document.getElementById('hiddenCanvas');
@@ -1102,8 +756,7 @@
       } else {
         ctx.fillStyle = '#FFFFFF'; // 시스템 공지문은 항상 흰색 배경
       }
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       let yPos = paddingTop;
       
@@ -1133,7 +786,7 @@
           ctx.fillText(title, canvas.width/2, yPos);
           yPos += titleHeight;
           
-          // 본문 박스스 그리기
+          // 본문 박스 그리기
           const contentBoxWidth = canvas.width * 0.9;
           const contentBoxX = (canvas.width - contentBoxWidth) / 2;
           ctx.fillStyle = 'white';
@@ -1256,7 +909,39 @@
       document.body.appendChild(canvas);
     }
     
-    // HTML 코드 업데이트 함수 확장
+    // 라운드 사각형 그리기 함수
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'undefined') {
+        radius = 5;
+      }
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+          radius[side] = radius[side] || defaultRadius[side];
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) {
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.stroke();
+      }
+    }
+    
+    // HTML 코드 업데이트
     function updateHtmlCode() {
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
       const buttonLink = buttonLinkInput.value;
@@ -1273,11 +958,95 @@
 <area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">
 </map>`;
       } else {
-        codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;"usemap="#map01"/>
+        codeOutput.value = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
 <map name="map01" id="map01">
 </map>`;
       }
     }
+    
+    // 복사 기능
+    copyButton.addEventListener('click', () => {
+      codeOutput.select();
+  
+      // 최신 방식 먼저 시도
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(codeOutput.value)
+          .then(() => alert('코드가 클립보드에 복사되었습니다!'))
+          .catch(err => {
+            console.error('복사 실패 (최신 방식):', err);
+            // 최신 방식 실패 시 구형 방식 시도
+            tryLegacyCopy();
+          });
+      } else {
+        // navigator.clipboard가 지원되지 않는 경우 구형 방식 시도
+        tryLegacyCopy();
+      }
+    
+      // 구형 방식 복사 함수
+      function tryLegacyCopy() {
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert('코드가 클립보드에 복사되었습니다!');
+          } else {
+            alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
+          }
+        } catch (err) {
+          console.error('복사 실패 (구형 방식):', err);
+          alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
+        }
+      }
+    });
+    
+    // 이미지 다운로드 기능
+    downloadButton.addEventListener('click', () => {
+      // 버튼 텍스트 변경하여 로딩 중임을 표시
+      downloadButton.textContent = '이미지 생성 중...';
+      downloadButton.disabled = true;
+  
+      setTimeout(() => {
+        const canvas = document.getElementById('hiddenCanvas');
+        if (!canvas) {
+          alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+          downloadButton.textContent = '이미지 다운로드';
+          downloadButton.disabled = false;
+          return;
+        }
+    
+        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+        const link = document.createElement('a');
+        link.download = `${fileName}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    
+        // 다운로드 완료 후 버튼 원래 상태로 복원
+        downloadButton.textContent = '이미지 다운로드';
+        downloadButton.disabled = false;
+      }, 100);
+    });
+    
+    // 모든 입력 요소에 이벤트 리스너 추가
+    titleInput.addEventListener('input', updatePreview);
+    buttonTextInput.addEventListener('input', updatePreview);
+    buttonLinkInput.addEventListener('input', updatePreview);
+    bgColorInput.addEventListener('input', updatePreview);
+    titleColorInput.addEventListener('input', updatePreview);
+    contentColorInput.addEventListener('input', updatePreview);
+    buttonColorInput.addEventListener('input', updatePreview);
+    fileNameInput.addEventListener('input', updatePreview);
+    
+    // Quill 에디터에 변경 이벤트 리스너 추가
+    quill.on('text-change', updatePreview);
+    
+    // 심볼 라디오 버튼에 이벤트 리스너 추가
+    symbolRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
+    
+    // 정렬 라디오 버튼에 이벤트 리스너 추가
+    alignmentRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
     
     // 템플릿 타입 변경 이벤트 리스너
     templateRadios.forEach(radio => {
@@ -1287,12 +1056,29 @@
     // 버튼 표시 옵션 변경 이벤트 리스너
     showButtonCheckbox.addEventListener('change', updateButtonUI);
     
-    // 초기 UI 상태 설정
-    updateTemplateUI();
-    updateButtonUI();
-
+    // 페이지 로드 시 초기 설정
+    document.addEventListener('DOMContentLoaded', function() {
+      // 버튼 표시 기본값 해제
+      document.getElementById('showButton').checked = false;
+      
+      // 버튼 옵션 숨기기
+      document.getElementById('button-options-container').style.display = 'none';
+      
+      // 템플릿 타입에 따른 초기 설정
+      updateTemplateUI();
+      
+      // 초기 미리보기 업데이트
+      updatePreview();
+    });
+    
     // 초기 미리보기 업데이트
-    window.onload = updatePreview;
+    window.onload = function() {
+      // 초기 설정
+      showButtonCheckbox.checked = false;
+      buttonOptionsContainer.style.display = 'none';
+      updateTemplateUI();
+      updatePreview();
+    };
   </script>
 </body>
 </html>
