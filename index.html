@@ -824,7 +824,7 @@
       // 템플릿 타입에 따른 높이 계산
       let symbolHeight = 0;
       let titleHeight = 40;
-      let contentBoxHeight = adjustedContentHeight + contentBoxPadding;
+      let contentBoxHeight = adjustedContentHeight + (contentBoxPadding * 2); // 상하 패딩을 모두 고려
       let buttonHeight = showButton ? 70 : 0;
       let paddingTop = 40;
       let paddingBottom = 40; // 아래쪽 패딩 축소
@@ -841,9 +841,10 @@
 
       // 전체 높이 계산 - 여유 공간 최적화
       // 버튼이 짤리지 않도록 충분한 공간 확보
-      const extraPadding = 150; // 여유 공간 추가
+      const buttonPadding = showButton ? 30 : 0; // 버튼이 있을 때만 추가 여백
+      const extraPadding = 20; // 최소 여유 공간
       const totalHeight = symbolHeight + systemHeaderHeight + titleHeight + dividerHeight + 
-                        contentBoxHeight + buttonHeight + paddingTop + paddingBottom + extraPadding;
+                        contentBoxHeight + buttonHeight + paddingTop + paddingBottom + buttonPadding + extraPadding;
       canvas.height = totalHeight;
 
       // 임시 요소 제거
@@ -1055,7 +1056,7 @@
         });
 
         // 텍스트 그리기
-        let contentY = boxY + 20; // 시작 위치 패딩
+        let contentY = boxY + (contentBoxPadding / 2); // 상단 패딩의 절반에서 시작
         
         let textX = boxX + textPadding;
         if (contentAlignment === 'center') {
@@ -1072,29 +1073,34 @@
 
       // 텍스트 줄바꿈 함수
       function wrapText(ctx, text, maxWidth) {
-        const words = text.split(' ');
+        // 빈 문자열이면 빈 배열 반환
+        if (!text || text.trim() === '') {
+          return [];
+        }
+
         const lines = [];
-        let currentLine = words[0] || '';
-        
-        for (let i = 1; i < words.length; i++) {
-          const word = words[i];
-          const testLine = currentLine + ' ' + word;
+        let currentLine = '';
+
+        // 한 글자씩 처리하는 방식으로 변경
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const testLine = currentLine + char;
           const metrics = ctx.measureText(testLine);
           const testWidth = metrics.width;
-          
-          if (testWidth > maxWidth) {
+
+          if (testWidth > maxWidth && currentLine !== '') {
             lines.push(currentLine);
-            currentLine = word;
+            currentLine = char;
           } else {
             currentLine = testLine;
           }
         }
-        
-        // 마지막 줄 추가
+
+        // 마지막 라인 추가
         if (currentLine.length > 0) {
           lines.push(currentLine);
         }
-        
+
         return lines;
       }
 
@@ -1112,7 +1118,7 @@
         }
         
         // 버튼 위치에 20px의 추가 여백 확보
-        yPos += 20;
+        // yPos += 20; //
 
         ctx.fillStyle = buttonColor;
         roundRect(ctx, buttonX, yPos, buttonWidth, 50, 24, true);
