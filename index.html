@@ -790,6 +790,10 @@
 
       // 실제 높이 측정 (줄바꿈 및 줄간격 고려)
       const actualContentHeight = tempDiv.offsetHeight;
+      
+      // 최소 높이 설정 (내용이 짧더라도 어느 정도 높이 보장)
+      const minContentHeight = 100;
+      const adjustedContentHeight = Math.max(actualContentHeight, minContentHeight);
 
       // 캔버스 생성
       const canvas = document.createElement('canvas');
@@ -802,7 +806,7 @@
       // 템플릿 타입에 따른 높이 계산
       let symbolHeight = 0;
       let titleHeight = 40;
-      let contentBoxHeight = actualContentHeight + contentBoxPadding;
+      let contentBoxHeight = adjustedContentHeight + contentBoxPadding;
       let buttonHeight = showButton ? 70 : 0;
       let paddingTop = 40;
       let paddingBottom = 40; // 아래쪽 패딩 축소
@@ -849,10 +853,15 @@
           const symbolImg = new Image();
           symbolImg.onload = function() {
             ctx.drawImage(symbolImg, canvas.width/2 - 24, yPos, 48, 48);
+            yPos += symbolHeight; // 이미지 로딩 후 yPos 증가
+            drawNormalContent();
+          };
+          symbolImg.onerror = function() {
+            console.error("심볼 이미지 로드 실패");
+            yPos += symbolHeight;
             drawNormalContent();
           };
           symbolImg.src = svgToImage(symbols[symbolType], symbolColors[symbolType]);
-          yPos += symbolHeight;
         } else {
           drawNormalContent();
         }
@@ -868,6 +877,7 @@
           const contentBoxWidth = canvas.width * 0.9;
           const contentBoxX = (canvas.width - contentBoxWidth) / 2;
           ctx.fillStyle = 'white';
+          // actualContentHeight 값을 사용하여 콘텐츠 높이에 맞게 조정
           roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
 
           // 본문 텍스트 그리기 - 개선된 함수 사용
@@ -904,6 +914,9 @@
         // 본문 바로 그리기
         const contentBoxWidth = canvas.width - 80; // 좌우 여백 40px씩
         const contentBoxX = 40;
+        ctx.fillStyle = 'white';
+        // 박스 높이를 텍스트 높이에 맞게 조정
+        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
 
         // 본문 텍스트 그리기 - 개선된 함수 사용
         drawContentText(contentBoxX, contentBoxWidth, yPos, lineHeight, processedHtml);
