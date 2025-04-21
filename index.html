@@ -685,20 +685,38 @@
       let previewHtml = '';
       
       if (templateType === 'normal') {
-        // 일반 공지문 템플릿
-        previewHtml = `
-          <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
-            <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
-              ${symbolHtml}
-              <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
-              <div style="background-color: white; border-radius: 8px; padding: 16px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
-              </div>
-              ${buttonHtml}
+      // 임시 요소 생성하여 실제 텍스트 내용 높이 계산
+      const tempDiv = document.createElement('div');
+      tempDiv.style.width = (imageWidth * 0.8) + 'px'; // 본문 영역의 실제 너비 고려
+      tempDiv.style.font = '14px Pretendard';
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.visibility = 'hidden';
+      tempDiv.style.padding = '15px'; // 패딩 추가
+      tempDiv.style.lineHeight = lineHeight + 'px'; // 설정된 줄간격 적용
+      tempDiv.style.wordBreak = 'break-word';
+      tempDiv.innerHTML = contentHtml;
+      document.body.appendChild(tempDiv);
+
+      // 실제 높이 측정 및 최소 높이 적용
+      const actualContentHeight = tempDiv.offsetHeight;
+      const minContentHeight = 100;
+      const adjustedContentHeight = Math.max(actualContentHeight, minContentHeight);
+      document.body.removeChild(tempDiv);
+
+      // 일반 공지문 템플릿
+      previewHtml = `
+        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+          <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
+            ${symbolHtml}
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
+            <div style="background-color: white; border-radius: 8px; padding: 16px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); min-height: ${adjustedContentHeight}px;">
+              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
             </div>
+            ${buttonHtml}
           </div>
-        `;
-      } else {
+        </div>
+      `;
+    } else {
         // 시스템 공지문 템플릿
         previewHtml = `
           <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
@@ -822,8 +840,10 @@
       }
 
       // 전체 높이 계산 - 여유 공간 최적화
+      // 버튼이 짤리지 않도록 충분한 공간 확보
+      const extraPadding = 150; // 여유 공간 추가
       const totalHeight = symbolHeight + systemHeaderHeight + titleHeight + dividerHeight + 
-                        contentBoxHeight + buttonHeight + paddingTop + paddingBottom;
+                        contentBoxHeight + buttonHeight + paddingTop + paddingBottom + extraPadding;
       canvas.height = totalHeight;
 
       // 임시 요소 제거
@@ -877,13 +897,26 @@
           const contentBoxWidth = canvas.width * 0.9;
           const contentBoxX = (canvas.width - contentBoxWidth) / 2;
           ctx.fillStyle = 'white';
-          // actualContentHeight 값을 사용하여 콘텐츠 높이에 맞게 조정
-          roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
+
+          // 본문 텍스트 측정
+          let textHeight = 0;
+          const processedLines = processedHtml.split('\n');
+          if (processedLines.length > 0) {
+            textHeight = processedLines.length * lineHeight;
+          }
+
+          // 최소 높이 적용 (내용이 짧더라도 최소 높이 보장)
+          const minTextHeight = 100 - contentBoxPadding; // 패딩 고려하여 조정
+          const calculatedHeight = Math.max(textHeight, minTextHeight);
+          const visibleContentBoxHeight = calculatedHeight + contentBoxPadding;
+
+          // 조정된 높이로 박스 그리기
+          roundRect(ctx, contentBoxX, yPos, contentBoxWidth, visibleContentBoxHeight, 8, true);
 
           // 본문 텍스트 그리기 - 개선된 함수 사용
           drawContentText(contentBoxX, contentBoxWidth, yPos, lineHeight, processedHtml);
 
-          yPos += contentBoxHeight + 20;
+          yPos += visibleContentBoxHeight + 20;
 
           // 버튼 그리기 (버튼 표시 설정 시)
           if (showButton) {
@@ -915,13 +948,26 @@
         const contentBoxWidth = canvas.width - 80; // 좌우 여백 40px씩
         const contentBoxX = 40;
         ctx.fillStyle = 'white';
+
+        // 본문 텍스트 측정
+        let textHeight = 0;
+        const processedLines = processedHtml.split('\n');
+        if (processedLines.length > 0) {
+          textHeight = processedLines.length * lineHeight;
+        }
+
+        // 최소 높이 적용 (내용이 짧더라도 최소 높이 보장)
+        const minTextHeight = 100 - contentBoxPadding; // 패딩 고려하여 조정
+        const calculatedHeight = Math.max(textHeight, minTextHeight);
+        const visibleContentBoxHeight = calculatedHeight + contentBoxPadding;
+
         // 박스 높이를 텍스트 높이에 맞게 조정
-        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, contentBoxHeight, 8, true);
+        roundRect(ctx, contentBoxX, yPos, contentBoxWidth, visibleContentBoxHeight, 8, true);
 
         // 본문 텍스트 그리기 - 개선된 함수 사용
         drawContentText(contentBoxX, contentBoxWidth, yPos, lineHeight, processedHtml);
 
-        yPos += contentBoxHeight + 20;
+        yPos += visibleContentBoxHeight + 20;
 
         // 버튼 그리기 (버튼 표시 설정 시)
         if (showButton) {
@@ -1064,6 +1110,9 @@
           // 시스템 공지문의 버튼은 본문과 동일한 너비로 정렬
           buttonX = 40;
         }
+        
+        // 버튼 위치에 20px의 추가 여백 확보
+        yPos += 20;
 
         ctx.fillStyle = buttonColor;
         roundRect(ctx, buttonX, yPos, buttonWidth, 50, 24, true);
