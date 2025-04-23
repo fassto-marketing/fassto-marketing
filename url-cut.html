@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fassto URL 단축기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3366ff;
+            --primary-dark: #2952cc;
+            --text-color: #333;
+            --light-gray: #f5f5f7;
+            --border-color: #e1e1e1;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .site-link {
+            color: #777;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            padding: 2rem;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="url"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="url"]:focus {
+            border-color: var(--primary-color);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        .result-container {
+            margin-top: 2rem;
+        }
+        
+        .result-box {
+            position: relative;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .short-url {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 10px;
+            transition: color 0.3s;
+            width: auto;
+        }
+        
+        .copy-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .copy-feedback {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .copy-feedback.show {
+            opacity: 1;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        
+        .notice {
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+        
+        .notice i {
+            margin-right: 5px;
+            color: var(--primary-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* 반응형 스타일 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">
+            <i class="fas fa-link"></i> Fassto URL 단축기
+        </a>
+        <a href="https://fassto.com" class="site-link">fassto.com</a>
+    </header>
+    
+    <main>
+        <div class="container">
+            <h1>긴 URL을 짧게 만드세요</h1>
+            
+            <div class="form-group">
+                <label for="url-input">URL 입력</label>
+                <input type="url" id="url-input" placeholder="https://" required>
+            </div>
+            
+            <button id="shorten-btn">
+                <i class="fas fa-cut"></i> 단축 URL 생성
+            </button>
+            
+            <div class="result-container hidden" id="result-container">
+                <label>생성된 단축 URL</label>
+                <div class="result-box">
+                    <a href="#" class="short-url" id="short-url" target="_blank"></a>
+                    <button class="copy-btn" id="copy-btn" title="URL 복사">
+                        <i class="far fa-copy"></i>
+                    </button>
+                    <span class="copy-feedback" id="copy-feedback">복사 완료!</span>
+                </div>
+            </div>
+            
+            <div class="notice">
+                <i class="fas fa-chart-line"></i> 곧 방문/클릭 통계 기능이 추가됩니다!
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        &copy; <span id="current-year">2025</span> Fassto. All rights reserved.
+    </footer>
+    
+    <script>
+        // 현재 연도 설정
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // DOM 요소
+        const urlInput = document.getElementById('url-input');
+        const shortenBtn = document.getElementById('shorten-btn');
+        const resultContainer = document.getElementById('result-container');
+        const shortUrlElement = document.getElementById('short-url');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyFeedback = document.getElementById('copy-feedback');
+        
+        // URL 단축 함수
+        function shortenUrl() {
+            // 입력 URL 가져오기
+            const originalUrl = urlInput.value.trim();
+            
+            // 입력 유효성 검사
+            if (!originalUrl) {
+                alert('URL을 입력해주세요.');
+                return;
+            }
+            
+            // URL 형식 검사
+            if (!isValidUrl(originalUrl)) {
+                alert('유효한 URL을 입력해주세요. (예: https://example.com)');
+                return;
+            }
+            
+            // 실제 구현에서는 서버에 요청을 보내 단축 URL을 생성합니다.
+            // 여기서는 데모용으로 랜덤 문자열을 생성합니다.
+            const shortCode = generateShortCode();
+            const shortUrl = `https://fassto.com/${shortCode}`;
+            
+            // 결과 표시
+            shortUrlElement.textContent = shortUrl;
+            shortUrlElement.href = originalUrl; // 실제로는 단축 URL로 설정하지만, 데모에서는 원본 URL로 설정
+            resultContainer.classList.remove('hidden');
+            
+            // 로컬 스토리지에 저장 (데모용)
+            saveToLocalStorage(shortCode, {
+                originalUrl: originalUrl,
+                createdAt: new Date().toISOString(),
+                clicks: 0
+            });
+        }
+        
+        // URL 유효성 검사
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // 단축 코드 생성 (랜덤 6자리 영숫자)
+        function generateShortCode(length = 6) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // 로컬 스토리지에 URL 데이터 저장
+        function saveToLocalStorage(shortCode, data) {
+            const urls = JSON.parse(localStorage.getItem('fassto_urls') || '{}');
+            urls[shortCode] = data;
+            localStorage.setItem('fassto_urls', JSON.stringify(urls));
+        }
+        
+        // URL 복사 기능
+        function copyToClipboard() {
+            const shortUrl = shortUrlElement.textContent;
+            
+            // 클립보드에 복사
+            navigator.clipboard.writeText(shortUrl)
+                .then(() => {
+                    // 복사 완료 메시지 표시
+                    copyFeedback.classList.add('show');
+                    setTimeout(() => {
+                        copyFeedback.classList.remove('show');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('클립보드 복사 실패:', err);
+                    alert('URL 복사에 실패했습니다. 직접 선택하여 복사해주세요.');
+                });
+        }
+        
+        // 이벤트 리스너
+        shortenBtn.addEventListener('click', shortenUrl);
+        copyBtn.addEventListener('click', copyToClipboard);
+        
+        // 엔터 키 입력 처리
+        urlInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                shortenUrl();
+            }
+        });
+    </script>
+</body>
+</html>
