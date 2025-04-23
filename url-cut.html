@@ -58,6 +58,20 @@
       <p class="text-lg text-gray-600 mb-8 text-center">긴 URL을 짧고 깔끔한 형태로 변환하세요. fassto.com/(단축코드) 형식으로 제공됩니다.</p>
       
       <div class="max-w-2xl mx-auto">
+        <!-- URL 파라미터가 있는 경우 리디렉션 부분 -->
+        <div id="redirect-message" class="hidden mb-6 bg-green-50 border-l-4 border-green-500 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-info-circle text-green-500"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-green-700">
+                잠시 후 원본 URL로 이동합니다...
+              </p>
+            </div>
+          </div>
+        </div>
+        
         <div class="mb-6">
           <label for="url-input" class="block text-gray-700 font-medium mb-2">URL 입력</label>
           <div class="flex">
@@ -75,14 +89,14 @@
             <div class="flex-grow">
               <label class="block text-gray-700 font-medium mb-2">생성된 단축 URL</label>
               <div class="relative">
-                <a href="#" id="short-url" class="text-green-600 hover:text-green-800 break-all font-medium text-lg"></a>
+                <a href="#" id="short-url" class="text-green-600 hover:text-green-800 break-all font-medium text-lg" target="_blank"></a>
               </div>
             </div>
-            <div class="mt-3 md:mt-0 flex space-x-2">
+            <div class="mt-3 md:mt-0 flex space-x-2 relative">
               <button id="copy-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg transition duration-150 ease-in-out flex items-center">
                 <i class="far fa-copy mr-2"></i>복사
               </button>
-              <div id="copy-feedback" class="copy-feedback absolute right-0 top-0 bg-gray-800 text-white text-sm py-1 px-3 rounded">
+              <div id="copy-feedback" class="copy-feedback absolute right-full mr-2 bg-gray-800 text-white text-sm py-1 px-3 rounded">
                 복사 완료!
               </div>
             </div>
@@ -90,6 +104,19 @@
         </div>
         
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-8">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-info-circle text-blue-500"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                <strong>데모 모드 안내:</strong> 현재 이 URL 단축기는 데모 모드로 작동합니다. 생성된 단축 URL은 같은 브라우저에서만 작동하며, 다른 사람과 공유할 수 없습니다. 실제 서비스로 사용하려면 서버 측 구현이 필요합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
           <div class="flex">
             <div class="flex-shrink-0">
               <i class="fas fa-info-circle text-blue-500"></i>
@@ -120,6 +147,50 @@
     const shortUrlElement = document.getElementById('short-url');
     const copyBtn = document.getElementById('copy-btn');
     const copyFeedback = document.getElementById('copy-feedback');
+    const redirectMessage = document.getElementById('redirect-message');
+    
+    // URL에서 코드 파라미터 확인 및 리디렉션 처리
+    function checkForRedirection() {
+      // URL 파라미터 파싱
+      const urlParams = new URLSearchParams(window.location.search);
+      const shortCode = urlParams.get('code');
+      
+      // 단축 코드가 있으면 리디렉션 처리
+      if (shortCode) {
+        redirectMessage.classList.remove('hidden');
+        
+        // 로컬 스토리지에서 원본 URL 조회
+        const urls = JSON.parse(localStorage.getItem('fassto_urls') || '{}');
+        const urlData = urls[shortCode];
+        
+        if (urlData && urlData.originalUrl) {
+          // 클릭 카운트 증가
+          urlData.clicks = (urlData.clicks || 0) + 1;
+          urls[shortCode] = urlData;
+          localStorage.setItem('fassto_urls', JSON.stringify(urls));
+          
+          // 3초 후 원본 URL로 리디렉션
+          setTimeout(() => {
+            window.location.href = urlData.originalUrl;
+          }, 1500);
+        } else {
+          redirectMessage.innerHTML = `
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  존재하지 않는 단축 URL입니다. 올바른 URL을 확인해주세요.
+                </p>
+              </div>
+            </div>
+          `;
+          redirectMessage.classList.remove('bg-green-50', 'border-green-500');
+          redirectMessage.classList.add('bg-yellow-50', 'border-yellow-500');
+        }
+      }
+    }
     
     // URL 단축 함수
     function shortenUrl() {
@@ -138,17 +209,19 @@
         return;
       }
       
-      // 실제 구현에서는 서버에 요청을 보내 단축 URL을 생성합니다.
-      // 여기서는 데모용으로 랜덤 문자열을 생성합니다.
+      // 단축 코드 생성
       const shortCode = generateShortCode();
-      const shortUrl = `fassto.com/${shortCode}`;
+      
+      // 현재 페이지 URL 기반으로 단축 URL 생성 (데모용)
+      const currentUrl = window.location.href.split('?')[0]; // 파라미터 제거
+      const shortUrl = `${currentUrl}?code=${shortCode}`;
       
       // 결과 표시
-      shortUrlElement.textContent = shortUrl;
-      shortUrlElement.href = originalUrl; // 실제로는 단축 URL로 설정하지만, 데모에서는 원본 URL로 설정
+      shortUrlElement.textContent = `fassto.com/${shortCode}`;
+      shortUrlElement.href = shortUrl; // 데모에서는 현재 페이지의 URL에 파라미터 추가
       resultContainer.classList.remove('hidden');
       
-      // 로컬 스토리지에 저장 (데모용)
+      // 로컬 스토리지에 저장
       saveToLocalStorage(shortCode, {
         originalUrl: originalUrl,
         createdAt: new Date().toISOString(),
@@ -201,6 +274,9 @@
           alert('URL 복사에 실패했습니다. 직접 선택하여 복사해주세요.');
         });
     }
+    
+    // 페이지 로드 시 리디렉션 확인
+    window.addEventListener('DOMContentLoaded', checkForRedirection);
     
     // 이벤트 리스너
     shortenBtn.addEventListener('click', shortenUrl);
