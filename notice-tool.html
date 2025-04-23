@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fassto 공지 이미지 생성기</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+    
+    .preview-box {
+      transition: background-color 0.3s ease;
+    }
+    
+    .custom-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
+    
+    .custom-textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      min-height: 150px;
+      margin-bottom: 1rem;
+      white-space: pre-line;
+    }
+    
+    .custom-button {
+      background-color: #00855B;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border: none;
+      width: 100%;
+    }
+    
+    .custom-button:hover {
+      background-color: #006c4a;
+    }
+    
+    .preview-button {
+      display: inline-block;
+      padding: 14px 32px;
+      background-color: #00855B;
+      color: white;
+      border-radius: 9999px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    
+    .code-box {
+      width: 100%;
+      height: 150px;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      resize: none;
+      margin-bottom: 1rem;
+    }
+
+    .symbol-selection {
+      margin-bottom: 1rem;
+    }
+
+    .symbol-option {
+      display: inline-block;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .symbol-option input {
+      margin-right: 5px;
+    }
+
+    .symbol-preview {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px auto;
+    }
+
+    /* 심볼 스타일 */
+    .symbol-info {
+      fill: #2563EB; /* 파란색 정보 아이콘 */
+    }
+    
+    .symbol-warning {
+      fill: #F59E0B; /* 노란색 경고 아이콘 */
+    }
+    
+    .symbol-error {
+      fill: #DC2626; /* 빨간색 에러 아이콘 */
+    }
+    
+    .symbol-success {
+      fill: #10B981; /* 초록색 성공 아이콘 */
+    }
+
+    .content-box {
+      background-color: white;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 0 auto;
+      max-width: 90%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .color-picker-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .color-input {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 0;
+      cursor: pointer;
+    }
+    
+    .file-name-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .button-section {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* 정렬 옵션 스타일 */
+    .alignment-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .alignment-option {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .alignment-option input {
+      margin-right: 5px;
+    }
+
+    /* Quill 에디터 스타일 */
+    .ql-editor {
+      min-height: 150px;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    .ql-toolbar {
+      border-top-left-radius: 0.375rem;
+      border-top-right-radius: 0.375rem;
+    }
+
+    .ql-container {
+      border-bottom-left-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    #editor-container {
+      margin-bottom: 1rem;
+    }
+
+    /* 템플릿 선택 스타일 추가 */
+    .template-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+    
+    .template-option {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .template-option input {
+      margin-right: 5px;
+    }
+    
+    /* 시스템 공지문 스타일 */
+    .notice-header {
+      text-align: left;
+      padding: 10px;
+      font-weight: bold;
+      color: #000;
+    }
+    
+    .notice-divider {
+      height: 2px;
+      background-color: #000;
+      margin: 10px 0;
+    }
+    
+    /* 버튼 표시 옵션 스타일 */
+    .button-display-option {
+      margin-bottom: 1rem;
+      padding: 8px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    /* 좌우 정렬 명확하게 설정 */
+    .input-area {
+      min-width: 300px;
+    }
+
+    .preview-area {
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    /* 반응형 레이아웃 수정 */
+    @media (min-width: 768px) {
+      .content-container {
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+      }
+      
+      .input-area {
+        flex: 1;
+        max-width: 50%;
+      }
+      
+      .preview-area {
+        flex: 1;
+        max-width: 50%;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .content-container {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .input-area, .preview-area {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+
+   </head>
+<body class="bg-gray-50">
+  <div class="container mx-auto p-4 max-w-6xl">
+    <h1 class="text-2xl font-bold text-center my-6">Fassto 공지 이미지 생성기</h1>
+    
+    <div class="content-container">
+      <!-- Input Section -->
+      <div class="input-area bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">설정</h2>
+        
+        <!-- 템플릿 타입 선택 추가 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">템플릿 타입</label>
+          <div class="template-options">
+            <label class="template-option">
+              <input type="radio" name="template-type" value="normal" checked> 일반 공지문
+            </label>
+            <label class="template-option">
+              <input type="radio" name="template-type" value="system"> 시스템 공지문
+            </label>
+          </div>
+        </div>
+
+        <!-- 심볼 선택 (일반 공지문에만 적용) -->
+        <div class="mb-4" id="symbol-selection-container">
+          <label class="block text-sm font-medium mb-1">심볼 선택</label>
+          <div class="symbol-selection">
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="none" checked> 없음
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="info"> 정보
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="warning"> 경고
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="error"> 오류
+            </label>
+            <label class="symbol-option">
+              <input type="radio" name="symbol" value="success"> 성공
+            </label>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">제목</label>
+          <input 
+            type="text" 
+            id="title" 
+            value="" 
+            class="custom-input"
+            placeholder="제목 입력"
+          >
+          <div class="color-picker-container">
+            <label class="text-sm">제목 색상:</label>
+            <input type="color" id="titleColor" value="#00855B" class="color-input">
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">본문</label>
+          
+          <!-- 본문 정렬 옵션 -->
+          <div class="alignment-options mb-2">
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="left" checked> 왼쪽 정렬
+            </label>
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="center"> 가운데 정렬
+            </label>
+            <label class="alignment-option">
+              <input type="radio" name="content-alignment" value="right"> 오른쪽 정렬
+            </label>
+          </div>
+
+          <!-- Quill 에디터로 대체 -->
+          <div id="editor-container">
+            <div id="editor"></div>
+          </div>
+          
+          <div class="color-picker-container">
+            <label class="text-sm">기본 텍스트 색상:</label>
+            <input type="color" id="contentColor" value="#333333" class="color-input">
+          </div>
+        </div>
+
+        <!-- 행간 조절 옵션 추가 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">행간 간격 (px)</label>
+          <input 
+            type="range" 
+            id="lineHeightSlider" 
+            min="14" 
+            max="28" 
+            step="1" 
+            value="16" 
+            class="w-full"
+          >
+          <div class="flex justify-between">
+            <span class="text-xs">좁게 (14px)</span>
+            <span id="lineHeightValue" class="text-xs font-bold">16px</span>
+            <span class="text-xs">넓게 (28px)</span>
+          </div>
+        </div>
+
+        <!-- 버튼 표시 옵션 추가 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">버튼 표시</label>
+          <div class="button-display-option">
+            <label class="inline-flex items-center mr-4">
+              <input type="checkbox" id="showButton" class="mr-2">
+              버튼 표시하기
+            </label>
+          </div>
+        </div>
+
+        <!-- 버튼 관련 옵션들 - 버튼 표시 설정에 따라 표시/숨김 -->
+        <div id="button-options-container">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">버튼 텍스트</label>
+            <input 
+              type="text" 
+              id="buttonText" 
+              value="" 
+              class="custom-input"
+              placeholder="버튼 텍스트 입력"
+            >
+          </div>
+        
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">버튼 링크</label>
+            <input 
+              type="text" 
+              id="buttonLink" 
+              value="" 
+              class="custom-input"
+              placeholder="버튼 링크 입력"
+            >
+            <div class="color-picker-container">
+              <label class="text-sm">버튼 색상:</label>
+              <input type="color" id="buttonColor" value="#00855B" class="color-input">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">배경색</label>
+          <input 
+            type="color" 
+            id="bgColor" 
+            value="#E6F3EF" 
+            class="custom-input h-10"
+            title="배경색 선택"
+          >
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">이미지 파일명</label>
+          <input 
+            type="text" 
+            id="fileName" 
+            value="notice_20250415_1" 
+            class="file-name-input"
+            placeholder="파일명 입력(확장자 제외)"
+          >
+          <p class="text-xs text-gray-500">예: notice_20250415_1 (.png는 자동으로 추가됩니다)</p>
+        </div>
+      </div>
+
+       <!-- Preview Section -->
+      <div class="preview-area bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">미리보기</h2>
+        
+        <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
+          <!-- 미리보기 여기에 표시 -->
+        </div>
+        
+        <div class="button-section">
+          <button id="downloadButton" class="custom-button mb-2">이미지 다운로드</button>
+        </div>
+        
+        <h3 class="text-lg font-bold mb-2 mt-4">HTML 코드</h3>
+        <textarea id="codeOutput" class="code-box" readonly></textarea>
+        
+        <button id="copyButton" class="custom-button">코드 복사하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quill 에디터 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+  <script>
+    // 한국 시간 기준으로 현재 날짜를 "notice_YYYYMMDD_1" 형식으로 반환하는 함수
+    function getCurrentDateFilename() {
+      // 현재 시간을 한국 시간(KST)으로 가져오기
+      const now = new Date();
+      const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9 (한국 시간)
+  
+      // 날짜 형식 추출 (YYYYMMDD)
+      const year = koreaTime.getUTCFullYear();
+      const month = (koreaTime.getUTCMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1
+      const day = koreaTime.getUTCDate().toString().padStart(2, '0');
+  
+      // "notice_YYYYMMDD_1" 형식으로 반환
+      return `notice_${year}${month}${day}_1`;
+    }
+    // 심볼 SVG 정의
+    const symbols = {
+      info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+      warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
+      error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+      success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+      none: ``
+    };
+    
+    // SVG 색상 맵핑
+    const symbolColors = {
+      info: '#2563EB',
+      warning: '#F59E0B',
+      error: '#DC2626',
+      success: '#10B981',
+      none: ''
+    };
+    
+    // Quill 에디터 초기화
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }],
+          ['clean']
+        ]
+      },
+      placeholder: '내용을 입력해 주세요.'
+    });
+
+     // Elements
+    const titleInput = document.getElementById('title');
+    const buttonTextInput = document.getElementById('buttonText');
+    const buttonLinkInput = document.getElementById('buttonLink');
+    const bgColorInput = document.getElementById('bgColor');
+    const titleColorInput = document.getElementById('titleColor');
+    const contentColorInput = document.getElementById('contentColor');
+    const buttonColorInput = document.getElementById('buttonColor');
+    const fileNameInput = document.getElementById('fileName');
+    const previewElement = document.getElementById('preview');
+    const codeOutput = document.getElementById('codeOutput');
+    const copyButton = document.getElementById('copyButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const symbolRadios = document.querySelectorAll('input[name="symbol"]');
+    const alignmentRadios = document.querySelectorAll('input[name="content-alignment"]');
+    const templateRadios = document.querySelectorAll('input[name="template-type"]');
+    const symbolSelectionContainer = document.getElementById('symbol-selection-container');
+    const showButtonCheckbox = document.getElementById('showButton');
+    const buttonOptionsContainer = document.getElementById('button-options-container');
+    const lineHeightSlider = document.getElementById('lineHeightSlider');
+    const lineHeightValue = document.getElementById('lineHeightValue');
+    
+    // 이미지 크기 설정
+    const imageWidth = 722; // 원본 이미지 너비
+    const htmlImageWidth = 361; // HTML 코드에 사용될 이미지 너비
+    let buttonCoords = [63, 689, 298, 727]; // 기본 좌표값
+    
+    // SVG를 이미지로 변환 - 수정된 함수
+    function svgToImage(svgString, color) {
+      // SVG 문자열에 색상 적용
+      let coloredSvg = svgString;
+      if (color) {
+        // fill 속성 추가
+        coloredSvg = svgString.replace('<svg', `<svg fill="${color}"`);
+      }
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coloredSvg)}`;
+    }
+    
+    // 현재 선택된 심볼 가져오기
+    function getSelectedSymbol() {
+      let selected = 'none';
+      symbolRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
+    
+    // 현재 선택된 정렬 가져오기
+    function getSelectedAlignment() {
+      let selected = 'left';
+      alignmentRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
+    
+    // 현재 선택된 템플릿 타입 가져오기
+    function getSelectedTemplate() {
+      let selected = 'normal';
+      templateRadios.forEach(radio => {
+        if (radio.checked) {
+          selected = radio.value;
+        }
+      });
+      return selected;
+    }
+
+    // 현재 행간 간격 값 가져오기
+    function getLineHeight() {
+      return parseInt(lineHeightSlider.value);
+    }
+    
+    // 템플릿 타입 변경 시 UI 업데이트
+    function updateTemplateUI() {
+      const templateType = getSelectedTemplate();
+      
+      // 심볼 옵션은 일반 공지문에만 표시
+      if (templateType === 'normal') {
+        symbolSelectionContainer.style.display = 'block';
+        // 일반 공지문일 때 기본 색상 설정
+        titleColorInput.value = '#00855B';
+        // 일반 공지문은 버튼 표시 기본값 체크
+        showButtonCheckbox.checked = true;
+        buttonOptionsContainer.style.display = 'block';
+      } else {
+        symbolSelectionContainer.style.display = 'none';
+        // 시스템 공지문일 때 기본 색상 설정
+        titleColorInput.value = '#191F28';
+        // 시스템 공지문은 버튼 표시 기본값 해제
+        showButtonCheckbox.checked = false;
+        buttonOptionsContainer.style.display = 'none';
+        // 시스템 공지문에서는 심볼 선택 초기화
+        document.querySelector('input[name="symbol"][value="none"]').checked = true;
+      }
+
+      // 미리보기 업데이트
+      updatePreview();
+    }
+    
+    // 버튼 표시 옵션 변경 시 UI 업데이트
+    function updateButtonUI() {
+      const showButton = showButtonCheckbox.checked;
+      
+      // 버튼 옵션 표시/숨김
+      buttonOptionsContainer.style.display = showButton ? 'block' : 'none';
+      
+      // 미리보기 업데이트
+      updatePreview();
+    }
+
+    // 행간 슬라이더 변경 시 UI 업데이트
+    function updateLineHeightUI() {
+      const lineHeight = getLineHeight();
+      lineHeightValue.textContent = `${lineHeight}px`;
+      
+      // 미리보기 업데이트
+      updatePreview();
+    }
+    
+    // 미리보기 업데이트
+    function updatePreview() {
+      const title = titleInput.value;
+      const buttonText = buttonTextInput.value;
+      const buttonLink = buttonLinkInput.value;
+      const bgColor = bgColorInput.value;
+      const titleColor = titleColorInput.value;
+      const contentColor = contentColorInput.value;
+      const buttonColor = buttonColorInput.value;
+      const symbolType = getSelectedSymbol();
+      const contentAlignment = getSelectedAlignment();
+      const templateType = getSelectedTemplate();
+      const showButton = showButtonCheckbox.checked;
+      const lineHeight = getLineHeight();
+      
+      // Quill 에디터의 내용 가져오기 (HTML 형식)
+      const contentHtml = quill.root.innerHTML;
+      
+      // 심볼 HTML (일반 공지문에만 적용) - 수정된 버전
+      let symbolHtml = '';
+      if (templateType === 'normal' && symbolType !== 'none') {
+        const symbolColor = symbolColors[symbolType];
+        symbolHtml = `<div style="width: 48px; height: 48px; margin: 0 auto 16px auto;">
+          ${symbols[symbolType].replace('<svg', `<svg fill="${symbolColor}" width="48" height="48" style="display: block; margin: 0 auto;"`)}
+        </div>`;
+      } 
+      // 버튼 HTML
+      let buttonHtml = '';
+      if (showButton) {
+        buttonHtml = `
+          <div style="margin-top: 24px; margin-bottom: 24px; text-align: center;">
+            <a href="${buttonLink}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: ${buttonColor}; color: white; border-radius: 9999px; font-weight: bold; text-decoration: none; font-size: 16px;">
+              ${buttonText}
+            </a>
+          </div>
+        `;
+      }
+      
+      // 정렬 스타일 설정
+      const alignStyle = `text-align: ${contentAlignment};`;
+      
+      // 템플릿 타입에 따라 다른 HTML 생성
+      let previewHtml = '';
+      
+      if (templateType === 'normal') {
+      // 임시 요소 생성하여 실제 텍스트 내용 높이 계산
+      const tempDiv = document.createElement('div');
+      tempDiv.style.width = (imageWidth * 0.8) + 'px'; // 본문 영역의 실제 너비 고려
+      tempDiv.style.font = '14px Pretendard';
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.visibility = 'hidden';
+      tempDiv.style.padding = '15px'; // 패딩 추가
+      tempDiv.style.lineHeight = lineHeight + 'px'; // 설정된 줄간격 적용
+      tempDiv.style.wordBreak = 'break-word';
+      tempDiv.innerHTML = contentHtml;
+      document.body.appendChild(tempDiv);
+
+      // 실제 높이 측정 및 최소 높이 적용
+      const actualContentHeight = tempDiv.offsetHeight;
+      let adjustedContentHeight = actualContentHeight;
+      if (actualContentHeight < 100) {
+        adjustedContentHeight = 100; // 본문이 너무 짧을 때 최소값만 보정
+      }
+      document.body.removeChild(tempDiv);
+
+      // 일반 공지문 템플릿
+      previewHtml = `
+        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+          <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
+            ${symbolHtml}
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
+            <div class="content" style="background-color: white; border-radius: 8px; padding: 16px; margin: 0 auto; max-width: 90%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); min-height: ${adjustedContentHeight}px;">
+              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
+            </div>
+            ${buttonHtml}
+          </div>
+        </div>
+      `;
+    } else {
+        // 시스템 공지문 템플릿
+        previewHtml = `
+          <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+            <div style="padding: 40px; background-color: #FFFFFF; font-family: 'Pretendard', sans-serif;">
+              <div style="text-align: left; font-weight: bold; font-size: 14px; color: #000; margin-bottom: 10px;">공지사항</div>
+              <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: ${titleColor};">${title}</h2>
+              <div style="height: 2px; background-color: #000; margin-bottom: 16px;"></div>
+              <div class="content" style="background-color: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
+              </div>
+              ${buttonHtml}
+            </div>
+          </div>
+        `;
+      }
+      
+      // 미리보기 업데이트
+      previewElement.innerHTML = previewHtml;
+      
+      // 버튼 좌표 업데이트 (버튼이 표시된 경우만)
+      if (showButton) {
+        const button = previewElement.querySelector('a');
+        if (button) {
+          const rect = button.getBoundingClientRect();
+          const previewRect = previewElement.getBoundingClientRect();
+          const scale = imageWidth / previewElement.offsetWidth;
+          
+          // 상대적 위치 계산
+          const left = (rect.left - previewRect.left) * scale;
+          const top = (rect.top - previewRect.top) * scale;
+          const right = left + (rect.width * scale);
+          const bottom = top + (rect.height * scale);
+          
+          buttonCoords = [
+            Math.round(left),
+            Math.round(top),
+            Math.round(right),
+            Math.round(bottom)
+          ];
+        }
+      }
+      
+      // HTML 코드 업데이트
+      updateHtmlCode();
+    }
+    
+    // 다운로드용 캔버스 생성 함수 (수정됨)
+    function createCanvasForDownload() {
+      const title = titleInput.value;
+      const buttonText = buttonTextInput.value;
+      const buttonLink = buttonLinkInput.value;
+      const bgColor = bgColorInput.value;
+      const titleColor = titleColorInput.value;
+      const contentColor = contentColorInput.value;
+      const buttonColor = buttonColorInput.value;
+      const symbolType = getSelectedSymbol();
+      const templateType = getSelectedTemplate();
+      const showButton = showButtonCheckbox.checked;
+      const lineHeight = getLineHeight();
+      
+      // Quill 에디터의 내용 가져오기
+      const contentHtml = quill.root.innerHTML;
+      
+      // HTML2Canvas 대신 직접 캔버스에 그리기
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 캔버스 크기 설정
+      canvas.width = imageWidth;
+      canvas.height = imageWidth; // 기본 높이, 나중에 조정
+      
+      // 배경 그리기
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 심볼 그리기 (Normal 템플릿에만)
+      let currentY = 40; // 시작 Y 위치
+      
+      if (templateType === 'normal' && symbolType !== 'none') {
+        // 심볼 이미지 로드하고 그리기
+        const img = new Image();
+        img.src = svgToImage(symbols[symbolType], symbolColors[symbolType]);
+        
+        img.onload = function() {
+          // 가운데 정렬을 위한 X 계산
+          const symbolX = (canvas.width - 48) / 2;
+          ctx.drawImage(img, symbolX, currentY, 48, 48);
+          currentY += 64; // 심볼 높이 + 간격
+          
+          // 다음 요소들 그리기
+          drawRemainingElements();
+        };
+      } else {
+        // 심볼이 없으면 바로 나머지 요소 그리기
+        drawRemainingElements();
+      }
+      
+      // 나머지 요소 그리기 함수
+      function drawRemainingElements() {
+        // 제목 그리기
+        ctx.font = 'bold 18px Pretendard';
+        ctx.fillStyle = titleColor;
+        ctx.textAlign = 'center';
+        ctx.fillText(title, canvas.width/2, currentY);
+        currentY += 30; // 제목 높이 + 간격
+        
+        // 콘텐츠 배경 그리기
+        ctx.fillStyle = '#FFFFFF';
+        const contentX = canvas.width * 0.1;
+        const contentWidth = canvas.width * 0.8;
+        const contentHeight = 200; // 고정 높이
+        
+        roundRect(ctx, contentX, currentY, contentWidth, contentHeight, 8, true, false);
+        
+        // 콘텐츠 텍스트 (간단한 텍스트만)
+        ctx.font = '14px Pretendard';
+        ctx.fillStyle = contentColor;
+        ctx.textAlign = 'center';
+        ctx.fillText('내용이 이미지에 표시됩니다', canvas.width/2, currentY + 100);
+        
+        currentY += contentHeight + 30; // 콘텐츠 영역 + 간격
+        
+        // 버튼 그리기 (if 표시 설정 true)
+        if(showButton) {
+          ctx.fillStyle = buttonColor;
+          const buttonWidth = 200;
+          const buttonHeight = 40;
+          const buttonX = (canvas.width - buttonWidth) / 2;
+          
+          roundRect(ctx, buttonX, currentY, buttonWidth, buttonHeight, 20, true, false);
+          
+          ctx.font = 'bold 16px Pretendard';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.textAlign = 'center';
+          ctx.fillText(buttonText || '버튼 텍스트', canvas.width/2, currentY + 25);
+          
+          currentY += buttonHeight + 30; // 버튼 높이 + 간격
+        }
+        
+        // 캔버스 높이 조정 (필요한 높이만큼)
+        const canvasCopy = document.createElement('canvas');
+        const ctxCopy = canvasCopy.getContext('2d');
+        canvasCopy.width = canvas.width;
+        canvasCopy.height = currentY;
+        
+        // 조정된 캔버스에 원본 내용 복사
+        ctxCopy.drawImage(canvas, 0, 0);
+        
+        // ID 속성 추가 (선택 사항)
+        canvasCopy.id = 'generatedImage';
+        
+        return canvasCopy;
+      }
+      
+      return canvas;
+    }
+    
+    // 라운드 사각형 그리기 함수
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'undefined') {
+        radius = 5;
+      }
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+          radius[side] = radius[side] || defaultRadius[side];
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) {
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.stroke();
+      }
+    }
+
+    // HTML 코드 업데이트 (이미지 크기 수정 적용)
+    function updateHtmlCode() {
+      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+      const buttonLink = buttonLinkInput.value;
+      const buttonText = buttonTextInput.value;
+      const showButton = showButtonCheckbox.checked;
+      
+      // 이미지 맵 좌표 (반으로 축소)
+      const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
+      
+      // 버튼 표시 여부에 따라 코드 생성
+      if (showButton) {
+        codeOutput.value = `<html>
+<body>
+<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
+<map name="map01" id="map01">
+<area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">`;
+      } else {
+        codeOutput.value = `<html>
+<body>
+<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
+<map name="map01" id="map01">`;
+      }
+    }
+    
+    // 복사 기능
+    copyButton.addEventListener('click', () => {
+      codeOutput.select();
+  
+      // 최신 방식 먼저 시도
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(codeOutput.value)
+          .then(() => alert('코드가 클립보드에 복사되었습니다!'))
+          .catch(err => {
+            console.error('복사 실패 (최신 방식):', err);
+            // 최신 방식 실패 시 구형 방식 시도
+            tryLegacyCopy();
+          });
+      } else {
+        // navigator.clipboard가 지원되지 않는 경우 구형 방식 시도
+        tryLegacyCopy();
+      }
+  
+      // 구형 방식 복사 함수
+      function tryLegacyCopy() {
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert('코드가 클립보드에 복사되었습니다!');
+          } else {
+            alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
+          }
+        } catch (err) {
+          console.error('복사 실패 (구형 방식):', err);
+          alert('복사 기능이 지원되지 않습니다. 코드를 직접 선택해서 복사해 주세요.');
+        }
+      }
+    });
+    
+    // 이미지 다운로드 기능 수정
+    downloadButton.addEventListener('click', () => {
+      downloadButton.textContent = '이미지 생성 중...';
+      downloadButton.disabled = true;
+
+      domtoimage.toPng(previewElement, {
+        quality: 0.95,
+        bgcolor: bgColorInput.value
+      })
+      .then(function(dataUrl) {
+        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+        const link = document.createElement('a');
+        link.download = `${fileName}.png`;
+        link.href = dataUrl;
+        link.click();
+
+        downloadButton.textContent = '이미지 다운로드';
+        downloadButton.disabled = false;
+      })
+      .catch(function(error) {
+        console.error('이미지 생성 오류:', error);
+        alert('이미지 생성 중 오류가 발생했습니다.');
+        downloadButton.textContent = '이미지 다운로드';
+        downloadButton.disabled = false;
+      });
+    });
+    
+    // 템플릿 타입 변경 이벤트 리스너
+    templateRadios.forEach(radio => {
+      radio.addEventListener('change', updateTemplateUI);
+    });
+    
+    // 버튼 표시 옵션 변경 이벤트 리스너
+    showButtonCheckbox.addEventListener('change', updateButtonUI);
+
+    // 행간 슬라이더 변경 이벤트 리스너
+    lineHeightSlider.addEventListener('input', updateLineHeightUI);
+    
+    // 모든 입력 요소에 이벤트 리스너 추가
+    titleInput.addEventListener('input', updatePreview);
+    buttonTextInput.addEventListener('input', updatePreview);
+    buttonLinkInput.addEventListener('input', updatePreview);
+    bgColorInput.addEventListener('input', updatePreview);
+    titleColorInput.addEventListener('input', updatePreview);
+    contentColorInput.addEventListener('input', updatePreview);
+    buttonColorInput.addEventListener('input', updatePreview);
+    fileNameInput.addEventListener('input', updatePreview);
+    
+    // Quill 에디터에 변경 이벤트 리스너 추가
+    quill.on('text-change', updatePreview);
+    
+    // 심볼 라디오 버튼에 이벤트 리스너 추가
+    symbolRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
+    
+    // 정렬 라디오 버튼에 이벤트 리스너 추가
+    alignmentRadios.forEach(radio => {
+      radio.addEventListener('change', updatePreview);
+    });
+    
+    // 초기 파일명 설정 (페이지 로드 시 바로 실행)
+    fileNameInput.value = getCurrentDateFilename();
+    
+    // 초기 템플릿 UI 업데이트
+    updateTemplateUI();
+    
+    // 초기 행간 값 표시
+    updateLineHeightUI();
+    
+    // 초기 미리보기 업데이트
+    updatePreview();
+  </script>
+</body>
+</html>
