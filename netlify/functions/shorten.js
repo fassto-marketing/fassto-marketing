@@ -1,27 +1,19 @@
-const fs = require('fs');
-const path = require('path');
-const FILE_PATH = path.resolve('/tmp/urls.json');
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Only POST allowed' };
+    return { statusCode: 405, body: 'POST 방식만 허용됩니다.' };
   }
 
   const { originalUrl } = JSON.parse(event.body || '{}');
-  if (!originalUrl || !originalUrl.startsWith('http')) {
-    return { statusCode: 400, body: 'Invalid URL' };
+
+  if (!originalUrl || !/^https?:\/\//.test(originalUrl)) {
+    return { statusCode: 400, body: '올바른 URL을 입력해주세요.' };
   }
 
   const shortCode = Math.random().toString(36).substring(2, 8);
-  let urls = {};
-  try {
-    if (fs.existsSync(FILE_PATH)) {
-      urls = JSON.parse(fs.readFileSync(FILE_PATH, 'utf-8'));
-    }
-  } catch (e) {}
-
-  urls[shortCode] = originalUrl;
-  fs.writeFileSync(FILE_PATH, JSON.stringify(urls), 'utf-8');
+  const store = getStore('urls');
+  await store.setJSON(shortCode, { originalUrl });
 
   return {
     statusCode: 200,
