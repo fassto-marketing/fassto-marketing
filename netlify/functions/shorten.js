@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getDeployStore } from '@netlify/blobs';
 
 export default async function handler(event) {
   if (event.httpMethod !== 'POST') {
@@ -12,7 +12,7 @@ export default async function handler(event) {
   }
 
   const shortCode = Math.random().toString(36).substring(2, 8);
-  const store = getStore('urls');
+  const store = getDeployStore('urls');  // 🔥 여기!
   await store.setJSON(shortCode, { originalUrl });
 
   return {
