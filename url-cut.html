@@ -1,294 +1,89 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>URL 단축기 - Fassto Marketing</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-    
-    body {
-      font-family: 'Pretendard', sans-serif;
-    }
-    
+    body { font-family: sans-serif; }
     .copy-feedback {
       visibility: hidden;
       opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: opacity 0.3s ease;
     }
-    
     .copy-feedback.show {
       visibility: visible;
       opacity: 1;
     }
   </style>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
-
-  <nav class="bg-gray-100 border-b border-gray-300 mb-6">
-     <ul class="container mx-auto px-4 py-3 flex items-center space-x-6">
-       <li>
-         <a href="index.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           홈
-         </a>
-       </li>
-       <li>
-         <a href="notice-tool.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           공지 이미지 생성기
-         </a>
-       </li>
-        <li>
-         <a href="coordinate-finder.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           좌표 찾기 도구
-         </a>
-       </li>
-       <li>
-         <a href="url-cut.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           URL 단축기
-         </a>
-       </li>
-     </ul>
-   </nav>
-
-  <main class="flex-grow container mx-auto p-4 max-w-4xl">
-    <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg w-full">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">URL 단축기</h1>
-      <p class="text-lg text-gray-600 mb-8 text-center">긴 URL을 짧고 깔끔한 형태로 변환하세요. fassto.com/(단축코드) 형식으로 제공됩니다.</p>
-      
-      <div class="max-w-2xl mx-auto">
-        <!-- URL 파라미터가 있는 경우 리디렉션 부분 -->
-        <div id="redirect-message" class="hidden mb-6 bg-green-50 border-l-4 border-green-500 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-info-circle text-green-500"></i>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-green-700">
-                잠시 후 원본 URL로 이동합니다...
-              </p>
-            </div>
-          </div>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <main class="flex-grow container mx-auto p-4 max-w-2xl">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold mb-4 text-center">URL 단축기</h1>
+      <div class="mb-6">
+        <label class="block mb-2 text-gray-700 font-medium">URL 입력</label>
+        <div class="flex">
+          <input id="url-input" type="url" placeholder="https://example.com" class="flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+          <button id="shorten-btn" class="px-4 py-2 bg-green-600 text-white font-medium rounded-r-lg hover:bg-green-700">단축</button>
         </div>
-        
-        <div class="mb-6">
-          <label for="url-input" class="block text-gray-700 font-medium mb-2">URL 입력</label>
-          <div class="flex">
-            <input type="url" id="url-input" placeholder="https://" 
-                   class="w-full px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
-            <button id="shorten-btn" 
-                    class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-3 rounded-r-lg transition duration-150 ease-in-out">
-              <i class="fas fa-cut mr-2"></i>단축
-            </button>
-          </div>
-        </div>
-        
-        <div id="result-container" class="hidden bg-gray-50 p-5 rounded-lg border border-gray-200 mb-6">
-          <div class="flex flex-col md:flex-row md:items-center justify-between">
-            <div class="flex-grow">
-              <label class="block text-gray-700 font-medium mb-2">생성된 단축 URL</label>
-              <div class="relative">
-                <a href="#" id="short-url" class="text-green-600 hover:text-green-800 break-all font-medium text-lg" target="_blank"></a>
-              </div>
-            </div>
-            <div class="mt-3 md:mt-0 flex space-x-2 relative">
-              <button id="copy-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg transition duration-150 ease-in-out flex items-center">
-                <i class="far fa-copy mr-2"></i>복사
-              </button>
-              <div id="copy-feedback" class="copy-feedback absolute right-full mr-2 bg-gray-800 text-white text-sm py-1 px-3 rounded">
-                복사 완료!
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-8">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-info-circle text-blue-500"></i>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                <strong>데모 모드 안내:</strong> 현재 이 URL 단축기는 데모 모드로 작동합니다. 생성된 단축 URL은 같은 브라우저에서만 작동하며, 다른 사람과 공유할 수 없습니다. 실제 서비스로 사용하려면 서버 측 구현이 필요합니다.
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-info-circle text-blue-500"></i>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                곧 단축 URL 통계 기능이 추가될 예정입니다. 클릭 수, 방문자 통계 등 다양한 정보를 확인할 수 있습니다.
-              </p>
-            </div>
-          </div>
+      </div>
+      <div id="result-container" class="hidden mt-6">
+        <label class="block mb-2 text-gray-700 font-medium">생성된 단축 URL</label>
+        <div class="flex items-center space-x-3">
+          <a id="short-url" href="#" target="_blank" class="text-green-600 break-all"></a>
+          <button id="copy-btn" class="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">복사</button>
+          <span id="copy-feedback" class="copy-feedback text-sm text-green-600">복사 완료!</span>
         </div>
       </div>
     </div>
   </main>
-  
-  <footer class="bg-gray-200 text-center p-4 mt-8"> 
-    <p class="text-sm text-gray-600">&copy; <span id="current-year">2025</span> Fassto Marketing. All Rights Reserved.</p>
-  </footer>
-
   <script>
-    // 현재 연도 설정
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-    
-    // DOM 요소
     const urlInput = document.getElementById('url-input');
     const shortenBtn = document.getElementById('shorten-btn');
     const resultContainer = document.getElementById('result-container');
     const shortUrlElement = document.getElementById('short-url');
     const copyBtn = document.getElementById('copy-btn');
     const copyFeedback = document.getElementById('copy-feedback');
-    const redirectMessage = document.getElementById('redirect-message');
-    
-    // URL에서 코드 파라미터 확인 및 리디렉션 처리
-    function checkForRedirection() {
-      // URL 파라미터 파싱
-      const urlParams = new URLSearchParams(window.location.search);
-      const shortCode = urlParams.get('code');
-      
-      // 단축 코드가 있으면 리디렉션 처리
-      if (shortCode) {
-        redirectMessage.classList.remove('hidden');
-        
-        // 로컬 스토리지에서 원본 URL 조회
-        const urls = JSON.parse(localStorage.getItem('fassto_urls') || '{}');
-        const urlData = urls[shortCode];
-        
-        if (urlData && urlData.originalUrl) {
-          // 클릭 카운트 증가
-          urlData.clicks = (urlData.clicks || 0) + 1;
-          urls[shortCode] = urlData;
-          localStorage.setItem('fassto_urls', JSON.stringify(urls));
-          
-          // 3초 후 원본 URL로 리디렉션
-          setTimeout(() => {
-            window.location.href = urlData.originalUrl;
-          }, 1500);
-        } else {
-          redirectMessage.innerHTML = `
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-yellow-700">
-                  존재하지 않는 단축 URL입니다. 올바른 URL을 확인해주세요.
-                </p>
-              </div>
-            </div>
-          `;
-          redirectMessage.classList.remove('bg-green-50', 'border-green-500');
-          redirectMessage.classList.add('bg-yellow-50', 'border-yellow-500');
-        }
-      }
-    }
-    
-    // URL 단축 함수
-    function shortenUrl() {
-      // 입력 URL 가져오기
+
+    async function shortenUrl() {
       const originalUrl = urlInput.value.trim();
-      
-      // 입력 유효성 검사
-      if (!originalUrl) {
-        alert('URL을 입력해주세요.');
+      if (!originalUrl || !/^https?:\/\//.test(originalUrl)) {
+        alert("유효한 URL을 입력해주세요.");
         return;
       }
-      
-      // URL 형식 검사
-      if (!isValidUrl(originalUrl)) {
-        alert('유효한 URL을 입력해주세요. (예: https://example.com)');
+
+      const res = await fetch('/.netlify/functions/shorten', {
+        method: 'POST',
+        body: JSON.stringify({ originalUrl })
+      });
+
+      if (!res.ok) {
+        alert("단축에 실패했습니다.");
         return;
       }
-      
-      // 단축 코드 생성
-      const shortCode = generateShortCode();
-      
-      // 현재 페이지 URL 기반으로 단축 URL 생성 (데모용)
-      const currentUrl = window.location.href.split('?')[0]; // 파라미터 제거
-      const shortUrl = `${currentUrl}?code=${shortCode}`;
-      
-      // 결과 표시
-      shortUrlElement.textContent = `fassto.com/${shortCode}`;
-      shortUrlElement.href = shortUrl; // 데모에서는 현재 페이지의 URL에 파라미터 추가
+
+      const data = await res.json();
+      const shortUrl = `${window.location.origin}/.netlify/functions/redirect?code=${data.shortCode}`;
+
+      shortUrlElement.textContent = shortUrl;
+      shortUrlElement.href = shortUrl;
       resultContainer.classList.remove('hidden');
-      
-      // 로컬 스토리지에 저장
-      saveToLocalStorage(shortCode, {
-        originalUrl: originalUrl,
-        createdAt: new Date().toISOString(),
-        clicks: 0
+    }
+
+    function copyToClipboard() {
+      navigator.clipboard.writeText(shortUrlElement.textContent).then(() => {
+        copyFeedback.classList.add('show');
+        setTimeout(() => copyFeedback.classList.remove('show'), 2000);
       });
     }
-    
-    // URL 유효성 검사
-    function isValidUrl(url) {
-      try {
-        new URL(url);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-    
-    // 단축 코드 생성 (랜덤 6자리 영숫자)
-    function generateShortCode(length = 6) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    }
-    
-    // 로컬 스토리지에 URL 데이터 저장
-    function saveToLocalStorage(shortCode, data) {
-      const urls = JSON.parse(localStorage.getItem('fassto_urls') || '{}');
-      urls[shortCode] = data;
-      localStorage.setItem('fassto_urls', JSON.stringify(urls));
-    }
-    
-    // URL 복사 기능
-    function copyToClipboard() {
-      const shortUrl = shortUrlElement.textContent;
-      
-      // 클립보드에 복사
-      navigator.clipboard.writeText(shortUrl)
-        .then(() => {
-          // 복사 완료 메시지 표시
-          copyFeedback.classList.add('show');
-          setTimeout(() => {
-            copyFeedback.classList.remove('show');
-          }, 2000);
-        })
-        .catch(err => {
-          console.error('클립보드 복사 실패:', err);
-          alert('URL 복사에 실패했습니다. 직접 선택하여 복사해주세요.');
-        });
-    }
-    
-    // 페이지 로드 시 리디렉션 확인
-    window.addEventListener('DOMContentLoaded', checkForRedirection);
-    
-    // 이벤트 리스너
+
     shortenBtn.addEventListener('click', shortenUrl);
     copyBtn.addEventListener('click', copyToClipboard);
-    
-    // 엔터 키 입력 처리
-    urlInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        shortenUrl();
-      }
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') shortenUrl();
     });
   </script>
 </body>
 </html>
-
