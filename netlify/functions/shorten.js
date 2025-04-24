@@ -1,6 +1,6 @@
-const { getStore } = require('@netlify/blobs');
+import { getStore } from '@netlify/blobs';
 
-exports.handler = async function (event) {
+export default async function handler(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'POST 방식만 허용됩니다.' };
   }
@@ -19,4 +19,4 @@ exports.handler = async function (event) {
     statusCode: 200,
     body: JSON.stringify({ shortCode }),
   };
-};
+}
