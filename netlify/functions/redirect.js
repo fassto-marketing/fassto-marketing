@@ -1,30 +1,20 @@
-const fs = require('fs');
-const path = require('path');
-const FILE_PATH = path.resolve('/tmp/urls.json');
+exports.handler = async (event) => {
+  const { code } = event.queryStringParameters;
 
-exports.handler = async function (event) {
-  const code = event.queryStringParameters.code;
-  if (!code) {
-    return { statusCode: 302, headers: { Location: '/url-cut.html' } };
-  }
+  // 예시: code에 해당하는 원래 URL을 조회
+  const originalUrl = await getOriginalUrl(code);
 
-  let urls = {};
-  try {
-    if (fs.existsSync(FILE_PATH)) {
-      urls = JSON.parse(fs.readFileSync(FILE_PATH, 'utf-8'));
-    }
-  } catch (e) {}
-
-  const originalUrl = urls[code];
   if (!originalUrl) {
     return {
-      statusCode: 302,
-      headers: { Location: '/url-cut.html?error=notfound' }
+      statusCode: 404,
+      body: 'Not Found',
     };
   }
 
   return {
     statusCode: 302,
-    headers: { Location: originalUrl }
+    headers: {
+      Location: originalUrl,
+    },
   };
 };
