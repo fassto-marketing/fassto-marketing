@@ -1,8 +1,8 @@
-import { getStore } from '@netlify/blobs';
+import { getDeployStore } from '@netlify/blobs';
 
 export default async function handler(event) {
   const code = event.queryStringParameters.code;
-  const store = getStore('urls');
+  const store = getDeployStore('urls');  // 🔥 여기!
   const data = await store.getJSON(code);
 
   if (!data || !data.originalUrl) {
