@@ -102,7 +102,7 @@
       }
 
       const data = await res.json();
-      const shortUrl = `${window.location.origin}/.netlify/functions/redirect?code=${data.shortCode}`;
+      const shortUrl = `${window.location.origin}/r/${data.shortCode}`;
 
       shortUrlElement.textContent = shortUrl;
       shortUrlElement.href = shortUrl;
