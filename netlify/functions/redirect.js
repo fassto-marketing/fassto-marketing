@@ -1,6 +1,6 @@
-const { getStore } = require('@netlify/blobs');
+import { getStore } from '@netlify/blobs';
 
-exports.handler = async function (event) {
+export default async function handler(event) {
   const code = event.queryStringParameters.code;
   const store = getStore('urls');
   const data = await store.getJSON(code);
@@ -18,4 +18,4 @@ exports.handler = async function (event) {
       Location: data.originalUrl,
     },
   };
-};
+}
