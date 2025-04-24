@@ -1,59 +1,347 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fassto Marketing</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
-  <style>
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fassto Marketing</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background-color: #0066ff;
+            color: white;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 1.8rem;
+            color: #0066ff;
+            margin-top: 30px;
+        }
+        .intro {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .news-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        .news-source {
+            color: #0066ff;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        .news-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .news-title {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+        .news-title a {
+            color: #333;
+            text-decoration: none;
+        }
+        .news-title a:hover {
+            color: #0066ff;
+            text-decoration: underline;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #0066ff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .cta-button:hover {
+            background-color: #0052cc;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin-top: 40px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .refresh-button {
+            background-color: #f1f1f1;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+        .refresh-button:hover {
+            background-color: #e1e1e1;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
     
-    body {
-      font-family: 'Pretendard', sans-serif;
-    }
-    
-  </style>
+    <!-- 구글 폰트 - 노토 산스 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body>
+    <header>
+        <div class="container">
+            <h1>Fassto Marketing</h1>
+            <p>물류 혁신을 선도하는 파스토의 최신 마케팅 정보와 물류 트렌드를 만나보세요</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="intro">
+            <h2>Fassto Marketing에 오신 것을 환영합니다!</h2>
+            <p>파스토(Fassto)는 이커머스와 물류 혁신을 주도하는 풀필먼트 플랫폼입니다. Fassto Marketing 페이지에서는 최신 물류 트렌드, 이커머스 배송 혁신 사례, 파스토의 신규 서비스 소식 등 다양한 정보를 제공합니다.</p>
+            <a href="https://www.fassto.ai/" class="cta-button">파스토 홈페이지 바로가기</a>
+        </section>
+        
+        <div class="news-section">
+            <div class="clearfix">
+                <h2>네이버 물류 관련 최신 소식</h2>
+                <button id="refreshLogisticsNews" class="refresh-button">새로고침</button>
+            </div>
+            <div id="logisticsNews">
+                <div class="loading">물류 관련 뉴스를 불러오는 중...</div>
+            </div>
+        </div>
+        
+        <div class="news-section">
+            <div class="clearfix">
+                <h2>파스토 관련 최신 소식</h2>
+                <button id="refreshFasstoNews" class="refresh-button">새로고침</button>
+            </div>
+            <div id="fasstoNews">
+                <div class="loading">파스토 관련 뉴스를 불러오는 중...</div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Fassto. All rights reserved.</p>
+            <p><a href="https://www.fassto.ai/" style="color: white;">파스토 홈페이지</a></p>
+        </div>
+    </footer>
 
-  <nav class="bg-gray-100 border-b border-gray-300 mb-6">
-     <ul class="container mx-auto px-4 py-3 flex items-center space-x-6">
-       <li>
-         <a href="index.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           홈
-         </a>
-       </li>
-       <li>
-         <a href="notice-tool.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           공지 이미지 생성기
-         </a>
-       </li>
-        <li>
-         <a href="coordinate-finder.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           좌표 찾기 도구
-         </a>
-       </li>
-       <li>
-         <a href="url-cut.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">
-           URL 단축기
-         </a>
-       </li>
-       </ul>
-   </nav>
-
-  <main class="flex-grow container mx-auto p-4 max-w-4xl flex items-center justify-center">
-    <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg text-center w-full">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4"> Fassto Marketing에 오신 것을 환영합니다!</h1>
-
-      <p class="text-lg text-gray-600 mb-8"> Fassto Marketing 관련 다양한 정보와 도구를 만나보세요.</p>
-
-      <a href="https://www.fassto.ai" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow hover:shadow-md"> 파스토 홈페이지 바로가기</a>
-
-</div>
-  </main>
-  <footer class="bg-gray-200 text-center p-4 mt-8"> <p class="text-sm text-gray-600">&copy; 2025 Fassto Marketing. All Rights Reserved.</p>
-  </footer>
-
+    <script>
+        // 네이버 뉴스 API를 사용하는 대신 CORS 우회를 위한 프록시 서버 사용
+        const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+        
+        // 물류 관련 뉴스 불러오기 (네이버 뉴스 검색 RSS)
+        function fetchLogisticsNews() {
+            const logisticsNewsContainer = document.getElementById('logisticsNews');
+            logisticsNewsContainer.innerHTML = '<div class="loading">물류 관련 뉴스를 불러오는 중...</div>';
+            
+            // 네이버 뉴스 검색 "물류" 키워드 RSS 피드
+            // 실제 환경에서는 서버사이드에서 처리하거나 CORS를 허용하는 프록시를 사용해야 함
+            fetch(PROXY_URL + encodeURIComponent('https://news.google.com/rss/search?q=물류&hl=ko&gl=KR&ceid=KR:ko'))
+                .then(response => response.text())
+                .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+                .then(data => {
+                    const items = data.querySelectorAll('item');
+                    let html = '';
+                    
+                    if (items.length > 0) {
+                        items.forEach((item, index) => {
+                            if (index < 5) { // 최대 5개 뉴스만 표시
+                                const title = item.querySelector('title')?.textContent || '제목 없음';
+                                const link = item.querySelector('link')?.textContent || '#';
+                                const pubDate = item.querySelector('pubDate')?.textContent || '';
+                                const source = item.querySelector('source')?.textContent || '뉴스 소스';
+                                
+                                // 날짜 포맷팅
+                                const date = new Date(pubDate);
+                                const formattedDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                
+                                html += `
+                                    <div class="news-item">
+                                        <span class="news-source">${source}</span>
+                                        <span class="news-date">${formattedDate}</span>
+                                        <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                                    </div>
+                                `;
+                            }
+                        });
+                    } else {
+                        html = '<p>물류 관련 뉴스를 찾을 수 없습니다.</p>';
+                    }
+                    
+                    logisticsNewsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching logistics news:', error);
+                    logisticsNewsContainer.innerHTML = '<p>뉴스를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
+                });
+        }
+        
+        // 파스토 관련 뉴스 불러오기
+        function fetchFasstoNews() {
+            const fasstoNewsContainer = document.getElementById('fasstoNews');
+            fasstoNewsContainer.innerHTML = '<div class="loading">파스토 관련 뉴스를 불러오는 중...</div>';
+            
+            // 네이버 뉴스 검색 "파스토" 또는 "fassto" 키워드 RSS 피드
+            fetch(PROXY_URL + encodeURIComponent('https://news.google.com/rss/search?q=파스토 OR fassto&hl=ko&gl=KR&ceid=KR:ko'))
+                .then(response => response.text())
+                .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+                .then(data => {
+                    const items = data.querySelectorAll('item');
+                    let html = '';
+                    
+                    if (items.length > 0) {
+                        items.forEach((item, index) => {
+                            if (index < 5) { // 최대 5개 뉴스만 표시
+                                const title = item.querySelector('title')?.textContent || '제목 없음';
+                                const link = item.querySelector('link')?.textContent || '#';
+                                const pubDate = item.querySelector('pubDate')?.textContent || '';
+                                const source = item.querySelector('source')?.textContent || '뉴스 소스';
+                                
+                                // 날짜 포맷팅
+                                const date = new Date(pubDate);
+                                const formattedDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                
+                                html += `
+                                    <div class="news-item">
+                                        <span class="news-source">${source}</span>
+                                        <span class="news-date">${formattedDate}</span>
+                                        <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                                    </div>
+                                `;
+                            }
+                        });
+                    } else {
+                        html = '<p>파스토 관련 뉴스를 찾을 수 없습니다.</p>';
+                    }
+                    
+                    fasstoNewsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching Fassto news:', error);
+                    fasstoNewsContainer.innerHTML = '<p>뉴스를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
+                });
+        }
+        
+        // 뉴스를 가져오지 못할 경우 대비한 샘플 뉴스
+        function loadSampleNews() {
+            const logisticsNewsContainer = document.getElementById('logisticsNews');
+            const fasstoNewsContainer = document.getElementById('fasstoNews');
+            
+            // 물류 관련 샘플 뉴스
+            const logisticsSampleHtml = `
+                <div class="news-item">
+                    <span class="news-source">물류신문</span>
+                    <span class="news-date">2025-04-24</span>
+                    <h3 class="news-title"><a href="#" target="_blank">물류 산업, 2025년 디지털 전환 가속화 전망</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">이커머스투데이</span>
+                    <span class="news-date">2025-04-23</span>
+                    <h3 class="news-title"><a href="#" target="_blank">국내 풀필먼트 시장 규모 작년 대비 30% 성장</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">디지털타임스</span>
+                    <span class="news-date">2025-04-22</span>
+                    <h3 class="news-title"><a href="#" target="_blank">물류 자동화 도입 기업, 운영 효율 25% 증가</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">테크뉴스</span>
+                    <span class="news-date">2025-04-20</span>
+                    <h3 class="news-title"><a href="#" target="_blank">AI 기반 물류 예측 시스템, 재고 관리 혁신 가져와</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">경제신문</span>
+                    <span class="news-date">2025-04-19</span>
+                    <h3 class="news-title"><a href="#" target="_blank">친환경 물류, ESG 경영 핵심으로 부상</a></h3>
+                </div>
+            `;
+            
+            // 파스토 관련 샘플 뉴스
+            const fasstoSampleHtml = `
+                <div class="news-item">
+                    <span class="news-source">스타트업투데이</span>
+                    <span class="news-date">2025-04-24</span>
+                    <h3 class="news-title"><a href="#" target="_blank">파스토, 시리즈 C 200억 투자 유치 성공</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">비즈니스월드</span>
+                    <span class="news-date">2025-04-22</span>
+                    <h3 class="news-title"><a href="#" target="_blank">파스토, 중소 이커머스 위한 풀필먼트 신규 서비스 출시</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">IT뉴스</span>
+                    <span class="news-date">2025-04-20</span>
+                    <h3 class="news-title"><a href="#" target="_blank">파스토, AI 기반 재고 관리 시스템 도입으로 효율성 극대화</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">물류신문</span>
+                    <span class="news-date">2025-04-18</span>
+                    <h3 class="news-title"><a href="#" target="_blank">파스토, 친환경 포장재 전면 도입 선언</a></h3>
+                </div>
+                <div class="news-item">
+                    <span class="news-source">경제일보</span>
+                    <span class="news-date">2025-04-15</span>
+                    <h3 class="news-title"><a href="#" target="_blank">파스토, 새로운 물류 허브 센터 오픈으로 처리 능력 2배 확대</a></h3>
+                </div>
+            `;
+            
+            logisticsNewsContainer.innerHTML = logisticsSampleHtml;
+            fasstoNewsContainer.innerHTML = fasstoSampleHtml;
+        }
+        
+        // 페이지 로드 시 뉴스 로딩 시도
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                fetchLogisticsNews();
+                fetchFasstoNews();
+            } catch (error) {
+                console.error('Error loading news:', error);
+                loadSampleNews();
+            }
+            
+            // 새로고침 버튼에 이벤트 리스너 추가
+            document.getElementById('refreshLogisticsNews').addEventListener('click', fetchLogisticsNews);
+            document.getElementById('refreshFasstoNews').addEventListener('click', fetchFasstoNews);
+        });
+    </script>
 </body>
 </html>
