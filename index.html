@@ -210,10 +210,9 @@
                       // 수정된 HTML 템플릿
                       return `
                         <div class="news-item">
-                          <span class="news-source">${domain}</span>
+                          <span class="news-source">${publisher}</span>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                          ${publisher ? `<span class="news-publisher">언론사: ${publisher}</span>` : ''}
                         </div>
                       `;
                     })
@@ -276,7 +275,7 @@
                       // 수정된 HTML 템플릿
                       return `
                         <div class="news-item">
-                          <span class="news-source">${domain}</span>
+                          <span class="news-source">${publisher}</span>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
                           ${publisher ? `<span class="news-publisher">언론사: ${publisher}</span>` : ''}
