@@ -5,6 +5,9 @@ command = "npm install"
 [functions]
 directory = "netlify/functions"
 
+[build.environment]
+NODE_VERSION = "18"
+
 [[redirects]]
   from = "/r/:code"
   to = "/.netlify/functions/redirect?code=:code"
