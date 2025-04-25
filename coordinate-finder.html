@@ -32,12 +32,20 @@
 <body class="bg-gray-50 flex flex-col min-h-screen">
 
   <nav class="bg-gray-100 border-b border-gray-300 mb-6">
-    <ul class="container mx-auto px-4 py-3 flex flex-wrap items-center gap-4 text-sm md:text-base">
-      <li><a href="index.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">홈</a></li>
-      <li><a href="notice-tool.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">공지 이미지 생성기</a></li>
-      <li><a href="coordinate-finder.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">좌표 찾기 도구</a></li>
-      <li><a href="url-cut.html" class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition duration-150 ease-in-out">URL 단축기</a></li>
-    </ul>
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="text-lg font-semibold text-green-700">Fassto</div>
+      <button id="menu-toggle" class="block md:hidden text-gray-700 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      <ul id="menu" class="hidden md:flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0 mt-4 md:mt-0 w-full md:w-auto">
+        <li><a href="index.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">홈</a></li>
+        <li><a href="notice-tool.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">공지 이미지 생성기</a></li>
+        <li><a href="coordinate-finder.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">좌표 찾기 도구</a></li>
+        <li><a href="url-cut.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">URL 단축기</a></li>
+      </ul>
+    </div>
   </nav>
 
   <main class="flex-grow container mx-auto p-4 max-w-5xl">
@@ -62,8 +70,8 @@
     </div>
   </main>
 
-  <footer class="bg-gray-200 text-center p-4 mt-8">
-      <p class="text-sm text-gray-600">&copy; 2025 Fassto Marketing. All Rights Reserved.</p>
+  <footer class="bg-gray-200 text-center p-4 mt-auto">
+    <p class="text-sm text-gray-600">© 2025 Fassto Marketing. All Rights Reserved.</p>
   </footer>
 
   <script>
@@ -178,6 +186,13 @@
     }
 
   </script>
+
+ <script>
+    document.getElementById('menu-toggle').addEventListener('click', function () {
+      const menu = document.getElementById('menu');
+      menu.classList.toggle('hidden');
+    });
+ </script>
 
  </body>
  </html>
