@@ -15,44 +15,104 @@ exports.handler = async function(event) {
   }
 
   try {
-    const response = await axios.get(url);
+
+    const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Referer': 'https://www.google.com/'
+  };
+    
+    const response = await axios.get(url, { headers });
     const $ = cheerio.load(response.data);
 
     // 언론사명 추출 개선 부분
     let publisher = '';
+    const domain = new URL(url).hostname;
     
-    // 방법 1: meta 태그에서 og:site_name 확인
-    publisher = $('meta[property="og:site_name"]').attr('content');
-    
-    // 방법 2: 언론사 전용 meta 태그 확인
-    if (!publisher) {
-      publisher = $('meta[name="media"]').attr('content') || 
-                  $('meta[name="publisher"]').attr('content') || 
-                  $('meta[name="author"]').attr('content');
+   // 도메인별 맞춤 처리 추가
+    if (domain.includes('etoday.co.kr')) {
+      publisher = $('.press_logo img').attr('alt') || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '이투데이';
+    } 
+    else if (domain.includes('yna.co.kr')) {
+      publisher = $('.media_end_head_top .logo img').attr('alt') || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '연합뉴스';
     }
-    
-    // 방법 3: 네이버 뉴스의 경우 특정 클래스나 ID 활용
-    if (!publisher) {
-      // 네이버 뉴스의 경우
-      publisher = $('.media_end_head_top .media_end_head_top_logo img').attr('alt') ||
-                  $('.press_logo img').attr('alt') ||
-                  $('.c_inner .logo_area img').attr('alt');
+    else if (domain.includes('ilyo.co.kr')) {
+      publisher = $('.press_logo span').text() || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '일요신문';
     }
-    
-    // 방법 4: 제목에서 추출 시도
-    if (!publisher) {
-      const titleText = $('title').text();
-      const titleParts = titleText.split('|');
-      if (titleParts.length > 1) {
-        publisher = titleParts[titleParts.length - 1].trim();
+    else if (domain.includes('techm.kr')) {
+      publisher = $('.article-header-wrap .media').text() || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '테크M';
+    }
+    else if (domain.includes('dealsite.co.kr')) {
+      publisher = $('meta[property="og:site_name"]').attr('content') || '딜사이트';
+    }
+    else if (domain.includes('newsis.com')) {
+      publisher = $('.header-logo img').attr('alt') || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '뉴시스';
+    }
+    else if (domain.includes('insightkorea.co.kr')) {
+      publisher = $('.tit_media img').attr('alt') || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '인사이트코리아';
+    }
+    else if (domain.includes('aving.net')) {
+      publisher = $('.header-logo-wrap img').attr('alt') || 
+                  $('meta[property="og:site_name"]').attr('content') || 
+                  '에이빙';
+    }
+    else {
+      // 기존 추출 방법 (변경 없음)
+      publisher = $('meta[property="og:site_name"]').attr('content');
+      
+      if (!publisher) {
+        publisher = $('meta[name="media"]').attr('content') || 
+                    $('meta[name="publisher"]').attr('content') || 
+                    $('meta[name="author"]').attr('content');
+      }
+      
+      if (!publisher) {
+        // 네이버 뉴스의 경우
+        publisher = $('.media_end_head_top .media_end_head_top_logo img').attr('alt') ||
+                    $('.press_logo img').attr('alt') ||
+                    $('.c_inner .logo_area img').attr('alt');
+      }
+      
+      if (!publisher) {
+        const titleText = $('title').text();
+        const titleParts = titleText.split('|');
+        if (titleParts.length > 1) {
+          publisher = titleParts[titleParts.length - 1].trim();
+        }
+      }
+      
+      if (!publisher) {
+        publisher = $('.publisher').text().trim() ||
+                    $('.source').text().trim() ||
+                    $('.news_agency').text().trim();
       }
     }
     
-    // 방법 5: 특정 언론사별 맞춤 선택자
+    // 언론사 정보가 없을 경우 도메인으로 대체 (새로 추가)
     if (!publisher) {
-      publisher = $('.publisher').text().trim() ||
-                  $('.source').text().trim() ||
-                  $('.news_agency').text().trim();
+      // 도메인에서 언론사명 추출 시도
+      const domainParts = domain.split('.');
+      if (domainParts.length >= 2) {
+        // www.example.co.kr -> example 추출
+        publisher = domainParts[domainParts.length === 4 ? 1 : 0];
+        // 첫 글자를 대문자로 변환
+        publisher = publisher.charAt(0).toUpperCase() + publisher.slice(1);
+      } else {
+        publisher = domain;
+      }
     }
     
     // 언론사 정보가 없을 경우 기본값 설정
