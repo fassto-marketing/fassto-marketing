@@ -51,7 +51,35 @@ exports.handler = async function(event) {
         'asiatoday.co.kr': '아시아투데이',
         'pressian.com': '프레시안',
         'venturesquare.net': '벤처스퀘어',
-        'newsgn.com': '뉴스경남'
+        'newsgn.com': '뉴스경남',
+        'aving.net': '에이빙뉴스',
+        'discoverynews.kr': '디스커버리뉴스',
+        'polinews.co.kr': '폴리뉴스',
+        'fntimes.com': '한국금융신문',
+        'newspim.com': '뉴스핌',
+        'newspost.kr': '뉴스포스트',
+        'newsworks.co.kr': '뉴스웍스',
+        'insight.co.kr': '인사이트',
+        'thevaluenews.co.kr': '더밸류뉴스',
+        'sisaon.co.kr': '시사오늘',
+        'businesspost.co.kr': '비즈니스포스트',
+        'incheonnews.com': '인천뉴스',
+        'incheonin.com': '인천in',
+        'nbnews.kr': 'NBN NEWS'
+        'dealsite.co.kr': '딜사이트',
+        'insightkorea.co.kr': '인사이트코리아',
+        'dnews.co.kr': '대한경제',
+        'dt.co.kr': '디지털타임스',
+        'thebell.co.kr': '더벨',
+        'ajunews.com': '아주경제',
+        'smedaily.co.kr': '중소기업신문',
+        'etnews.com': '전자신문',
+        'hansbiz.co.kr': '한스경제',
+        'nocutnews.co.kr': '노컷뉴스',
+        'byline.network': '바이라인네트워크',
+        'sentv.co.kr': '서울경제TV',
+        'zdnet.co.kr': '지디넷코리아',
+        'ddaily.co.kr': '디지털데일리'
       };
 
       for (const domain in publisherMap) {
