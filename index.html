@@ -196,14 +196,40 @@
                   const date = new Date(item.pubDate).toLocaleDateString();
                   const domain = new URL(item.originallink || item.link).hostname;
         
-                  html += `
-                    <div class="news-item">
-                      <span class="news-source">${domain}</span>
-                      <span class="news-date">${date}</span>
-                      <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                    </div>
-                  `;
+                  const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
+                    .then(res => res.json())
+                    .then(publisherData => {
+                      const publisher = publisherData.publisher || '언론사 미표시';
+                      return `
+                        <div class="news-item">
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
+                          <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                          <span class="news-publisher">언론사: ${publisher}</span>
+                        </div>
+                      `;
+                    })
+                    .catch(error => {
+                      console.error('언론사 정보 로딩 실패:', error);
+                      return `
+                        <div class="news-item">
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
+                          <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                          <span class="news-publisher">언론사: 언론사 정보 로딩 실패</span>
+                        </div>
+                      `;
+                    });
+        
+                  fetchPromises.push(publisherPromise);
                 });
+        
+                Promise.all(fetchPromises)
+                  .then(newsItemsHTML => {
+                    html = newsItemsHTML.join(''); // Combine all HTML snippets into one string
+                    logisticsNewsContainer.innerHTML = html; // Update the container once
+                  });
+                  
               } else {
                 html = '<p>관련 뉴스를 찾을 수 없습니다.</p>';
               }
