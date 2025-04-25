@@ -1,7 +1,7 @@
 {
   "name": "fassto-url-shortener",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@netlify/blobs": "latest",
     "node-fetch": "^2.6.11",
