@@ -93,14 +93,15 @@ exports.handler = async function(event) {
     let publisher = '';
 
     if (domain.includes('etoday.co.kr')) {
-      publisher = $('.press_logo img').attr('alt') ||
-                  $('meta[property="og:site_name"]').attr('content') ||
-                  '이투데이';
+      const pressAlt = $('.press_logo img').attr('alt');
+      const ogSiteName = $('meta[property="og:site_name"]').attr('content');
+      publisher = pressAlt || ogSiteName || '이투데이';
     } else if (domain.includes('yna.co.kr')) {
-      publisher = $('.media_end_head_top .logo img').attr('alt') ||
-                  $('meta[property="og:site_name"]').attr('content') ||
-                  '연합뉴스';
+      const logoAlt = $('.media_end_head_top .logo img').attr('alt');
+      const ogSiteNameYna = $('meta[property="og:site_name"]').attr('content');
+      publisher = logoAlt || ogSiteNameYna || '연합뉴스';
     }
+
 
     // fallback
     if (!publisher && extractedPublisher) {
