@@ -1,15 +1,15 @@
-// functions/getNaverNews.js
+// getNaverNews.js
 const fetch = require('node-fetch');
 
 exports.handler = async function(event) {
-  const query = '파스토'; // 검색어
+  const query = event.queryStringParameters.query || '파스토';
   const url = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(query)}&display=5&sort=date`;
 
   try {
     const res = await fetch(url, {
       headers: {
-        'X-Naver-Client-Id': 'aJ1lgNaPNguAe0nhTb26',
-        'X-Naver-Client-Secret': 'crk8ObUpST'
+        'X-Naver-Client-Id': '여기에-클라이언트-ID',
+        'X-Naver-Client-Secret': '여기에-클라이언트-SECRET'
       }
     });
 
