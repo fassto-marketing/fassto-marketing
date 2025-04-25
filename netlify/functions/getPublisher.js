@@ -142,6 +142,8 @@ exports.handler = async function(event) {
       statusCode: 200,  // 성공 응답 코드로 변경
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
