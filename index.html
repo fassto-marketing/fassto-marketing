@@ -192,14 +192,14 @@
             .then(response => response.json())
             .then(data => {
               let html = '';
-              const fetchPromises = [];
+              const fetchPromises = []; // 추가: 언론사 정보 가져오기 위한 프로미스 배열
         
               if (data.items && data.items.length > 0) {
                 data.items.forEach(item => {
                   const title = item.title.replace(/<[^>]+>/g, '');
                   const link = item.link;
                   const date = new Date(item.pubDate).toLocaleDateString();
-                  const originallink = item.originallink || item.link;
+                  const originallink = item.originallink || item.link; // 추가: 원본 링크 가져오기
                   const domain = new URL(item.originallink || item.link).hostname;
         
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
@@ -257,27 +257,55 @@
             .then(response => response.json())
             .then(data => {
               let html = '';
+              const fetchPromises = [];  // 추가: 언론사 정보 가져오기 위한 프로미스 배열
         
               if (data.items && data.items.length > 0) {
                 data.items.forEach(item => {
-                  const title = item.title.replace(/<[^>]+>/g, ''); // HTML 태그 제거
+                  const title = item.title.replace(/<[^>]+>/g, '');
                   const link = item.link;
                   const date = new Date(item.pubDate).toLocaleDateString();
+                  const originallink = item.originallink || item.link;  // 추가: 원본 링크 가져오기
                   const domain = new URL(item.originallink || item.link).hostname;
         
-                  html += `
-                    <div class="news-item">
-                      <span class="news-source">${domain}</span>
-                      <span class="news-date">${date}</span>
-                      <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                    </div>
-                  `;
+                  // 추가: 언론사 정보 가져오는 부분
+                  const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
+                    .then(res => res.json())
+                    .then(publisherData => {
+                      const publisher = publisherData.publisher || '언론사 미표시';
+                      return `
+                        <div class="news-item">
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
+                          <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                          <span class="news-publisher">언론사: ${publisher}</span>
+                        </div>
+                      `;
+                    })
+                    .catch(error => {
+                      console.error('언론사 정보 로딩 실패:', error);
+                      return `
+                        <div class="news-item">
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
+                          <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
+                          <span class="news-publisher">언론사: 언론사 정보 로딩 실패</span>
+                        </div>
+                      `;
+                    });
+        
+                  fetchPromises.push(publisherPromise);
                 });
+        
+                // 추가: 모든 프로미스가 해결된 후 HTML 적용
+                Promise.all(fetchPromises)
+                  .then(newsItemsHTML => {
+                    html = newsItemsHTML.join('');
+                    fasstoNewsContainer.innerHTML = html;
+                  });
               } else {
                 html = '<p>파스토 관련 뉴스를 찾을 수 없습니다.</p>';
+                fasstoNewsContainer.innerHTML = html;
               }
-        
-              fasstoNewsContainer.innerHTML = html;
             })
             .catch(error => {
               console.error('뉴스 로딩 실패:', error);
