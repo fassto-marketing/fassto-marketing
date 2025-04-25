@@ -194,10 +194,11 @@
                   const title = item.title.replace(/<[^>]+>/g, '');
                   const link = item.link;
                   const date = new Date(item.pubDate).toLocaleDateString();
+                  const domain = new URL(item.originallink || item.link).hostname;
         
                   html += `
                     <div class="news-item">
-                      <span class="news-source">네이버뉴스</span>
+                      <span class="news-source">${domain}</span>
                       <span class="news-date">${date}</span>
                       <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
                     </div>
@@ -230,10 +231,11 @@
                   const title = item.title.replace(/<[^>]+>/g, ''); // HTML 태그 제거
                   const link = item.link;
                   const date = new Date(item.pubDate).toLocaleDateString();
+                  const domain = new URL(item.originallink || item.link).hostname;
         
                   html += `
                     <div class="news-item">
-                      <span class="news-source">네이버뉴스</span>
+                      <span class="news-source">${domain}</span>
                       <span class="news-date">${date}</span>
                       <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
                     </div>
