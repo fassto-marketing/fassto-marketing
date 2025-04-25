@@ -1,9 +1,9 @@
 GET /.netlify/functions/getPublisher?url=https://news.naver.com/...
 
-const axios = require('axios');
-const cheerio = require('cheerio');
+import axios from 'axios';
+import cheerio from 'cheerio';
 
-exports.handler = async function(event) {
+export async function handler(event) {
   const url = event.queryStringParameters.url;
 
   if (!url) {
