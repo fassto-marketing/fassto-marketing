@@ -1,6 +1,5 @@
 GET /.netlify/functions/getPublisher?url=https://news.naver.com/...
 
-// netlify/functions/getPublisher.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -14,17 +13,12 @@ exports.handler = async function(event) {
     };
   }
 
-  console.log('🔍 요청 URL:', url);
-  console.log('🌿 추출된 언론사명 (백업):', extractedPublisher);
-  console.log('📦 응답 받은 HTML:', response.data.slice(0, 300)); // 처음 300자만 보기
-
-  // URL에서 언론사 이름 추출 (백업용)
+  // URL에서 언론사 이름 추출 함수
   function extractPublisherFromUrl(url) {
     try {
       const parsedUrl = new URL(url);
       const hostname = parsedUrl.hostname;
-      
-      // 주요 언론사 도메인 매핑
+
       const publisherMap = {
         'news.naver.com': '네이버뉴스',
         'news.nate.com': '네이트뉴스',
@@ -62,70 +56,64 @@ exports.handler = async function(event) {
         'newsgn.com': '뉴스경남'
       };
 
-      // 정확한 매칭 확인
       for (const domain in publisherMap) {
         if (hostname === domain || hostname.endsWith('.' + domain)) {
           return publisherMap[domain];
         }
       }
 
-      // 도메인의 주요 부분 추출
       const domainParts = hostname.split('.');
       if (domainParts.length >= 2) {
         const mainDomain = domainParts[domainParts.length - 2];
-        // 일반적인 최상위 도메인이나 국가 코드가 아닌지 확인
         if (!['com', 'net', 'org', 'gov', 'edu', 'co', 'go', 'or', 'kr'].includes(mainDomain)) {
-          // 첫 글자를 대문자로 변환
           return mainDomain.charAt(0).toUpperCase() + mainDomain.slice(1);
         }
       }
-      
+
       return hostname;
     } catch (e) {
       return null;
     }
   }
 
-  // URL에서 추출한 언론사 이름(백업용)
   const extractedPublisher = extractPublisherFromUrl(url);
 
   try {
     const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+      'User-Agent': 'Mozilla/5.0',
+      'Accept': 'text/html,application/xhtml+xml',
+      'Accept-Language': 'ko-KR,ko;q=0.9',
       'Referer': 'https://www.google.com/'
     };
-    
-    const response = await axios.get(url, { headers, timeout: 5000 });  // 타임아웃 추가
-    const $ = cheerio.load(response.data);
 
-    // 언론사명 추출 개선 부분
-    let publisher = '';
+    const response = await axios.get(url, { headers, timeout: 5000 });
+    const $ = cheerio.load(response.data);
     const domain = new URL(url).hostname;
-    
-    // 도메인별 맞춤 처리 추가
+
+    let publisher = '';
+
     if (domain.includes('etoday.co.kr')) {
-      publisher = $('.press_logo img').attr('alt') || 
-                  $('meta[property="og:site_name"]').attr('content') || 
+      publisher = $('.press_logo img').attr('alt') ||
+                  $('meta[property="og:site_name"]').attr('content') ||
                   '이투데이';
-    } 
-    else if (domain.includes('yna.co.kr')) {
-      publisher = $('.media_end_head_top .logo img').attr('alt') || 
-                  $('meta[property="og:site_name"]').attr('content') || 
+    } else if (domain.includes('yna.co.kr')) {
+      publisher = $('.media_end_head_top .logo img').attr('alt') ||
+                  $('meta[property="og:site_name"]').attr('content') ||
                   '연합뉴스';
     }
-    // 기존 다른 도메인 처리 코드...
 
-    // 언론사 정보가 없을 경우, URL에서 추출한 정보 사용
+    // fallback
     if (!publisher && extractedPublisher) {
       publisher = extractedPublisher;
     }
-    
-    // 언론사 정보가 없을 경우 기본값 설정
+
     if (!publisher) {
       publisher = '언론사 정보 없음';
     }
+
+    console.log('🔍 요청 URL:', url);
+    console.log('🌿 추출된 언론사명:', publisher);
+    console.log('📦 응답 받은 HTML (300자):', response.data.slice(0, 300));
 
     return {
       statusCode: 200,
@@ -134,23 +122,20 @@ exports.handler = async function(event) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        publisher: publisher,
+        publisher,
         extractedFrom: publisher === extractedPublisher ? 'url' : 'page',
-        url: url // 디버깅용 URL 정보
+        url
       })
     };
-  } 
-  catch (error) {
-    // 오류 발생 시 URL에서 추출한 언론사 이름 반환
+
+  } catch (error) {
     return {
-      statusCode: 200,  // 성공 응답 코드로 변경
+      statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         publisher: extractedPublisher || '언론사 정보 없음',
         extractedFrom: 'url',
         error: error.message
