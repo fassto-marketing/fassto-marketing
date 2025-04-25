@@ -1,9 +1,7 @@
-GET /.netlify/functions/getPublisher?url=https://news.naver.com/...
+const axios = require('axios');
+const cheerio = require('cheerio');
 
-import axios from 'axios';
-import cheerio from 'cheerio';
-
-export async function handler(event) {
+exports.handler = async function(event) {
   const url = event.queryStringParameters.url;
 
   if (!url) {
@@ -102,8 +100,6 @@ export async function handler(event) {
       publisher = logoAlt || ogSiteNameYna || '연합뉴스';
     }
 
-
-    // fallback
     if (!publisher && extractedPublisher) {
       publisher = extractedPublisher;
     }
@@ -111,10 +107,6 @@ export async function handler(event) {
     if (!publisher) {
       publisher = '언론사 정보 없음';
     }
-
-    console.log('🔍 요청 URL:', url);
-    console.log('🌿 추출된 언론사명:', publisher);
-    console.log('📦 응답 받은 HTML (300자):', response.data.slice(0, 300));
 
     return {
       statusCode: 200,
