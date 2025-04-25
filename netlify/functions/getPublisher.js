@@ -46,6 +46,16 @@ exports.handler = async function(event) {
         'sbs.co.kr': 'SBS',
         'imbc.com': 'MBC',
         'kbs.co.kr': 'KBS'
+        'veritas-a.com': '베리타스알파'
+        'bizwnews.com': '비즈월드'
+        'klnews.co.kr': '물류신문'
+        'finomy.com': '현대경제신문'
+        'asiatime.co.kr': '아시아타임즈'
+        'naeil.com': '내일신문'
+        'asiatoday.co.kr': '아시아투데이'
+        'pressian.com': '프레시안'
+        'venturesquare.net': '벤처스퀘어'
+        'newsgn.com': '뉴스경남'
       };
 
       // 정확한 매칭 확인
