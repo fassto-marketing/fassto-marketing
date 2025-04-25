@@ -65,7 +65,7 @@ exports.handler = async function(event) {
         'businesspost.co.kr': '비즈니스포스트',
         'incheonnews.com': '인천뉴스',
         'incheonin.com': '인천in',
-        'nbnews.kr': 'NBN NEWS'
+        'nbnews.kr': 'NBN NEWS',
         'dealsite.co.kr': '딜사이트',
         'insightkorea.co.kr': '인사이트코리아',
         'dnews.co.kr': '대한경제',
@@ -75,11 +75,10 @@ exports.handler = async function(event) {
         'smedaily.co.kr': '중소기업신문',
         'etnews.com': '전자신문',
         'hansbiz.co.kr': '한스경제',
-        'nocutnews.co.kr': '노컷뉴스',
         'byline.network': '바이라인네트워크',
         'sentv.co.kr': '서울경제TV',
         'zdnet.co.kr': '지디넷코리아',
-        'ddaily.co.kr': '디지털데일리'
+        'ddaily.co.kr': '디지털데일리',
       };
 
       for (const domain in publisherMap) {
