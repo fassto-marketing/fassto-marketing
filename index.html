@@ -205,19 +205,15 @@
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
                     .then(res => res.json())
                     .then(publisherData => {
-                      const publisher = publisherData.publisher; // 기본값 설정 제거
-                      let publisherHtml = ''; // 언론사 정보를 담을 HTML 문자열 초기화
-    
-                      // publisher 변수에 유효한 값이 있고, '언론사 미표시' 또는 '언론사 정보 없음'이 아닐 경우에만 span 태그 추가
-                      if (publisher && publisher !== '언론사 미표시' && publisher !== '언론사 정보 없음') {
-                        publisherHtml = `<span class="news-publisher">언론사: ${publisher}</span>`;
-                      }
-    
+                      const publisher = publisherData.publisher || ''; // publisher가 undefined인 경우 빈 문자열로 설정
+                      
+                      // 수정된 HTML 템플릿
                       return `
                         <div class="news-item">
-                          <span class="news-source"><span class="math-inline">\{domain\}</span\>
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                          <span class="news-publisher">언론사: ${publisher}</span>
+                          ${publisher ? `<span class="news-publisher">언론사: ${publisher}</span>` : ''}
                         </div>
                       `;
                     })
@@ -228,7 +224,6 @@
                           <span class="news-source">${domain}</span>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                          <span class="news-publisher">언론사: 언론사 정보 로딩 실패</span>
                         </div>
                       `;
                     });
@@ -244,9 +239,8 @@
                   
               } else {
                 html = '<p>관련 뉴스를 찾을 수 없습니다.</p>';
+                logisticsNewsContainer.innerHTML = html;
               }
-        
-              logisticsNewsContainer.innerHTML = html;
             })
             .catch(error => {
               console.error('물류 뉴스 로딩 실패:', error);
@@ -273,23 +267,19 @@
                   const originallink = item.originallink || item.link;  // 추가: 원본 링크 가져오기
                   const domain = new URL(item.originallink || item.link).hostname;
         
-                  // 추가: 언론사 정보 가져오는 부분
+                  // 수정된 언론사 정보 가져오는 부분
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
                     .then(res => res.json())
                     .then(publisherData => {
-                      const publisher = publisherData.publisher; // 기본값 설정 제거
-                      let publisherHtml = ''; // 언론사 정보를 담을 HTML 문자열 초기화
-    
-                      // publisher 변수에 유효한 값이 있고, '언론사 미표시' 또는 '언론사 정보 없음'이 아닐 경우에만 span 태그 추가
-                      if (publisher && publisher !== '언론사 미표시' && publisher !== '언론사 정보 없음') {
-                        publisherHtml = `<span class="news-publisher">언론사: ${publisher}</span>`;
-                      }
-    
+                      const publisher = publisherData.publisher || ''; // publisher가 undefined인 경우 빈 문자열로 설정
+                      
+                      // 수정된 HTML 템플릿
                       return `
                         <div class="news-item">
-                          <span class="news-source"><span class="math-inline">\{domain\}</span\>
+                          <span class="news-source">${domain}</span>
+                          <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                          <span class="news-publisher">언론사: ${publisher}</span>
+                          ${publisher ? `<span class="news-publisher">언론사: ${publisher}</span>` : ''}
                         </div>
                       `;
                     })
@@ -300,7 +290,6 @@
                           <span class="news-source">${domain}</span>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
-                          <span class="news-publisher">언론사: 언론사 정보 로딩 실패</span>
                         </div>
                       `;
                     });
