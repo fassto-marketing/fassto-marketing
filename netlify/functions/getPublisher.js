@@ -14,6 +14,10 @@ exports.handler = async function(event) {
     };
   }
 
+  console.log('🔍 요청 URL:', url);
+  console.log('🌿 추출된 언론사명 (백업):', extractedPublisher);
+  console.log('📦 응답 받은 HTML:', response.data.slice(0, 300)); // 처음 300자만 보기
+
   // URL에서 언론사 이름 추출 (백업용)
   function extractPublisherFromUrl(url) {
     try {
