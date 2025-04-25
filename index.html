@@ -188,12 +188,14 @@
             .then(response => response.json())
             .then(data => {
               let html = '';
+              const fetchPromises = [];
         
               if (data.items && data.items.length > 0) {
                 data.items.forEach(item => {
                   const title = item.title.replace(/<[^>]+>/g, '');
                   const link = item.link;
                   const date = new Date(item.pubDate).toLocaleDateString();
+                  const originallink = item.originallink || item.link;
                   const domain = new URL(item.originallink || item.link).hostname;
         
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
