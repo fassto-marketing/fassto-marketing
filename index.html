@@ -205,10 +205,17 @@
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
                     .then(res => res.json())
                     .then(publisherData => {
-                      const publisher = publisherData.publisher || '언론사 미표시';
+                      const publisher = publisherData.publisher; // 기본값 설정 제거
+                      let publisherHtml = ''; // 언론사 정보를 담을 HTML 문자열 초기화
+    
+                      // publisher 변수에 유효한 값이 있고, '언론사 미표시' 또는 '언론사 정보 없음'이 아닐 경우에만 span 태그 추가
+                      if (publisher && publisher !== '언론사 미표시' && publisher !== '언론사 정보 없음') {
+                        publisherHtml = `<span class="news-publisher">언론사: ${publisher}</span>`;
+                      }
+    
                       return `
                         <div class="news-item">
-                          <span class="news-source">${domain}</span>
+                          <span class="news-source"><span class="math-inline">\{domain\}</span\>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
                           <span class="news-publisher">언론사: ${publisher}</span>
@@ -271,10 +278,17 @@
                   const publisherPromise = fetch('/.netlify/functions/getPublisher?url=' + encodeURIComponent(originallink))
                     .then(res => res.json())
                     .then(publisherData => {
-                      const publisher = publisherData.publisher || '언론사 미표시';
+                      const publisher = publisherData.publisher; // 기본값 설정 제거
+                      let publisherHtml = ''; // 언론사 정보를 담을 HTML 문자열 초기화
+    
+                      // publisher 변수에 유효한 값이 있고, '언론사 미표시' 또는 '언론사 정보 없음'이 아닐 경우에만 span 태그 추가
+                      if (publisher && publisher !== '언론사 미표시' && publisher !== '언론사 정보 없음') {
+                        publisherHtml = `<span class="news-publisher">언론사: ${publisher}</span>`;
+                      }
+    
                       return `
                         <div class="news-item">
-                          <span class="news-source">${domain}</span>
+                          <span class="news-source"><span class="math-inline">\{domain\}</span\>
                           <span class="news-date">${date}</span>
                           <h3 class="news-title"><a href="${link}" target="_blank">${title}</a></h3>
                           <span class="news-publisher">언론사: ${publisher}</span>
