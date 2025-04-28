@@ -79,6 +79,13 @@ exports.handler = async function(event) {
         'sentv.co.kr': '서울경제TV',
         'zdnet.co.kr': '지디넷코리아',
         'ddaily.co.kr': '디지털데일리',
+        'http://kpenews.com': '한국정경신문',
+        'globalepic.co.kr': '글로벌에픽',
+        'paxetv.com': '팍스경제TV',
+        'news.tf.co.kr': '더팩트',
+        'bizhankook.com': '비즈한국',
+        
+        
       };
 
       for (const domain in publisherMap) {
