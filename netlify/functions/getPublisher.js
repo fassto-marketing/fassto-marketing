@@ -84,8 +84,10 @@ exports.handler = async function(event) {
         'paxetv.com': '팍스경제TV',
         'news.tf.co.kr': '더팩트',
         'bizhankook.com': '비즈한국',
-        
-        
+        'techm.kr': '테크M',
+        'topstarnews.net': '톱스타뉴스',
+        'newsfreezone.co.kr': '뉴스프리존',
+        'econovill.com': '이코노믹리뷰',
       };
 
       for (const domain in publisherMap) {
