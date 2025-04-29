@@ -76,7 +76,6 @@ body {
 /* url-cut.html 스타일 */
 .copy-feedback { visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s; }
 .copy-feedback.show { visibility: visible; opacity: 1; }
-body { font-family: 'Pretendard', sans-serif; }
 
 /* notice-tool.html 스타일 */
 .preview-box { transition: background-color 0.3s ease; }
