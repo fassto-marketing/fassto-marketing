@@ -6,165 +6,9 @@
     <title>Fassto Marketing</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-        body {
-            font-family: 'Pretendard', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        header {
-            text-align: center;
-            padding: 40px 0;
-            background-color: #02855B;
-            color: white;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-        h2 {
-            font-size: 1.8rem;
-            color: #02855B;
-            margin-top: 30px;
-        }
-        .intro {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .news-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .news-item {
-            border-bottom: 1px solid #eee;
-            padding: 15px 0;
-        }
-        .news-item:last-child {
-            border-bottom: none;
-        }
-        .news-source {
-            color: #02855B;
-            font-weight: 500;
-            margin-right: 10px;
-        }
-        .news-date {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .news-title {
-            margin: 5px 0;
-            font-size: 1.1rem;
-        }
-        .news-title a {
-            color: #333;
-            text-decoration: none;
-        }
-        .news-title a:hover {
-            color: #02855B;
-            text-decoration: underline;
-        }
-        .cta-button {
-            display: inline-block;
-            background-color: #02855B;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .cta-button:hover {
-            background-color: #00C186;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #333;
-            color: white;
-            margin-top: 40px;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        .refresh-button {
-            background-color: #f1f1f1;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            float: right;
-        }
-        .refresh-button:hover {
-            background-color: #e1e1e1;
-        }
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        .news-publisher {
-          font-size: 0.8em;
-          color: #777;
-        }
-
-        /* 기존 스타일 코드 아래에 추가 */
-        @media (max-width: 767px) { /* Tailwind CSS의 md 브레이크포인트 기준 */
-          #menu.hidden {
-            display: none;
-          }
-          #menu {
-            display: block; /* 기본값은 block으로 설정 */
-            position: absolute; /* 다른 요소 위에 뜨도록 설정 */
-            top: 60px; /* 메뉴 버튼 아래에 위치하도록 조정 (네비게이션 바 높이에 따라 값 변경) */
-            left: 0;
-            right: 0;
-            background-color: #f3f4f6; /* 배경색 지정 (기존 bg-gray-100과 유사) */
-            border-bottom: 1px solid #d1d5db; /* 하단 경계선 (기존 border-gray-300과 유사) */
-            padding: 1rem; /* 내부 여백 */
-            z-index: 50; /* 다른 요소들 위에 보이도록 z-index 설정 */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 그림자 효과 추가 */
-          }
-          #menu li {
-            margin-bottom: 0.5rem; /* 메뉴 항목 간 간격 조정 */
-          }
-          #menu li:last-child {
-            margin-bottom: 0; /* 마지막 메뉴 항목 하단 간격 제거 */
-          }
-          #menu a { /* 링크 스타일 조정 */
-            padding: 0.5rem 1rem;
-            display: block; /* 링크 영역 전체 클릭 가능하도록 */
-          }
-        }
-        
-        /* 데스크탑에서는 기존 스타일 유지 */
-        @media (min-width: 768px) {
-          #menu {
-            position: static; /* 데스크탑에서는 기본 위치로 */
-            display: flex;
-            background-color: transparent;
-            border-bottom: none;
-            padding: 0;
-            box-shadow: none;
-          }
-        }
     </style>
 </head>
 
@@ -437,10 +281,32 @@
     </script>
 
     <script>
-    document.getElementById('menu-toggle').addEventListener('click', function () {
-      const menu = document.getElementById('menu');
-      menu.classList.toggle('hidden');
-    });
-  </script>
+      // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
+      document.addEventListener('DOMContentLoaded', function() {
+        // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
+        const currentPath = window.location.pathname.split('/').pop();
+        const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
+    
+        menuLinks.forEach(link => {
+          // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
+          const linkPath = link.getAttribute('href');
+    
+          // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
+          if (linkPath && linkPath === currentPath) {
+            link.classList.add('active-menu');
+          }
+          // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
+          else if (currentPath === '' && linkPath === 'index.html') {
+             link.classList.add('active-menu');
+          }
+        });
+      });
+    
+      // --- 메뉴 토글 스크립트 (수정된 부분) ---
+      document.getElementById('menu-toggle').addEventListener('click', function () {
+        const menu = document.getElementById('menu');
+        menu.classList.toggle('menu-open'); // 'hidden' 대신 'menu-open' 사용
+      });
+    </script>
 </body>
 </html>
