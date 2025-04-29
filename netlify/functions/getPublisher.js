@@ -88,6 +88,20 @@ exports.handler = async function(event) {
         'topstarnews.net': '톱스타뉴스',
         'newsfreezone.co.kr': '뉴스프리존',
         'econovill.com': '이코노믹리뷰',
+        'marketnews.co.kr': '마켓뉴스',
+        'ntoday.co.kr': '투데이신문',
+        'startuptoday.co.kr': '오늘경제',
+        'einfomax.co.kr': '연합인포맥스',
+        'mediapen.com': '미디어펜',
+        'newscape.co.kr': '뉴스케이프',
+        'newsquest.co.kr': '뉴스퀘스트',
+        'kookje.co.kr': '국제신문',
+        'iminju.net': '민주신문',
+        'news1.kr': '뉴스1',
+        'newstof.com': '뉴스톱',
+        'energy-news.co.kr': '에너지신문',
+        'busan.com': '부산일보',
+        
       };
 
       for (const domain in publisherMap) {
