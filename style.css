@@ -1,0 +1,542 @@
+/* ===== 파스토 마케팅 사이트 공통 스타일 ===== */
+
+/* Pretendard 폰트 임포트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* 변수 정의 - 파스토 브랜드 색상 및 스타일 */
+:root {
+  /* 파스토 브랜드 색상 */
+  --fassto-blue: #0057FF;       /* 주요 브랜드 색상 */
+  --fassto-dark-blue: #004BE0;  /* 버튼 호버 등에 사용 */
+  --fassto-light-blue: #E5EEFF; /* 배경 및 강조 요소 */
+  --fassto-black: #1A1A1A;      /* 텍스트 주 색상 */
+  --fassto-gray-900: #212529;   /* 서브 헤딩 색상 */
+  --fassto-gray-700: #495057;   /* 일반 텍스트 색상 */
+  --fassto-gray-500: #ADB5BD;   /* 부가 정보 텍스트 */
+  --fassto-gray-300: #DEE2E6;   /* 구분선 색상 */
+  --fassto-gray-100: #F8F9FA;   /* 배경 색상 */
+  --fassto-white: #FFFFFF;      /* 흰색 배경 및 텍스트 */
+  
+  /* 컴포넌트 크기 */
+  --header-height: 60px;
+  --container-max-width: 1200px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* 애니메이션 속도 */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+  
+  /* 그림자 효과 */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+/* ===== 기본 리셋 및 베이스 스타일 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--fassto-gray-900);
+  background-color: var(--fassto-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--fassto-blue);
+  text-decoration: none;
+  transition: color var(--transition-fast) ease;
+}
+
+a:hover {
+  color: var(--fassto-dark-blue);
+}
+
+/* ===== 레이아웃 컴포넌트 ===== */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.section {
+  padding: 4rem 0;
+}
+
+.section-sm {
+  padding: 2rem 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -1rem;
+}
+
+.col {
+  flex: 1;
+  padding: 0 1rem;
+}
+
+/* ===== 헤더 및 네비게이션 ===== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--fassto-white);
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 32px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+}
+
+.nav-item {
+  margin-left: 1.5rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--fassto-gray-900);
+  transition: color var(--transition-fast) ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--fassto-blue);
+}
+
+/* 모바일 메뉴 토글 버튼 */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  width: 100%;
+  height: 2px;
+  background-color: var(--fassto-gray-900);
+  transition: all var(--transition-normal) ease;
+}
+
+/* ===== 버튼 스타일 ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-normal) ease;
+}
+
+.btn-primary {
+  color: var(--fassto-white);
+  background-color: var(--fassto-blue);
+  border-color: var(--fassto-blue);
+}
+
+.btn-primary:hover {
+  background-color: var(--fassto-dark-blue);
+  border-color: var(--fassto-dark-blue);
+}
+
+.btn-outline {
+  color: var(--fassto-blue);
+  background-color: transparent;
+  border-color: var(--fassto-blue);
+}
+
+.btn-outline:hover {
+  color: var(--fassto-white);
+  background-color: var(--fassto-blue);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* ===== 입력 필드 스타일 ===== */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--fassto-gray-900);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--fassto-gray-900);
+  background-color: var(--fassto-white);
+  border: 1px solid var(--fassto-gray-300);
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-normal) ease, box-shadow var(--transition-normal) ease;
+}
+
+.form-control:focus {
+  border-color: var(--fassto-blue);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0, 87, 255, 0.15);
+}
+
+/* ===== 카드 스타일 ===== */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--fassto-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: transform var(--transition-normal) ease, box-shadow var(--transition-normal) ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-img {
+  width: 100%;
+  height: auto;
+}
+
+.card-body {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.card-title {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fassto-black);
+}
+
+.card-text {
+  color: var(--fassto-gray-700);
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: var(--fassto-gray-100);
+  border-top: 1px solid var(--fassto-gray-300);
+}
+
+/* ===== 헤딩 스타일 ===== */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--fassto-black);
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+/* ===== 푸터 스타일 ===== */
+.footer {
+  padding: 2rem 0;
+  background-color: var(--fassto-gray-100);
+  border-top: 1px solid var(--fassto-gray-300);
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  color: var(--fassto-gray-700);
+  text-align: center;
+}
+
+/* ===== 유틸리티 클래스 ===== */
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.fw-medium {
+  font-weight: 500 !important;
+}
+
+.fw-normal {
+  font-weight: 400 !important;
+}
+
+.my-1 {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.my-2 {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.my-3 {
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.my-4 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.my-5 {
+  margin-top: 3rem !important;
+  margin-bottom: 3rem !important;
+}
+
+.py-1 {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.py-2 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.py-3 {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.py-4 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.py-5 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+
+/* ===== 반응형 스타일 ===== */
+@media (max-width: 1199.98px) {
+  :root {
+    --container-max-width: 960px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  :root {
+    --container-max-width: 720px;
+  }
+  
+  h1 {
+    font-size: 2.25rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --container-max-width: 540px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .menu-toggle {
+    display: flex;
+  }
+  
+  .nav {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background-color: var(--fassto-white);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 2rem;
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal) ease;
+    z-index: 99;
+  }
+  
+  .nav.active {
+    transform: translateX(0);
+  }
+  
+  .nav-list {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .nav-item {
+    margin: 0 0 1.5rem 0;
+  }
+  
+  .nav-link {
+    font-size: 1.25rem;
+    display: block;
+    padding: 0.5rem 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.4rem;
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+  
+  .btn {
+    padding: 0.625rem 1.25rem;
+  }
+}
+
+/* ===== 특정 도구별 스타일 ===== */
+/* URL 단축기 스타일 */
+.url-shortener-container {
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+/* 공지 이미지 생성기 스타일 */
+.notice-generator {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.notice-preview {
+  border: 2px solid var(--fassto-gray-300);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background-color: var(--fassto-gray-100);
+}
+
+/* 좌표 찾기 스타일 */
+.coordinate-finder {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.coordinate-display {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--fassto-light-blue);
+  border-radius: var(--border-radius-md);
+  font-family: monospace;
+  font-size: 1rem;
+}
