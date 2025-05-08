@@ -1104,33 +1104,37 @@
   </script>
 
   <script>
-    // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
-    document.addEventListener('DOMContentLoaded', function() {
-      // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
-      const currentPath = window.location.pathname.split('/').pop();
-      const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
-  
-      menuLinks.forEach(link => {
-        // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
-        const linkPath = link.getAttribute('href');
-  
-        // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
-        if (linkPath && linkPath === currentPath) {
-          link.classList.add('active-menu');
-        }
-        // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
-        else if (currentPath === '' && linkPath === 'index.html') {
-           link.classList.add('active-menu');
-        }
+      // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
+      document.addEventListener('DOMContentLoaded', function() {
+        // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
+        const currentPath = window.location.pathname.split('/').pop();
+        const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
+    
+        menuLinks.forEach(link => {
+          // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
+          const linkPath = link.getAttribute('href');
+    
+          // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
+          if (linkPath && linkPath === currentPath) {
+            link.classList.add('active-menu');
+          }
+          // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
+          else if (currentPath === '' && linkPath === 'index.html') {
+             link.classList.add('active-menu');
+          }
+        });
       });
-    });
-  
-    // --- 메뉴 토글 스크립트 (수정된 부분) ---
-    document.getElementById('menu-toggle').addEventListener('click', function () {
+    
+      // --- 햄버거 메뉴 토글 이벤트 추가 ---
+      const toggleBtn = document.getElementById('menu-toggle');
       const menu = document.getElementById('menu');
-      menu.classList.toggle('menu-open'); // 'hidden' 대신 'menu-open' 사용
+      if (toggleBtn && menu) {
+        toggleBtn.addEventListener('click', function () {
+          menu.classList.toggle('menu-open');
+        });
+      }
     });
-  </script>
+    </script>
 
   <footer class="bg-gray-200 text-center p-4 mt-auto">
     <p class="text-sm text-gray-600">© 2025 Fassto Marketing. All Rights Reserved.</p>
