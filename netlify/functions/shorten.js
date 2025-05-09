@@ -15,7 +15,7 @@ exports.handler = async function(event) {
     }
 
     const shortCode = Math.random().toString(36).substring(2, 8);
-    const store = getDeployStore('urls'); // Netlify Blob 저장소 이름 'urls'
+    const store = getDeployStore('.netlify/blobs/deploy'); // Netlify Blob 저장소 이름 'deploy'
     await store.setJSON(shortCode, { originalUrl });
 
     return {
