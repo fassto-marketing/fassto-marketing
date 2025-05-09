@@ -28,7 +28,7 @@ body {
     opacity: 0;
     pointer-events: none;
     
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;; /* 부드럽게 움직이는 효과 (0.3초) */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* 부드럽게 움직이는 효과 (0.3초) */
   }
   #menu.menu-open { /* 'menu-open' 상태일 때 (메뉴 열렸을 때) */
     transform: translateX(0); /* 화면 안으로 들어오도록 위치 이동 */
