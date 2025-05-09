@@ -13,7 +13,6 @@ body {
 /* 모바일 메뉴 스타일 */
 @media (max-width: 767px) { /* 화면 너비가 767px 이하일 때 (모바일) */
   #menu {
-    display: block;
     position: absolute;
     top: 60px; /* 네비게이션 바 높이에 맞춰 조정 필요할 수 있음 */
     left: 0;
@@ -23,18 +22,28 @@ body {
     padding: 1rem; /* 메뉴 안쪽 여백 */
     z-index: 50; /* 다른 요소들 위에 보이도록 */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 그림자 효과 */
+
+    /* ✅ 모바일에서 처음에는 숨김 상태 */
     transform: translateX(-100%); /* 기본 상태: 화면 왼쪽 밖에 숨기기 */
-    transition: transform 0.3s ease-in-out; /* 부드럽게 움직이는 효과 (0.3초) */
+    opacity: 0;
+    pointer-events: none;
+    
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;; /* 부드럽게 움직이는 효과 (0.3초) */
   }
   #menu.menu-open { /* 'menu-open' 상태일 때 (메뉴 열렸을 때) */
     transform: translateX(0); /* 화면 안으로 들어오도록 위치 이동 */
+    opacity: 1;
+    pointer-events: auto;
   }
+  
   #menu li {
     margin-bottom: 0.5rem; /* 메뉴 항목 사이 간격 */
   }
+  
   #menu li:last-child {
     margin-bottom: 0;
   }
+  
   #menu a {
     padding: 0.5rem 1rem; /* 메뉴 링크 글자 주변 여백 */
     display: block; /* 링크 영역 전체 클릭 가능하게 */
