@@ -101,7 +101,10 @@ exports.handler = async function(event) {
         'newstof.com': '뉴스톱',
         'energy-news.co.kr': '에너지신문',
         'busan.com': '부산일보',
-        
+        'hellot.net': '헬로티',
+        'imwood.co.kr': '나무신문',
+        'daily.hankooki.com': '데일리한국',
+        'weeklytoday.com': '위클리오늘',
       };
 
       for (const domain in publisherMap) {
