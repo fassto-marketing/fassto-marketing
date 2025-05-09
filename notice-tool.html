@@ -1089,11 +1089,17 @@
       const menu = document.getElementById('menu');
       if (toggleBtn && menu) {
         toggleBtn.addEventListener('click', function () {
-          menu.classList.toggle('hidden');
-          menu.classList.toggle('menu-open');
-        });
-      }
-    });
+          const isOpen = menu.classList.contains('menu-open');
+            if (isOpen) {
+              menu.classList.remove('menu-open');
+              menu.classList.add('hidden');
+            } else {
+              menu.classList.toggle('hidden');
+              menu.classList.toggle('menu-open');
+            }
+          });
+        }
+      });
   </script>
 
   <footer class="bg-gray-200 text-center p-4 mt-auto">
