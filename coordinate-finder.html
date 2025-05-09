@@ -21,7 +21,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
-      <ul id="menu" class="hidden md:flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0 mt-4 md:mt-0 w-full md:w-auto">
+      <ul id="menu" class="hidden transform transition-transform duration-300 ease-in-out md:flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0 mt-4 md:mt-0 w-full md:w-auto">
         <li><a href="index.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">홈</a></li>
         <li><a href="notice-tool.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">공지 이미지 생성기</a></li>
         <li><a href="coordinate-finder.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">좌표 찾기 도구</a></li>
@@ -170,33 +170,42 @@
   </script>
 
  <script>
-  // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
-  document.addEventListener('DOMContentLoaded', function() {
-    // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
-    const currentPath = window.location.pathname.split('/').pop();
-    const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
-
-    menuLinks.forEach(link => {
-      // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
-      const linkPath = link.getAttribute('href');
-
-      // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
-      if (linkPath && linkPath === currentPath) {
-        link.classList.add('active-menu');
-      }
-      // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
-      else if (currentPath === '' && linkPath === 'index.html') {
-         link.classList.add('active-menu');
-      }
-    });
-  });
-
-  // --- 메뉴 토글 스크립트 (수정된 부분) ---
-  document.getElementById('menu-toggle').addEventListener('click', function () {
-    const menu = document.getElementById('menu');
-    menu.classList.toggle('menu-open'); // 'hidden' 대신 'menu-open' 사용
-  });
-</script>
-
+      // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
+      document.addEventListener('DOMContentLoaded', function() {
+        // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
+        const currentPath = window.location.pathname.split('/').pop();
+        const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
+    
+        menuLinks.forEach(link => {
+          // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
+          const linkPath = link.getAttribute('href');
+    
+          // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
+          if (linkPath && linkPath === currentPath) {
+            link.classList.add('active-menu');
+          }
+          // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
+          else if (currentPath === '' && linkPath === 'index.html') {
+             link.classList.add('active-menu');
+          }
+        });
+    
+        // --- 메뉴 토글 ---
+        const toggleBtn = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu');
+        if (toggleBtn && menu) {
+          toggleBtn.addEventListener('click', function () {
+            const isOpen = menu.classList.contains('menu-open');
+            if (isOpen) {
+              menu.classList.remove('menu-open');
+              menu.classList.add('hidden');
+            } else {
+              menu.classList.add('menu-open');
+              menu.classList.remove('hidden');
+            }
+          });
+        }
+      });
+    </script>
  </body>
  </html>
