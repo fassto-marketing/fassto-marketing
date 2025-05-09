@@ -300,12 +300,22 @@
              link.classList.add('active-menu');
           }
         });
-      });
     
-      // --- 메뉴 토글 스크립트 (수정된 부분) ---
-      document.getElementById('menu-toggle').addEventListener('click', function () {
+        // --- 메뉴 토글 ---
+        const toggleBtn = document.getElementById('menu-toggle');
         const menu = document.getElementById('menu');
-        menu.classList.toggle('menu-open'); // 'hidden' 대신 'menu-open' 사용
+        if (toggleBtn && menu) {
+          toggleBtn.addEventListener('click', function () {
+            const isOpen = menu.classList.contains('menu-open');
+            if (isOpen) {
+              menu.classList.remove('menu-open');
+              menu.classList.add('hidden');
+            } else {
+              menu.classList.add('menu-open');
+              menu.classList.remove('hidden');
+            }
+          });
+        }
       });
     </script>
 </body>
