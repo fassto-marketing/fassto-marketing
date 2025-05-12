@@ -1,4 +1,4 @@
-const { getDeployStore } = require('@netlify/blobs');
+const urls = {};
 
 // 'export default async function handler(event)' 대신 'exports.handler = async function(event)' 사용
 exports.handler = async function(event) {
@@ -14,19 +14,20 @@ exports.handler = async function(event) {
       return { statusCode: 400, body: '올바른 URL을 입력해주세요.' };
     }
 
+    // 고유 코드 생성
     const shortCode = Math.random().toString(36).substring(2, 8);
-    const store = getDeployStore('.netlify/blobs/deploy'); // Netlify Blob 저장소 이름 'deploy'
-    await store.setJSON(shortCode, { originalUrl });
+
+    // 메모리에 저장
+    urls[shortCode] = originalUrl;
 
     return {
       statusCode: 200,
       body: JSON.stringify({ shortCode }),
     };
   } catch (error) {
-    console.error("Shorten function error:", error); // Netlify 로그에 에러 기록
     return {
-      statusCode: 500, // 서버 내부 오류 상태 코드
-      body: JSON.stringify({ message: 'URL 단축 중 서버 오류가 발생했습니다.' }) // 좀 더 구체적인 에러 메시지 반환
+      statusCode: 500,
+      body: JSON.stringify({ message: '서버 오류' }),
     };
   }
 };
