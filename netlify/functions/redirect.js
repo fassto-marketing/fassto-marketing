@@ -1,21 +1,21 @@
-const { getDeployStore } = require('@netlify/blobs');
+// shorten.js에서 저장된 urls 객체를 같은 파일 내 공유
+const urls = require('./shorten').urls;
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
   const code = event.queryStringParameters.code;
-  const store = getDeployStore('urls');  // 🔥 여기!
-  const data = await store.getJSON(code);
+  const url = urls && urls[code];
 
-  if (!data || !data.originalUrl) {
+  if (!url) {
     return {
       statusCode: 404,
-      body: '해당 코드로 저장된 URL이 없습니다.',
+      body: '유효하지 않은 단축 URL입니다.',
     };
   }
 
   return {
     statusCode: 302,
     headers: {
-      Location: data.originalUrl,
+      Location: url,
     },
   };
-}
+};
