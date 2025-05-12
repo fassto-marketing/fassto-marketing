@@ -1,10 +1,10 @@
 [build]
 publish = "."
-command = "npm install && npm run build"
+command = "npm install"
 
 [functions]
 directory = "netlify/functions"
-included_files = ["!node_modules/@netlify/**"]
+included_files = ["!node_modules/@netlify/blobs/**"]
 
 [build.environment]
 NODE_VERSION = "18"
