@@ -1,39 +1,47 @@
-const fetch = require('node-fetch');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'POST only' };
+    return { statusCode: 405, body: 'POST 방식만 허용됩니다.' };
   }
 
-  const { originalUrl } = JSON.parse(event.body);
-  if (!originalUrl || !/^https?:\/\//.test(originalUrl)) {
-    return { statusCode: 400, body: 'Invalid URL' };
+  try {
+    const { originalUrl } = JSON.parse(event.body);
+    if (!originalUrl || !/^https?:\/\//.test(originalUrl)) {
+      return { statusCode: 400, body: '올바른 URL을 입력해주세요.' };
+    }
+
+    const shortcode = Math.random().toString(36).substring(2, 8);
+
+    const { error } = await supabase.from('urls').insert([
+      {
+        shortcode,
+        original_url: originalUrl
+      }
+    ]);
+
+    if (error) {
+      console.error('Supabase 오류:', error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ message: 'Supabase 삽입 실패' })
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ shortCode: shortcode })
+    };
+  } catch (err) {
+    console.error('단축 실패 오류:', err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: '서버 오류' })
+    };
   }
-
-  const shortCode = Math.random().toString(36).substring(2, 8);
-
-  const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/urls`, {
-    method: 'POST',
-    headers: {
-      'apikey': process.env.SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify({
-      shortcode: shortCode,
-      original_url: originalUrl
-    })
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();  // ← 추가!
-    console.error('Supabase 오류:', errorText);  // ← Netlify 함수 로그에 찍힘!
-    return { statusCode: 500, body: 'Supabase insert failed' };
-  }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ shortCode })
-  };
 };
