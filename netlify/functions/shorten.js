@@ -27,6 +27,8 @@ exports.handler = async function(event) {
   });
 
   if (!res.ok) {
+    const errorText = await res.text();  // ← 추가!
+    console.error('Supabase 오류:', errorText);  // ← Netlify 함수 로그에 찍힘!
     return { statusCode: 500, body: 'Supabase insert failed' };
   }
 
