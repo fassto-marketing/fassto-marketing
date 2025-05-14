@@ -23,7 +23,9 @@ exports.handler = async function(event) {
         shortcode,
         original_url: originalUrl
       }
-    ]);
+    ],
+    { returning: 'minimal' } // ✅ 핵심 수정
+  );
 
     if (error) {
       console.error('Supabase 오류:', error);
