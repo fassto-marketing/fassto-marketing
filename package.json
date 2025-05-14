@@ -3,9 +3,26 @@
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@netlify/blobs": "latest",
-    "node-fetch": "^2.6.11",
+    "@netlify/blobs": "^9.1.1",
+    "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.6.8",
-    "cheerio": "^1.0.0-rc.12"
-  }
+    "cheerio": "^1.0.0-rc.12",
+    "node-fetch": "^2.6.11"
+  },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fassto-marketing/fassto-marketing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fassto-marketing/fassto-marketing/issues"
+  },
+  "homepage": "https://github.com/fassto-marketing/fassto-marketing#readme"
 }
