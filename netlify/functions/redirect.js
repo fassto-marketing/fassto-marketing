@@ -21,6 +21,8 @@ exports.handler = async function (event) {
     };
   }
 
+  console.log("✅ 원본 URL로 리디렉션:", data.original_url);
+
   return {
     statusCode: 302,
     headers: {
