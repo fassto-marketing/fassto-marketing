@@ -10,7 +10,9 @@ const supabase = createClient(
 );
 
 exports.handler = async function (event) {
-  const code = event.queryStringParameters.code;
+  const path = event.path; // 예: "/.netlify/functions/redirect/bxmz0t"
+  const segments = path.split('/');
+  const code = segments[segments.length - 1];
   console.log("➡️ 요청된 shortcode:", code);
 
   const { data, error } = await supabase
