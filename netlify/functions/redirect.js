@@ -1,5 +1,9 @@
 const { createClient } = require('@supabase/supabase-js');
 
+// 🔽 환경변수 확인용 로그
+console.log("✅ SUPABASE_URL:", process.env.SUPABASE_URL);
+console.log("✅ SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY?.substring(0, 10) + "...");
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
@@ -7,6 +11,7 @@ const supabase = createClient(
 
 exports.handler = async function (event) {
   const code = event.queryStringParameters.code;
+  console.log("➡️ 요청된 shortcode:", code);
 
   const { data, error } = await supabase
     .from('urls')
@@ -14,14 +19,19 @@ exports.handler = async function (event) {
     .eq('shortcode', code)
     .single();
 
-  if (error || !data) {
+  if (error) {
+    console.error("❌ Supabase SELECT 에러:", error);
+  }
+
+  if (!data) {
+    console.log("❗ Supabase에서 데이터를 찾지 못했습니다.");
     return {
       statusCode: 404,
       body: '유효하지 않은 단축 URL입니다.',
     };
   }
 
-  console.log("✅ 원본 URL로 리디렉션:", data.original_url);
+  console.log("✅ 리디렉션 URL:", data.original_url);
 
   return {
     statusCode: 302,
