@@ -32,19 +32,20 @@ exports.handler = async function (event) {
 
   const originalUrl = data.original_url;
 
-  // ✅ 클릭 기록 (비동기 처리)
-  try {
-    await supabase.from('clicks').insert([
-      {
-        shortcode: code,
-        timestamp: new Date().toISOString(),
-        user_agent: event.headers['user-agent'] || 'unknown',
-        ip_address: event.headers['x-forwarded-for'] || 'unknown'
-      }
-    ]);
+  // ✅ 클릭 기록 (비동기 처리 + 오류 체크)
+  const { error: logError } = await supabase.from('clicks').insert([
+    {
+      shortcode: code,
+      timestamp: new Date().toISOString(),
+      user_agent: event.headers['user-agent'] || 'unknown',
+      ip_address: event.headers['x-forwarded-for'] || event.headers['client-ip'] || 'unknown',
+    }
+  ]);
+  
+  if (logError) {
+    console.error("🔴 클릭 기록 실패:", logError);
+  } else {
     console.log("🟢 클릭 기록 성공");
-  } catch (clickError) {
-    console.error("🔴 클릭 기록 실패:", clickError);
   }
 
   // ✅ 리디렉션 처리
