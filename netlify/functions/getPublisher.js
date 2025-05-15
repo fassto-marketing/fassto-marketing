@@ -105,6 +105,13 @@ exports.handler = async function(event) {
         'imwood.co.kr': '나무신문',
         'daily.hankooki.com': '데일리한국',
         'weeklytoday.com': '위클리오늘',
+        'srtimes.kr': 'SR타임스',
+        'moneys.co.kr': '머니S',
+        'viva100.com': '브릿지경제',
+        'cio.com': 'CIO Korea',
+        'newscham.net': '참세상',
+        'sommeliertimes.com': '소믈리에타임즈',
+        'wsobi.com': '여성소비자신문',
       };
 
       for (const domain in publisherMap) {
