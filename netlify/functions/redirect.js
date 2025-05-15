@@ -15,26 +15,40 @@ exports.handler = async function (event) {
   const code = segments[segments.length - 1];
   console.log("➡️ 요청된 shortcode:", code);
 
+  // ✅ 원본 URL 조회
   const { data, error } = await supabase
     .from('urls')
     .select('original_url')
     .eq('shortcode', code)
     .single();
 
-  if (error) {
+  if (error || !data) {
     console.error("❌ Supabase SELECT 에러:", error);
-  }
-
-  if (!data) {
-    console.log("❗ Supabase에서 데이터를 찾지 못했습니다.");
     return {
       statusCode: 404,
       body: '유효하지 않은 단축 URL입니다.',
     };
   }
 
-  console.log("✅ 리디렉션 URL:", data.original_url);
+  const originalUrl = data.original_url;
 
+  // ✅ 클릭 기록 (비동기 처리)
+  try {
+    await supabase.from('clicks').insert([
+      {
+        shortcode: code,
+        timestamp: new Date().toISOString(),
+        user_agent: event.headers['user-agent'] || 'unknown',
+        ip_address: event.headers['x-forwarded-for'] || 'unknown'
+      }
+    ]);
+    console.log("🟢 클릭 기록 성공");
+  } catch (clickError) {
+    console.error("🔴 클릭 기록 실패:", clickError);
+  }
+
+  // ✅ 리디렉션 처리
+  console.log("✅ 리디렉션 URL:", data.original_url);
   return {
     statusCode: 302,
     headers: {
