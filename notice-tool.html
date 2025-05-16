@@ -584,9 +584,6 @@
     const buttonOptionsContainer = document.getElementById('button-options-container');
     const lineHeightSlider = document.getElementById('lineHeightSlider');
     const lineHeightValue = document.getElementById('lineHeightValue');
-    const contentFontSizeSlider = document.getElementById('contentFontSizeSlider');
-    const contentFontSizeValue = document.getElementById('contentFontSizeValue');
-
     
     // 이미지 크기 설정
     const imageWidth = 722; // 원본 이미지 너비
@@ -757,7 +754,7 @@
 
       // 일반 공지문 템플릿
       previewHtml = `
-        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+        <div style="width: ${templateType === 'normal' ? imageWidth + 'px' : '100%'}; max-width: 100%; margin: 0 auto;">
           <div style="text-align: center; padding: 40px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif;">
             ${symbolHtml}
             <h2 style="font-size: ${titleFontSizeSlider.value}px; font-weight: bold; margin-bottom: 16px; color: ${titleColor}; white-space: pre-line;">${title}</h2>
@@ -771,7 +768,7 @@
     } else {
         // 시스템 공지문 템플릿
         previewHtml = `
-          <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+          <div style="width: ${templateType === 'normal' ? imageWidth + 'px' : '100%'}; max-width: 100%; margin: 0 auto;">
             <div style="padding: 40px; background-color: #FFFFFF; font-family: 'Pretendard', sans-serif;">
               <div style="text-align: left; font-weight: bold; font-size: 14px; color: #000; margin-bottom: 10px;">공지사항</div>
               <h2 style="font-size: ${titleFontSizeSlider.value}px; font-weight: bold; margin-bottom: 16px; color: ${titleColor}; white-space: pre-line;">${title}</h2>
@@ -830,7 +827,9 @@
       const lineHeight = getLineHeight();
       const titleFontSizeSlider = document.getElementById('titleFontSizeSlider');
       const titleFontSizeValue = document.getElementById('titleFontSizeValue');
-      
+      const contentFontSizeSlider = document.getElementById('contentFontSizeSlider');
+      const contentFontSizeValue = document.getElementById('contentFontSizeValue');
+
       // Quill 에디터의 내용 가져오기
       const contentHtml = quill.root.innerHTML;
       
@@ -851,8 +850,8 @@
       
       if (templateType === 'normal' && symbolType !== 'none') {
         // 심볼 이미지 로드하고 그리기
-        const img = new Image();
-        img.src = svgToImage(symbols[symbolType], symbolColors[symbolType]);
+        const symbolSrc = svgToImage(symbols[symbolType], symbolColors[symbolType]);
+        symbolHtml = `<div style="text-align: center; margin-bottom: 16px;"><img src="${symbolSrc}" width="48" height="48" /></div>`;
         
         img.onload = function() {
           // 가운데 정렬을 위한 X 계산
@@ -962,29 +961,22 @@
 
     // HTML 코드 업데이트 (이미지 크기 수정 적용)
     function updateHtmlCode() {
-      const fileName = 'notice_20250415_1';
-      const buttonCoords = [63, 689, 298, 727];
-      const buttonLink = 'https://example.com';
-      const buttonText = '자세히 보기';
+      const fileName = fileNameInput.value.trim() || 'notice';
+      const buttonLink = buttonLinkInput.value.trim();
+      const buttonText = buttonTextInput.value.trim();
+      const showButton = showButtonCheckbox.checked;
       const showButton = true; // 버튼 보이기 여부 조건에 맞게 수정
   
       const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
   
-      let html = `<html>
-  <body>
-  <img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 361px; height: auto;" usemap="#map01"/>
-  <map name="map01" id="map01">`;
-  
+      let html = `<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
+      <map name="map01" id="map01">`;
+      
       if (showButton && buttonLink) {
         html += `
-  <area shape="rect" coords="${scaledCoords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">`;
+      <area shape="rect" coords="${scaledCoords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">`;
       }
-  
-      html += `
-  </map>
-  </body>
-  </html>`;
-  
+      
       codeOutput.value = html;
     }
     
