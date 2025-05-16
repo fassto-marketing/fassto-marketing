@@ -564,7 +564,6 @@
      // Elements
     const titleInput = document.getElementById('title');
     const titleElement = document.getElementById('preview-title');
-    const contentInput = document.getElementById('content');
     const contentElement = document.getElementById('preview-content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
@@ -572,7 +571,7 @@
     const titleColorInput = document.getElementById('titleColor');
     const contentColorInput = document.getElementById('contentColor');
     const buttonColorInput = document.getElementById('buttonColor');
-    const fileNameInput = document.getElementById('file-name');
+    const fileNameInput = document.getElementById('fileName');
     const previewElement = document.getElementById('preview');
     const codeOutput = document.getElementById('html-code');
     const copyButton = document.getElementById('copyButton');
@@ -966,7 +965,6 @@
       const buttonLink = buttonLinkInput.value.trim();
       const buttonText = buttonTextInput.value.trim();
       const showButton = showButtonCheckbox.checked;
-      const showButton = true; // 버튼 보이기 여부 조건에 맞게 수정
   
       const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
   
