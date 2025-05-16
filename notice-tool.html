@@ -561,8 +561,10 @@
     });
 
      // Elements
-    const titleInput = document.getElementById('preview-title');
-    const contentInput = document.getElementById('preview-content');
+    const titleInput = document.getElementById('title');
+    const titleElement = document.getElementById('preview-title');
+    const contentInput = document.getElementById('content');
+    const contentElement = document.getElementById('preview-content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
     const bgColorInput = document.getElementById('bgColor');
@@ -960,29 +962,29 @@
 
     // HTML 코드 업데이트 (이미지 크기 수정 적용)
     function updateHtmlCode() {
-      const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
-      const buttonLink = buttonLinkInput.value;
-      const buttonText = buttonTextInput.value.trim() || '자세히 보기';
-      const showButton = showButtonCheckbox.checked;
-      
-      // 이미지 맵 좌표 (반으로 축소)
+      const fileName = 'notice_20250415_1';
+      const buttonCoords = [63, 689, 298, 727];
+      const buttonLink = 'https://example.com';
+      const buttonText = '자세히 보기';
+      const showButton = true; // 버튼 보이기 여부 조건에 맞게 수정
+  
       const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
-      
+  
       let html = `<html>
-    <body>
-    <img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 361px; height: auto;" usemap="#map01"/>
-    <map name="map01" id="map01">`;
-    
+  <body>
+  <img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 361px; height: auto;" usemap="#map01"/>
+  <map name="map01" id="map01">`;
+  
       if (showButton && buttonLink) {
         html += `
-    <area shape="rect" coords="${scaledCoords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">`;
+  <area shape="rect" coords="${scaledCoords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">`;
       }
-    
+  
       html += `
-    </map>
-    </body>
-    </html>`;
-    
+  </map>
+  </body>
+  </html>`;
+  
       codeOutput.value = html;
     }
     
