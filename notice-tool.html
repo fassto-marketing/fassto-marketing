@@ -491,6 +491,8 @@
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
+          <h2 id="preview-title">공지 제목입니다</h2>
+          <p id="preview-content">공지 내용이 여기에 표시됩니다.</p>
           <!-- 미리보기 여기에 표시 -->
         </div>
         
@@ -499,7 +501,7 @@
         </div>
         
         <h3 class="text-lg font-bold mb-2 mt-4">HTML 코드</h3>
-        <textarea id="codeOutput" class="code-box" readonly></textarea>
+        <textarea id="html-code" class="code-box" readonly></textarea>
         
         <button id="copyButton" class="custom-button">코드 복사하기</button>
       </div>
@@ -559,7 +561,8 @@
     });
 
      // Elements
-    const titleInput = document.getElementById('title');
+    const titleInput = document.getElementById('preview-title');
+    const contentInput = document.getElementById('preview-content');
     const buttonTextInput = document.getElementById('buttonText');
     const buttonLinkInput = document.getElementById('buttonLink');
     const bgColorInput = document.getElementById('bgColor');
@@ -567,8 +570,8 @@
     const contentColorInput = document.getElementById('contentColor');
     const buttonColorInput = document.getElementById('buttonColor');
     const fileNameInput = document.getElementById('file-name');
-    const previewElement = document.querySelector('preview');
-    const codeOutput = document.getElementById('codeOutput');
+    const previewElement = document.getElementById('preview');
+    const codeOutput = document.getElementById('html-code');
     const copyButton = document.getElementById('copyButton');
     const downloadButton = document.getElementById('downloadButton');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
@@ -959,25 +962,28 @@
     function updateHtmlCode() {
       const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
       const buttonLink = buttonLinkInput.value;
-      const buttonText = buttonTextInput.value;
+      const buttonText = buttonTextInput.value.trim() || '자세히 보기';
       const showButton = showButtonCheckbox.checked;
       
       // 이미지 맵 좌표 (반으로 축소)
       const scaledCoords = buttonCoords.map(coord => Math.round(coord / 2)).join(',');
       
-      // 버튼 표시 여부에 따라 코드 생성
-      if (showButton) {
-        codeOutput.value = `<html>
-<body>
-<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
-<map name="map01" id="map01">
-<area shape="rect" coords="${scaledCoords}" href="${buttonLink}"  alt="${buttonText}"  target="_blank" style="outline: none;">`;
-      } else {
-        codeOutput.value = `<html>
-<body>
-<img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: ${htmlImageWidth}px; height: auto;" usemap="#map01"/>
-<map name="map01" id="map01">`;
+      let html = `<html>
+    <body>
+    <img src="/classic/cmn/commInfo/getNoticeImage.do?file=branding/${fileName}.png" style="width: 361px; height: auto;" usemap="#map01"/>
+    <map name="map01" id="map01">`;
+    
+      if (showButton && buttonLink) {
+        html += `
+    <area shape="rect" coords="${scaledCoords}" href="${buttonLink}" alt="${buttonText}" target="_blank" style="outline: none;">`;
       }
+    
+      html += `
+    </map>
+    </body>
+    </html>`;
+    
+      codeOutput.value = html;
     }
     
     // 복사 기능
