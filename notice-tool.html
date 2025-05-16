@@ -357,10 +357,10 @@
         <!-- 제목 폰트 크기 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">제목 폰트 크기 (px)</label>
-          <input type="range" id="titleFontSizeSlider" min="14" max="40" value="24" step="1" class="w-full">
+          <input type="range" id="titleFontSizeSlider" min="14" max="40" value="18" step="1" class="w-full">
           <div class="flex justify-between text-xs">
             <span>14px</span>
-            <span id="titleFontSizeValue">24px</span>
+            <span id="titleFontSizeValue">18px</span>
             <span>40px</span>
           </div>
         </div>
@@ -395,10 +395,10 @@
         <!-- 본문 폰트 크기 -->
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">본문 폰트 크기 (px)</label>
-          <input type="range" id="contentFontSizeSlider" min="12" max="24" value="16" step="1" class="w-full">
+          <input type="range" id="contentFontSizeSlider" min="12" max="24" value="13" step="1" class="w-full">
           <div class="flex justify-between text-xs">
             <span>12px</span>
-            <span id="contentFontSizeValue">16px</span>
+            <span id="contentFontSizeValue">13px</span>
             <span>24px</span>
           </div>
         </div>
@@ -566,11 +566,11 @@
     const titleColorInput = document.getElementById('titleColor');
     const contentColorInput = document.getElementById('contentColor');
     const buttonColorInput = document.getElementById('buttonColor');
-    const fileNameInput = document.getElementById('fileName');
-    const previewElement = document.getElementById('preview');
+    const fileNameInput = document.getElementById('file-name');
+    const previewElement = document.querySelector('.preview-box');
     const codeOutput = document.getElementById('codeOutput');
     const copyButton = document.getElementById('copyButton');
-    const downloadButton = document.getElementById('downloadButton');
+    const downloadButton = document.getElementById('download-btn');
     const symbolRadios = document.querySelectorAll('input[name="symbol"]');
     const alignmentRadios = document.querySelectorAll('input[name="content-alignment"]');
     const templateRadios = document.querySelectorAll('input[name="template-type"]');
@@ -1018,29 +1018,29 @@
     downloadButton.addEventListener('click', () => {
       downloadButton.textContent = '이미지 생성 중...';
       downloadButton.disabled = true;
-      
-      const originalWidth = previewElement.style.width;  // 원래 너비 저장
-      previewElement.style.width = '722px';              // 저장 시 너비 고정
 
       domtoimage.toPng(previewElement, {
-        quality: 0.95,
-        bgcolor: bgColorInput.value
+        width: 722, // 361px * 2
+        height: previewElement.offsetHeight * 2, // 높이도 2배
+        style: {
+          transform: 'scale(2)',
+          transformOrigin: 'top left',
+          width: '361px'
+        }
       })
       .then(function(dataUrl) {
-        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+        const fileName = fileNameInput.value.trim() || 'notice';
         const link = document.createElement('a');
         link.download = `${fileName}.png`;
         link.href = dataUrl;
         link.click();
-        
-        previewElement.style.width = originalWidth;      // ✅ 원래 너비 복원
+  
         downloadButton.textContent = '이미지 다운로드';
         downloadButton.disabled = false;
       })
       .catch(function(error) {
         console.error('이미지 생성 오류:', error);
         alert('이미지 생성 중 오류가 발생했습니다.');
-        previewElement.style.width = originalWidth;      // ✅ 에러 발생 시도 원래 너비 복원
         downloadButton.textContent = '이미지 다운로드';
         downloadButton.disabled = false;
       });
