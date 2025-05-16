@@ -15,7 +15,7 @@
     }
 
     .preview-box {
-      width: 722px;
+      width: 361px;
       padding: 36px 20px;
       display: flex;
       flex-direction: column;
@@ -495,6 +495,18 @@
           <p id="preview-content">공지 내용이 여기에 표시됩니다.</p>
           <!-- 미리보기 여기에 표시 -->
         </div>
+
+        <label>본문 정렬:
+          <select id="alignment">
+            <option value="left">왼쪽</option>
+            <option value="center" selected>가운데</option>
+            <option value="right">오른쪽</option>
+          </select>
+        </label>
+        
+        <label>본문 폰트 크기: <span id="contentFontSizeValue">13px</span>
+          <input type="range" id="contentFontSizeSlider" min="10" max="30" value="13">
+        </label>
         
         <div class="button-section">
           <button id="downloadButton" class="custom-button mb-2">이미지 다운로드</button>
@@ -1088,21 +1100,13 @@
     // 초기 행간 값 표시
     updateLineHeightUI();
     
-    // ✅ 기본값을 화면에 표시해주기 위한 코드
-    titleFontSizeValue.textContent = `${titleFontSizeSlider.value}px`;
-    contentFontSizeValue.textContent = `${contentFontSizeSlider.value}px`;
     
-    // 초기 미리보기 업데이트
-    updatePreview();
+    titleFontSizeValue.textContent = `${titleFontSizeSlider.value}px`; // ✅ 기본값을 화면에 표시해주기 위한 코드
+    titleFontSizeSlider.addEventListener('input', () => { // 슬라이더가 움직일 때마다 값 표시 + 미리보기 갱신
+      
+    contentFontSizeValue.textContent = `${contentFontSizeSlider.value}px`; // ✅ 기본값을 화면에 표시해주기 위한 코드
+    contentFontSizeSlider.addEventListener('input', () => { // 슬라이더가 움직일 때마다 값 표시 + 미리보기 갱신
     
-    // 슬라이더가 움직일 때마다 값 표시 + 미리보기 갱신
-    titleFontSizeSlider.addEventListener('input', () => {
-    titleFontSizeValue.textContent = `${titleFontSizeSlider.value}px`;
-    updatePreview();
-  });
-    
-    contentFontSizeSlider.addEventListener('input', () => {
-    contentFontSizeValue.textContent = `${contentFontSizeSlider.value}px`;
     updatePreview();
   });
 
