@@ -40,6 +40,12 @@
       text-align: center;
       white-space: pre-line;
     }
+
+    #preview-content {
+      font-size: 13px;
+      white-space: pre-line;
+      text-align: center;
+    }
     
     .custom-input, .file-name-input {
       width: 100%;
@@ -689,6 +695,7 @@
     function updatePreview() {
       const rawTitle = titleInput.value;
       const title = rawTitle.replace(/\n/g, '<br>');
+      const contentHtml = quill.root.innerHTML; // Quill 에디터의 내용 가져오기 (HTML 형식)
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
@@ -700,9 +707,6 @@
       const templateType = getSelectedTemplate();
       const showButton = showButtonCheckbox.checked;
       const lineHeight = getLineHeight();
-      
-      // Quill 에디터의 내용 가져오기 (HTML 형식)
-      const contentHtml = quill.root.innerHTML;
       
       // 심볼 HTML (일반 공지문에만 적용) - 수정된 버전
       let symbolHtml = '';
