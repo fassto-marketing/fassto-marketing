@@ -690,6 +690,8 @@
     function updatePreview() {
       const rawTitle = titleInput.value;
       const title = rawTitle.replace(/\n/g, '<br>');
+      const contentText = contentInput.value.replace(/\n/g, "<br>");
+      contentElement.innerHTML = contentText;
       const buttonText = buttonTextInput.value;
       const buttonLink = buttonLinkInput.value;
       const bgColor = bgColorInput.value;
