@@ -1012,32 +1012,35 @@
       previewClone.style.zIndex = "-1";
       document.body.appendChild(previewClone); // DOM에 추가
 
-      domtoimage.toPng(previewClone, {
-        quality: 1,
-        bgcolor: bgColorInput.value,
-        width: 722,
-        height: previewClone.scrollHeight
-      })
-      .then(function(dataUrl) {
-        const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
-        const link = document.createElement('a');
-        link.download = `${fileName}.png`;
-        link.href = dataUrl;
-        link.click();
+      // 300ms 기다렸다가 domtoimage 실행 (font 렌더링 보장)
+      setTimeout(() => {
+        domtoimage.toPng(previewClone, {
+          quality: 1,
+          bgcolor: bgColorInput.value,
+          width: 722,
+          height: previewClone.scrollHeight
+        })
+        .then(function(dataUrl) {
+          const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
+          const link = document.createElement('a');
+          link.download = `${fileName}.png`;
+          link.href = dataUrl;
+          link.click();
 
-        downloadButton.textContent = '이미지 다운로드';
-        downloadButton.disabled = false;
+          downloadButton.textContent = '이미지 다운로드';
+          downloadButton.disabled = false;
 
-        document.body.removeChild(previewClone); // 끝나면 제거
-      })
-      .catch(function(error) {
-        console.error('이미지 생성 오류:', error);
-        alert('이미지 생성 중 오류가 발생했습니다.');
-        downloadButton.textContent = '이미지 다운로드';
-        downloadButton.disabled = false;
+          document.body.removeChild(previewClone);
+        })
+        .catch(function(error) {
+          console.error('이미지 생성 오류:', error);
+          alert('이미지 생성 중 오류가 발생했습니다.');
+          downloadButton.textContent = '이미지 다운로드';
+          downloadButton.disabled = false;
 
-        document.body.removeChild(previewClone); // 에러 시에도 제거
-      });
+          document.body.removeChild(previewClone);
+        });
+      }, 300); // 폰트가 렌더링될 시간을 줌
     });
     
     // 템플릿 타입 변경 이벤트 리스너
