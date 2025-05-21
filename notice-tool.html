@@ -1001,17 +1001,21 @@
       downloadButton.textContent = '이미지 생성 중...';
       downloadButton.disabled = true;
 
-      domtoimage.toPng(previewElement, {
-        quality: 0.95,
+      const previewClone = previewElement.cloneNode(true); // #preview 복제
+      previewClone.style.transform = ""; // scale 제거
+      previewClone.style.width = "722px"; // 진짜 2x 사이즈
+      previewClone.style.height = "auto";
+      previewClone.style.position = "absolute";
+      previewClone.style.top = "-9999px"; // 화면 밖에 위치
+      previewClone.style.left = "-9999px";
+      previewClone.style.zIndex = "-1";
+      document.body.appendChild(previewClone); // DOM에 추가
+
+      domtoimage.toPng(previewClone, {
+        quality: 1,
         bgcolor: bgColorInput.value,
-        width: 722, // 2x 기준 너비
-        height: previewElement.scrollHeight, // 실제 콘텐츠 전체 높이
-        style: {
-          transform: "scale(2)",
-          transformOrigin: "top left",
-          width: "361px" // 원본 기준 너비
-          // height는 설정하지 않음 (또는 "auto")
-        }
+        width: 722,
+        height: previewClone.scrollHeight
       })
       .then(function(dataUrl) {
         const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
@@ -1022,12 +1026,16 @@
 
         downloadButton.textContent = '이미지 다운로드';
         downloadButton.disabled = false;
+
+        document.body.removeChild(previewClone); // 끝나면 제거
       })
       .catch(function(error) {
         console.error('이미지 생성 오류:', error);
         alert('이미지 생성 중 오류가 발생했습니다.');
         downloadButton.textContent = '이미지 다운로드';
         downloadButton.disabled = false;
+
+        document.body.removeChild(previewClone); // 에러 시에도 제거
       });
     });
     
