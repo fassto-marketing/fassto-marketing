@@ -1002,6 +1002,7 @@
       downloadButton.disabled = true;
 
       const previewClone = previewElement.cloneNode(true); // #preview 복제
+      previewClone.innerHTML = previewElement.innerHTML;   // ❗ 복제한 요소에 내용 복사
       previewClone.style.transform = ""; // scale 제거
       previewClone.style.width = "722px"; // 진짜 2x 사이즈
       previewClone.style.height = "auto";
