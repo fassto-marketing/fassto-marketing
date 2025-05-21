@@ -478,7 +478,7 @@
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm" 
-             style="width: 722px; margin: 0 auto; padding-top: 36px; padding-bottom: 36px;">
+             style="width: 722px; margin: 0 auto; padding-top: 36px; padding-bottom: 36px; overflow: visible;">
           <!-- 미리보기 여기에 표시 -->
         </div>
         
@@ -1004,12 +1004,13 @@
       domtoimage.toPng(previewElement, {
         quality: 0.95,
         bgcolor: bgColorInput.value,
-        width: 722, // 고정된 너비
-        height: previewElement.offsetHeight, // 동적으로 계산
+        width: 722, // 2x 기준 너비
+        height: previewElement.scrollHeight, // 실제 콘텐츠 전체 높이
         style: {
           transform: "scale(2)",
           transformOrigin: "top left",
-          width: "361px"
+          width: "361px" // 원본 기준 너비
+          // height는 설정하지 않음 (또는 "auto")
         }
       })
       .then(function(dataUrl) {
