@@ -473,7 +473,8 @@
       </div>
 
        <!-- Preview Section -->
-      <div class="preview-area bg-white p-6 rounded-lg shadow-md">
+      <div id="preview" class="preview-box mb-6 border rounded-lg shadow-sm"
+           style="width: 722px; margin: 0 auto; overflow: hidden; padding: 0; box-sizing: border-box;">
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
         <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm" style="width: 722px; margin: 0 auto; padding-top: 36px; padding-bottom: 36px;">
@@ -734,7 +735,7 @@
 
       // 일반 공지문 템플릿
       previewHtml = `
-        <div style="width: ${imageWidth}px; max-width: 100%; margin: 0 auto;">
+        <div style="width: 100%; margin: 0 auto;">
           <div style="width: 722px; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 36px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif; box-sizing: border-box;">
             ${symbolHtml}
             <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
