@@ -476,7 +476,7 @@
       <div class="preview-area bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">미리보기</h2>
         
-        <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm">
+        <div id="preview" class="preview-box mb-6 border rounded-lg overflow-hidden shadow-sm" style="width: 722px; margin: 0 auto; padding-top: 36px; padding-bottom: 36px;">
           <!-- 미리보기 여기에 표시 -->
         </div>
         
@@ -1001,7 +1001,14 @@
 
       domtoimage.toPng(previewElement, {
         quality: 0.95,
-        bgcolor: bgColorInput.value
+        bgcolor: bgColorInput.value,
+        width: 722, // 고정된 너비
+        height: previewElement.offsetHeight, // 동적으로 계산
+        style: {
+          transform: "scale(2)",
+          transformOrigin: "top left",
+          width: "361px"
+        }
       })
       .then(function(dataUrl) {
         const fileName = fileNameInput.value.trim() || 'notice_20250415_1';
