@@ -735,12 +735,12 @@
 
       // 일반 공지문 템플릿
       previewHtml = `
-        <div style="width: 100%; margin: 0 auto;">
-          <div style="width: 722px; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 36px 0; background-color: ${bgColor}; font-family: 'Pretendard', sans-serif; box-sizing: border-box;">
+        <div style="display: flex; justify-content: center; background-color: ${bgColor}; padding: 36px 0;">
+          <div style="width: 722px; display: flex; flex-direction: column; align-items: center; gap: 20px; font-family: 'Pretendard', sans-serif; box-sizing: border-box;">
             ${symbolHtml}
-            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px; color: ${titleColor};">${title}</h2>
+            <h2 style="font-size: 18px; font-weight: bold; color: ${titleColor}; margin: 0;">${title}</h2>
             <div class="content" style="background-color: white; border-radius: 8px; padding: 16px; width: 650px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); min-height: ${adjustedContentHeight}px;">
-              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; margin: 0; line-height: ${lineHeight}px;">${contentHtml}</div>
+              <div style="${alignStyle} font-size: 14px; color: ${contentColor}; line-height: ${lineHeight}px;">${contentHtml}</div>
             </div>
             ${buttonHtml}
           </div>
