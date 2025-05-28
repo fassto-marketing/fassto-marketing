@@ -107,7 +107,7 @@
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <strong>이미지</strong>
-          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
+          <button onclick="removeImageBlock(this)" class="text-sm text-red-500">삭제</button>
         </div>
         <div class="drop-zone w-full h-40 flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded cursor-pointer">
           이미지를 첨부하거나 이 영역에 드래그하세요
@@ -138,6 +138,7 @@
             filename: file.name,
             type: file.type,
             cid: cid
+            dataURL: reader.result
           });
         };
         reader.readAsDataURL(file);
@@ -180,6 +181,18 @@
         fileInput.files = dataTransfer.files;
         fileInput.dispatchEvent(new Event('change'));
       }
+    }
+
+    function removeImageBlock(button) {
+      const block = button.closest('.block');
+      const img = block.querySelector('img');
+      const cid = img?.getAttribute('data-cid');
+    
+      if (cid && window.imageAttachments) {
+        window.imageAttachments = window.imageAttachments.filter(att => att.cid !== cid);
+      }
+    
+      block.remove();
     }
 
     function addButtonBlock() {
@@ -266,7 +279,10 @@
     
         if (img && img.getAttribute('data-cid')) {
           const cid = img.getAttribute('data-cid');
-          html += `<img src="cid:${cid}" style="max-width:100%;margin:1em 0;" />`;
+          const attachment = window.imageAttachments.find(a => a.cid === cid);
+          if (attachment) {
+            html += `<img src="${attachment.dataURL}" style="max-width:100%;margin:1em 0;" />`;
+          }
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
           html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
         } else if (inputs.length === 2) {
