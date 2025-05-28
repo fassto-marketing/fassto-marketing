@@ -33,15 +33,22 @@
     </div>
   </nav>
   
-<section>
-  <h1>대량 이메일 보내기</h1>
-  <form id="emailForm">
-    <input type="text" name="subject" placeholder="제목" required><br><br>
-    <textarea name="body" placeholder="본문 HTML로 작성" required></textarea><br><br>
-    <textarea name="recipients" placeholder="수신자 이메일 목록 (쉼표로 구분)" required></textarea><br><br>
-    <button type="submit">발송</button>
+<main class="container mx-auto px-4 flex-1">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">대량 이메일 보내기</h1>
+  <form id="emailForm" class="space-y-4">
+    <input type="text" name="subject" placeholder="제목" required
+      class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+    
+    <textarea name="body" placeholder="본문 HTML로 작성" required
+      class="w-full border border-gray-300 rounded p-2 h-40 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+    
+    <textarea name="recipients" placeholder="수신자 이메일 목록 (쉼표로 구분)" required
+      class="w-full border border-gray-300 rounded p-2 h-32 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+    
+    <button type="submit"
+      class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow">발송</button>
   </form>
-</section>
+</main>
 
    <footer class="bg-gray-200 text-center p-4 mt-auto">
     <p class="text-sm text-gray-600">© 2025 Fassto Marketing. All Rights Reserved.</p>
