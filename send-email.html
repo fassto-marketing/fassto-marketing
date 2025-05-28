@@ -36,32 +36,44 @@
     </div>
   </nav>
   
-<main class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
-  <h1 class="text-2xl font-bold mb-6">🧱 이메일 콘텐츠 빌더</h1>
-
-<!-- 이메일 제목 입력란: 콘텐츠 빌더 위쪽에 배치 -->
-<div class="w-full max-w-xl mb-6">
-  <label for="email-subject" class="block mb-2 font-semibold text-gray-700">이메일 제목</label>
-  <input id="email-subject" type="text" placeholder="이메일 제목을 입력하세요" 
-         class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
-</div>
-
-<!-- 발송처 입력란 -->
-<div class="w-full max-w-xl mb-6">
-  <label for="email-recipient" class="block mb-2 font-semibold text-gray-700">수신자 이메일</label>
-  <input id="email-recipient" type="email" placeholder="수신자 이메일 주소를 입력하세요" 
-         class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
-</div>
-
-  <div class="flex space-x-2 mb-4">
-    <button onclick="addImageBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">이미지</button>
-    <button onclick="addTextBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">텍스트</button>
-    <button onclick="addButtonBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">버튼</button>
+<main class="bg-white min-h-screen flex flex-col items-center py-10 px-4">
+  <div class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">📧 이메일 콘텐츠 빌더</h1>
+    <p class="text-gray-500 mt-2 text-sm">디자인한 콘텐츠를 여러 명에게 한 번에 발송할 수 있어요.</p>
   </div>
 
-  <div id="builder" class="w-full max-w-xl space-y-4"></div>
+  <div class="w-full max-w-2xl space-y-6 bg-gray-50 p-6 rounded-xl shadow-md">
+    <!-- 이메일 제목 -->
+    <div>
+      <label for="email-subject" class="block mb-1 font-semibold text-gray-700">이메일 제목</label>
+      <input id="email-subject" type="text" placeholder="예: 신규 프로모션 안내"
+             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+    </div>
 
-  <button onclick="sendEmail()" class="mt-6 bg-green-600 text-white font-bold px-6 py-3 rounded shadow">📬 이메일 발송</button>
+    <!-- 수신자 -->
+    <div>
+      <label for="email-recipient" class="block mb-1 font-semibold text-gray-700">
+        수신자 이메일 (여러 개 붙여넣기 가능)
+      </label>
+      <textarea id="email-recipient" rows="3" placeholder="예: a@domain.com, b@domain.com"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+    </div>
+
+    <!-- 콘텐츠 빌더 영역 -->
+    <div>
+      <div class="flex space-x-2 mb-3">
+        <button onclick="addImageBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">이미지</button>
+        <button onclick="addTextBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">텍스트</button>
+        <button onclick="addButtonBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">버튼</button>
+      </div>
+      <div id="builder" class="space-y-4"></div>
+    </div>
+
+    <!-- 발송 버튼 -->
+    <div class="text-center">
+      <button onclick="sendEmail()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow">📨 이메일 발송</button>
+    </div>
+  </div>
 </main>
 
    <footer class="bg-gray-200 text-center p-4 mt-auto">
@@ -176,16 +188,17 @@
 
     function sendEmail() {
       const subject = document.getElementById('email-subject').value.trim();
-      const recipient = document.getElementById('email-recipient').value.trim();
-      if (!subject) {
-        alert('이메일 제목을 입력해 주세요!');
+      const recipientsRaw = document.getElementById('email-recipient').value.trim();
+      if (!subject || !recipientsRaw) {
+        alert('제목과 수신자 이메일을 입력해주세요.');
         return;
       }
-      if (!recipient) {
-        alert('수신자 이메일을 입력해 주세요!');
-        return;
-      }
-      
+    
+      // 수신자 이메일 여러 개 처리 (엑셀에서 붙여넣은 값 처리)
+      const recipients = recipientsRaw
+        .split(/[\s,;]+/)
+        .filter(email => email.includes('@'));
+    
       const blocks = document.querySelectorAll('#builder > div');
       let html = '';
     
@@ -193,26 +206,34 @@
         const inputs = block.querySelectorAll('input, textarea');
         const img = block.querySelector('img');
     
-        // 🖼️ 이미지가 있다면 base64든 URL이든 우선 출력
         if (img && img.getAttribute('src')) {
           html += `<img src="${img.getAttribute('src')}" style="max-width:100%;margin:1em 0;" />`;
-        }
-    
-        // 📝 텍스트 블록 (textarea)
-        else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
+        } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
           html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
-        }
-    
-        // 🔘 버튼 블록
-        else if (inputs.length === 2) {
+        } else if (inputs.length === 2) {
           const text = inputs[0].value;
           const url = inputs[1].value;
           html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
         }
       });
     
-      console.log('최종 HTML:', html);
-      alert("📨 콘솔에 HTML이 출력되었습니다. 이 HTML을 이메일 본문에 사용하세요!");
+      // 🔗 Netlify function 호출
+      fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, recipients, html })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("발송 실패");
+        return response.json();
+      })
+      .then(data => {
+        alert(`📨 ${data.successCount}명에게 이메일이 발송되었습니다!`);
+      })
+      .catch(err => {
+        console.error(err);
+        alert('이메일 발송 중 오류가 발생했습니다.');
+      });
     }
 
       document.addEventListener('DOMContentLoaded', () => {
