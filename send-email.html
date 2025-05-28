@@ -56,11 +56,11 @@
   <script>
     function addTextBlock() {
       const block = document.createElement('div');
-      block.className = 'p-4 bg-white rounded shadow';
+      block.className = 'block p-4 bg-white rounded shadow';
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <strong>텍스트</strong>
-          <button onclick="this.closest('div').remove()" class="text-sm text-red-500">삭제</button>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
         </div>
         <textarea class="w-full border p-2 rounded" placeholder="내용 입력"></textarea>
       `;
@@ -69,11 +69,11 @@
 
     function addImageBlock() {
       const block = document.createElement('div');
-      block.className = 'p-4 bg-white rounded shadow';
+      block.className = 'block p-4 bg-white rounded shadow';
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <strong>이미지</strong>
-          <button onclick="this.closest('div').remove()" class="text-sm text-red-500">삭제</button>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
         </div>
         <input type="text" class="w-full border p-2 rounded" placeholder="이미지 주소 (URL)" />
       `;
@@ -82,11 +82,11 @@
 
     function addButtonBlock() {
       const block = document.createElement('div');
-      block.className = 'p-4 bg-white rounded shadow';
+      block.className = 'block p-4 bg-white rounded shadow';
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <strong>버튼</strong>
-          <button onclick="this.closest('div').remove()" class="text-sm text-red-500">삭제</button>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
         </div>
         <input type="text" class="w-full border p-2 rounded mb-2" placeholder="버튼 텍스트" />
         <input type="text" class="w-full border p-2 rounded" placeholder="버튼 링크 (URL)" />
