@@ -60,14 +60,20 @@
       const subject = this.subject.value;
       const body = this.body.value;
       const recipients = this.recipients.value;
-
+    
       const response = await fetch('/.netlify/functions/send-bulk-email', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject, body, recipients }),
       });
-
+    
       const result = await response.json();
       alert(result.success ? "성공적으로 발송됨!" : "오류: " + result.error);
+    
+      if (result.success) {
+        // ✅ 입력값 초기화
+        this.reset();
+      }
     });
   </script>
 
