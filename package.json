@@ -7,7 +7,8 @@
     "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.6.8",
     "cheerio": "^1.0.0-rc.12",
-    "node-fetch": "^2.6.11"
+    "node-fetch": "^2.6.11",
+    "@sendgrid/mail": "^8.0.0"
   },
   "description": "",
   "main": "index.js",
@@ -25,8 +26,4 @@
     "url": "https://github.com/fassto-marketing/fassto-marketing/issues"
   },
   "homepage": "https://github.com/fassto-marketing/fassto-marketing#readme"
-  }
-  "dependencies": {
-  "@sendgrid/mail": "^8.0.0"
-  }
-
+}
