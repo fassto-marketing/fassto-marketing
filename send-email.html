@@ -39,9 +39,23 @@
 <main class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
   <h1 class="text-2xl font-bold mb-6">🧱 이메일 콘텐츠 빌더</h1>
 
+<!-- 이메일 제목 입력란: 콘텐츠 빌더 위쪽에 배치 -->
+<div class="w-full max-w-xl mb-6">
+  <label for="email-subject" class="block mb-2 font-semibold text-gray-700">이메일 제목</label>
+  <input id="email-subject" type="text" placeholder="이메일 제목을 입력하세요" 
+         class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+</div>
+
+<!-- 발송처 입력란 -->
+<div class="w-full max-w-xl mb-6">
+  <label for="email-recipient" class="block mb-2 font-semibold text-gray-700">수신자 이메일</label>
+  <input id="email-recipient" type="email" placeholder="수신자 이메일 주소를 입력하세요" 
+         class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+</div>
+
   <div class="flex space-x-2 mb-4">
-    <button onclick="addTextBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">텍스트</button>
     <button onclick="addImageBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">이미지</button>
+    <button onclick="addTextBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">텍스트</button>
     <button onclick="addButtonBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">버튼</button>
   </div>
 
@@ -146,7 +160,32 @@
       }
     }
 
+    function addButtonBlock() {
+      const block = document.createElement('div');
+      block.className = 'block p-4 bg-white rounded shadow';
+      block.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <strong>버튼</strong>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
+        </div>
+        <input type="text" placeholder="버튼 텍스트" class="w-full border p-2 rounded mb-2" />
+        <input type="text" placeholder="버튼 링크 URL" class="w-full border p-2 rounded" />
+      `;
+      document.getElementById('builder').appendChild(block);
+    }
+
     function sendEmail() {
+      const subject = document.getElementById('email-subject').value.trim();
+      const recipient = document.getElementById('email-recipient').value.trim();
+      if (!subject) {
+        alert('이메일 제목을 입력해 주세요!');
+        return;
+      }
+      if (!recipient) {
+        alert('수신자 이메일을 입력해 주세요!');
+        return;
+      }
+      
       const blocks = document.querySelectorAll('#builder > div');
       let html = '';
     
