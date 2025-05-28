@@ -7,7 +7,7 @@ exports.handler = async (event) => {
 
   const messages = emails.map(email => ({
     to: email,
-    from: 'hello@fassot.com',
+    from: 'hello@fassto.com',
     subject: subject,
     html: body,
   }));
