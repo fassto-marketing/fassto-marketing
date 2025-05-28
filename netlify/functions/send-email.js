@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     };
   }
 
-  const { subject, body, recipients } = JSON.parse(event.body);
+  const { subject, html, recipients } = JSON.parse(event.body);
   const emails = recipients
   .split(/[\n,]+/)              // 쉼표 또는 줄바꿈(\n) 기준으로 나누고
   .map(email => email.trim())   // 앞뒤 공백 제거
