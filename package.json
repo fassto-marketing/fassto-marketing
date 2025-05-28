@@ -25,4 +25,8 @@
     "url": "https://github.com/fassto-marketing/fassto-marketing/issues"
   },
   "homepage": "https://github.com/fassto-marketing/fassto-marketing#readme"
-}
+  }
+  "dependencies": {
+  "@sendgrid/mail": "^8.0.0"
+  }
+
