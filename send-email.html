@@ -68,48 +68,110 @@
       document.getElementById('builder').appendChild(block);
     }
 
-    function addImageBlock() {
+    function addImageBlock(file = null) {
       const block = document.createElement('div');
-      block.className = 'block p-4 bg-white rounded shadow';
+      block.className = 'block p-4 bg-white rounded shadow border border-dashed border-gray-300 relative';
+    
+      const imgPreviewId = 'img-preview-' + Date.now();
+    
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
           <strong>이미지</strong>
           <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
         </div>
-        <input type="text" class="w-full border p-2 rounded" placeholder="이미지 주소 (URL)" />
-      `;
-      document.getElementById('builder').appendChild(block);
-    }
-
-    function addButtonBlock() {
-      const block = document.createElement('div');
-      block.className = 'block p-4 bg-white rounded shadow';
-      block.innerHTML = `
-        <div class="flex justify-between items-center mb-2">
-          <strong>버튼</strong>
-          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
+        <div class="drop-zone w-full h-40 flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded cursor-pointer">
+          이미지를 첨부하거나 이 영역에 드래그하세요
         </div>
-        <input type="text" class="w-full border p-2 rounded mb-2" placeholder="버튼 텍스트" />
-        <input type="text" class="w-full border p-2 rounded" placeholder="버튼 링크 (URL)" />
+        <input type="file" accept="image/*" class="hidden image-upload" />
+        <img id="${imgPreviewId}" class="max-w-full mt-2 hidden rounded" />
       `;
-      document.getElementById('builder').appendChild(block);
+    
+      const builder = document.getElementById('builder');
+      builder.appendChild(block);
+    
+      const dropZone = block.querySelector('.drop-zone');
+      const fileInput = block.querySelector('.image-upload');
+      const preview = block.querySelector(`#${imgPreviewId}`);
+    
+      // 클릭으로 파일 첨부
+      dropZone.addEventListener('click', () => fileInput.click());
+    
+      // 파일 선택 시
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+            preview.setAttribute('data-src', reader.result);
+            dropZone.classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    
+      // 드래그 앤 드롭
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('bg-gray-200');
+      });
+    
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('bg-gray-200');
+      });
+    
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('bg-gray-200');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+            preview.setAttribute('data-src', reader.result);
+            dropZone.classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    
+      // 드롭으로 직접 받은 파일 처리
+      if (file) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
     }
 
     function sendEmail() {
       const blocks = document.querySelectorAll('#builder > div');
       let html = '';
+    
       blocks.forEach(block => {
         const inputs = block.querySelectorAll('input, textarea');
-        if (inputs.length === 1) {
-          if (inputs[0].type === 'text') {
-            html += `<img src="${inputs[0].value}" style="max-width:100%;margin:1em 0;" />`;
-          } else {
-            html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
-          }
-        } else if (inputs.length === 2) {
-          html += `<a href="${inputs[1].value}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${inputs[0].value}</a>`;
+        const img = block.querySelector('img');
+    
+        // 🖼️ 이미지가 있다면 base64든 URL이든 우선 출력
+        if (img && img.getAttribute('src')) {
+          html += `<img src="${img.getAttribute('src')}" style="max-width:100%;margin:1em 0;" />`;
+        }
+    
+        // 📝 텍스트 블록 (textarea)
+        else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
+          html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
+        }
+    
+        // 🔘 버튼 블록
+        else if (inputs.length === 2) {
+          const text = inputs[0].value;
+          const url = inputs[1].value;
+          html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
         }
       });
+    
       console.log('최종 HTML:', html);
       alert("📨 콘솔에 HTML이 출력되었습니다. 이 HTML을 이메일 본문에 사용하세요!");
     }
