@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     to: email,
     from: 'hello@fassto.com', 
     subject: subject,
-    html: body,
+    html: html,
   }));
 
   try {
@@ -34,7 +34,7 @@ exports.handler = async (event) => {
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      body: JSON.stringify({ success: true })
+      body: JSON.stringify({ success: true, successCount: emails.length })
     };
   } catch (error) {
     return {
