@@ -39,8 +39,17 @@
     <input type="text" name="subject" placeholder="제목" required
       class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
     
-    <textarea name="body" placeholder="본문 HTML로 작성" required
-      class="w-full border border-gray-300 rounded p-2 h-40 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+    <!-- 본문 구성 에디터 영역 -->
+    <div id="builder" class="space-y-4 mb-4">
+      <!-- 여기에 텍스트/이미지/버튼 블록이 추가됩니다 -->
+    </div>
+
+    <!-- 구성 요소 추가 버튼 -->
+    <div class="flex space-x-2 mb-6">
+      <button type="button" onclick="addTextBlock()" class="bg-gray-200 px-4 py-2 rounded">텍스트</button>
+      <button type="button" onclick="addImageBlock()" class="bg-gray-200 px-4 py-2 rounded">이미지</button>
+      <button type="button" onclick="addButtonBlock()" class="bg-gray-200 px-4 py-2 rounded">버튼</button>
+    </div>
     
     <textarea name="recipients" placeholder="수신자 이메일 목록 (쉼표로 구분)" required
       class="w-full border border-gray-300 rounded p-2 h-32 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
@@ -76,6 +85,79 @@
       }
     });
   </script>
+
+<script>
+  function addTextBlock() {
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <textarea placeholder="텍스트 입력" class="w-full border p-2 rounded"></textarea>
+    `;
+    document.getElementById('builder').appendChild(block);
+  }
+
+  function addImageBlock() {
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <input type="text" placeholder="이미지 주소(URL)" class="w-full border p-2 rounded" />
+    `;
+    document.getElementById('builder').appendChild(block);
+  }
+
+  function addButtonBlock() {
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <input type="text" placeholder="버튼 텍스트" class="border p-2 rounded mb-2 mr-2" />
+      <input type="text" placeholder="버튼 링크(URL)" class="border p-2 rounded" />
+    `;
+    document.getElementById('builder').appendChild(block);
+  }
+
+  function getEmailHtml() {
+    const blocks = document.querySelectorAll('#builder > div');
+    let html = '';
+
+    blocks.forEach(block => {
+      const inputs = block.querySelectorAll('input, textarea');
+
+      if (inputs.length === 1) {
+        const value = inputs[0].value.trim();
+        if (inputs[0].tagName === 'TEXTAREA') {
+          html += `<p style="margin: 1em 0;">${value}</p>`;
+        } else {
+          html += `<img src="${value}" alt="" style="max-width:100%;margin:1em 0;" />`;
+        }
+      } else if (inputs.length === 2) {
+        const text = inputs[0].value.trim();
+        const link = inputs[1].value.trim();
+        html += `<a href="${link}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
+      }
+    });
+
+    return html;
+  }
+
+  // 기존 제출 코드에 붙이기: 이메일 본문을 동적으로 넣음
+  document.getElementById('emailForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const subject = this.subject.value;
+    const body = getEmailHtml(); // ✨ 여기서 동적으로 생성한 HTML 사용
+    const recipients = this.recipients.value;
+
+    const response = await fetch('/.netlify/functions/send-bulk-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, body, recipients }),
+    });
+
+    const result = await response.json();
+    alert(result.success ? "성공적으로 발송됨!" : "오류: " + result.error);
+
+    if (result.success) {
+      this.reset();
+      document.getElementById('builder').innerHTML = ''; // 에디터 영역도 초기화
+    }
+  });
+</script>
 
   <script>
       // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
