@@ -95,10 +95,13 @@
     }
 
     function addImageBlock(file = null) {
+      if (!window.imageAttachments) window.imageAttachments = [];
+    
       const block = document.createElement('div');
       block.className = 'block p-4 bg-white rounded shadow border border-dashed border-gray-300 relative';
     
       const imgPreviewId = 'img-preview-' + Date.now();
+      const cid = 'img' + Date.now(); // 고유 ID 생성
     
       block.innerHTML = `
         <div class="flex justify-between items-center mb-2">
@@ -109,7 +112,7 @@
           이미지를 첨부하거나 이 영역에 드래그하세요
         </div>
         <input type="file" accept="image/*" class="hidden image-upload" />
-        <img id="${imgPreviewId}" class="max-w-full mt-2 hidden rounded" />
+        <img id="${imgPreviewId}" class="max-w-full mt-2 hidden rounded" data-cid="${cid}" />
       `;
     
       const builder = document.getElementById('builder');
@@ -119,6 +122,26 @@
       const fileInput = block.querySelector('.image-upload');
       const preview = block.querySelector(`#${imgPreviewId}`);
     
+      // 이미지 파일 처리 함수
+      const handleFile = (file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1]; // 헤더 제거
+          preview.src = reader.result;
+          preview.classList.remove('hidden');
+          dropZone.classList.add('hidden');
+    
+          // 이미지 첨부 정보를 전역 배열에 저장
+          window.imageAttachments.push({
+            content: base64,
+            filename: file.name,
+            type: file.type,
+            cid: cid
+          });
+        };
+        reader.readAsDataURL(file);
+      };
+    
       // 클릭으로 파일 첨부
       dropZone.addEventListener('click', () => fileInput.click());
     
@@ -126,14 +149,7 @@
       fileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         if (file && file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            preview.src = reader.result;
-            preview.classList.remove('hidden');
-            preview.setAttribute('data-src', reader.result);
-            dropZone.classList.add('hidden');
-          };
-          reader.readAsDataURL(file);
+          handleFile(file);
         }
       });
     
@@ -152,14 +168,7 @@
         dropZone.classList.remove('bg-gray-200');
         const file = e.dataTransfer.files[0];
         if (file && file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            preview.src = reader.result;
-            preview.classList.remove('hidden');
-            preview.setAttribute('data-src', reader.result);
-            dropZone.classList.add('hidden');
-          };
-          reader.readAsDataURL(file);
+          handleFile(file);
         }
       });
     
@@ -206,8 +215,9 @@
         const inputs = block.querySelectorAll('input, textarea');
         const img = block.querySelector('img');
     
-        if (img && img.getAttribute('src')) {
-          html += `<img src="${img.getAttribute('src')}" style="max-width:100%;margin:1em 0;" />`;
+        if (img && img.getAttribute('data-cid')) {
+          const cid = img.getAttribute('data-cid');
+          html += `<img src="cid:${cid}" style="max-width:100%;margin:1em 0;" />`;
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
           html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
         } else if (inputs.length === 2) {
@@ -221,7 +231,7 @@
       fetch('/.netlify/functions/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, recipients, html })
+        body: JSON.stringify({ subject, recipients, html, attachments: window.imageAttachments })
       })
       .then(response => {
         if (!response.ok) throw new Error("발송 실패");
