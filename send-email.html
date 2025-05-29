@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이메일 대량 발송</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      
+    </style>  
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+  <nav class="bg-gray-100 border-b border-gray-300 mb-6">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html">
+        <img src="파스토 로고.png" alt="파스토 로고" class="h-8">
+      </a>
+      <button id="menu-toggle" class="block md:hidden text-gray-700 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      <ul id="menu" class="transform transition-transform duration-300 ease-in-out md:flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0 mt-4 md:mt-0 w-full md:w-auto">
+        <li><a href="notice-tool.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">공지 이미지 생성기</a></li>
+        <li><a href="coordinate-finder.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">좌표 찾기 도구</a></li>
+        <li><a href="url-cut.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">URL 단축기</a></li>
+        <li><a href="send-email.html" class="block text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md transition">이메일 대량 발송</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+<main class="flex-grow container mx-auto p-4 max-w-2xl">
+  <div class="bg-white p-8 rounded-lg shadow-lg">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">📧 이메일 콘텐츠 빌더</h1>
+      <p class="text-gray-500 mt-2 text-sm">디자인한 콘텐츠를 여러 명에게 한 번에 발송할 수 있어요.</p>
+    </div>
+
+    <!-- 이메일 제목 -->
+    <div>
+      <label for="email-subject" class="block mb-1 font-semibold text-gray-700">이메일 제목</label>
+      <input id="email-subject" type="text" placeholder="예: 신규 프로모션 안내"
+             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+    </div>
+
+    <!-- 수신자 -->
+    <div>
+      <label for="email-recipient" class="block mb-1 font-semibold text-gray-700">
+        수신자 이메일 (여러 개 붙여넣기 가능)
+      </label>
+      <textarea id="email-recipient" rows="3" placeholder="예: a@domain.com, b@domain.com"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+    </div>
+
+    <!-- 콘텐츠 빌더 영역 -->
+    <div>
+      <div class="flex space-x-2 mb-3">
+        <button onclick="addImageBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">이미지</button>
+        <button onclick="addTextBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">텍스트</button>
+        <button onclick="addButtonBlock()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">버튼</button>
+      </div>
+      <div id="builder" class="space-y-4"></div>
+    </div>
+
+    <!-- 발송 및 미리보기 -->
+    <div class="text-center">
+      <button onclick="previewEmail()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded shadow">📄 미리보기</button>
+      <button onclick="sendEmail()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow">📨 이메일 발송</button>
+    </div>
+</main>
+
+   <footer class="bg-gray-200 text-center p-4 mt-auto">
+    <p class="text-sm text-gray-600">© 2025 Fassto Marketing. All Rights Reserved.</p>
+   </footer>
+
+  <script>
+    function addTextBlock() {
+      const block = document.createElement('div');
+      block.className = 'block p-4 bg-white rounded shadow';
+      block.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <strong>텍스트</strong>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
+        </div>
+        <textarea class="w-full border p-2 rounded" placeholder="내용 입력"></textarea>
+      `;
+      document.getElementById('builder').appendChild(block);
+    }
+
+    function addImageBlock(file = null) {
+      if (!window.imageAttachments) window.imageAttachments = [];
+    
+      const block = document.createElement('div');
+      block.className = 'block p-4 bg-white rounded shadow border border-dashed border-gray-300 relative';
+    
+      const imgPreviewId = 'img-preview-' + Date.now();
+      const cid = 'img' + Date.now(); // 고유 ID 생성
+    
+      block.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <strong>이미지</strong>
+          <button onclick="removeImageBlock(this)" class="text-sm text-red-500">삭제</button>
+        </div>
+        <div class="drop-zone w-full h-40 flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded cursor-pointer">
+          이미지를 첨부하거나 이 영역에 드래그하세요
+        </div>
+        <input type="file" accept="image/*" class="hidden image-upload" />
+        <img id="${imgPreviewId}" class="max-w-full mt-2 hidden rounded" data-cid="${cid}" />
+      `;
+    
+      const builder = document.getElementById('builder');
+      builder.appendChild(block);
+    
+      const dropZone = block.querySelector('.drop-zone');
+      const fileInput = block.querySelector('.image-upload');
+      const preview = block.querySelector(`#${imgPreviewId}`);
+    
+      // 이미지 파일 처리 함수
+      const handleFile = (file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1]; // 헤더 제거
+          preview.src = reader.result;
+          preview.classList.remove('hidden');
+          dropZone.classList.add('hidden');
+    
+          // 이미지 첨부 정보를 전역 배열에 저장
+          window.imageAttachments.push({
+            content: base64,
+            filename: file.name,
+            type: file.type,
+            cid: cid,
+            dataURL: reader.result
+          });
+        };
+        reader.readAsDataURL(file);
+      };
+    
+      // 클릭으로 파일 첨부
+      dropZone.addEventListener('click', () => fileInput.click());
+    
+      // 파일 선택 시
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          handleFile(file);
+        }
+      });
+    
+      // 드래그 앤 드롭
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('bg-gray-200');
+      });
+    
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('bg-gray-200');
+      });
+    
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('bg-gray-200');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          handleFile(file);
+        }
+      });
+    
+      // 드롭으로 직접 받은 파일 처리
+      if (file) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    }
+
+    function removeImageBlock(button) {
+      const block = button.closest('.block');
+      const img = block.querySelector('img');
+      const cid = img?.getAttribute('data-cid');
+    
+      if (cid && window.imageAttachments) {
+        window.imageAttachments = window.imageAttachments.filter(att => att.cid !== cid);
+      }
+    
+      block.remove();
+    }
+
+    function addButtonBlock() {
+      const block = document.createElement('div');
+      block.className = 'block p-4 bg-white rounded shadow';
+      block.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <strong>버튼</strong>
+          <button onclick="this.closest('.block').remove()" class="text-sm text-red-500">삭제</button>
+        </div>
+        <input type="text" placeholder="버튼 텍스트" class="w-full border p-2 rounded mb-2" />
+        <input type="text" placeholder="버튼 링크 URL" class="w-full border p-2 rounded" />
+      `;
+      document.getElementById('builder').appendChild(block);
+    }
+
+    function sendEmail() {
+      const subject = document.getElementById('email-subject').value.trim();
+      const recipientsRaw = document.getElementById('email-recipient').value.trim();
+      if (!subject || !recipientsRaw) {
+        alert('제목과 수신자 이메일을 입력해주세요.');
+        return;
+      }
+    
+      // 수신자 이메일 여러 개 처리 (엑셀에서 붙여넣은 값 처리)
+      const recipients = recipientsRaw
+        .split(/[\s,;]+/)
+        .filter(email => email.includes('@'));
+    
+      const blocks = document.querySelectorAll('#builder > div');
+      let html = '';
+    
+      blocks.forEach(block => {
+        const inputs = block.querySelectorAll('input, textarea');
+        const img = block.querySelector('img');
+    
+        if (img && img.getAttribute('data-cid')) {
+          const cid = img.getAttribute('data-cid');
+          html += `<img src="cid:${cid}" style="max-width:100%;margin:1em 0;" />`;
+        } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
+          html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
+        } else if (inputs.length === 2) {
+          const text = inputs[0].value;
+          const url = inputs[1].value;
+          html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
+        }
+      });
+    
+      // 🔗 Netlify function 호출
+      fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, recipients, html, attachments: window.imageAttachments })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("발송 실패");
+        return response.json();
+      })
+      .then(data => {
+        alert(`📨 ${data.successCount}명에게 이메일이 발송되었습니다!`);
+      })
+      .catch(err => {
+        console.error(err);
+        alert('이메일 발송 중 오류가 발생했습니다.');
+      });
+    }
+
+      document.addEventListener('DOMContentLoaded', () => {
+      new Sortable(document.getElementById('builder'), {
+        animation: 150,
+        ghostClass: 'bg-yellow-100'
+      });
+    });
+  </script>
+
+    <script>
+    function previewEmail() {
+      const blocks = document.querySelectorAll('#builder > div');
+      let html = '';
+    
+      blocks.forEach(block => {
+        const inputs = block.querySelectorAll('input, textarea');
+        const img = block.querySelector('img');
+    
+        if (img && img.getAttribute('data-cid')) {
+          const cid = img.getAttribute('data-cid');
+          const attachment = window.imageAttachments.find(a => a.cid === cid);
+          if (attachment) {
+            html += `<img src="${attachment.dataURL}" style="max-width:100%;margin:1em 0;" />`;
+          }
+        } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
+          html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
+        } else if (inputs.length === 2) {
+          const text = inputs[0].value;
+          const url = inputs[1].value;
+          html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
+        }
+      });
+    
+      // 팝업창에 HTML 출력
+      const previewWindow = window.open('', '_blank', 'width=800,height=600');
+      previewWindow.document.write(`
+        <html>
+          <head><title>이메일 미리보기</title></head>
+          <body style="font-family:sans-serif;padding:2em;">
+            ${html}
+          </body>
+        </html>
+      `);
+    }
+    </script>
+
+  <script>
+      // --- 활성 메뉴 표시 스크립트 (추가된 부분) ---
+      document.addEventListener('DOMContentLoaded', function() {
+        // 현재 웹페이지 주소에서 파일 이름 부분만 가져옵니다. (예: "index.html", "notice-tool.html")
+        const currentPath = window.location.pathname.split('/').pop();
+        const menuLinks = document.querySelectorAll('#menu a'); // 메뉴 안의 모든 링크(<a>)를 찾습니다.
+    
+        menuLinks.forEach(link => {
+          // 각 링크가 연결된 주소(href 속성)를 가져옵니다.
+          const linkPath = link.getAttribute('href');
+    
+          // 링크 주소와 현재 페이지 파일 이름이 같으면, 그 링크에 'active-menu' 스타일을 적용합니다.
+          if (linkPath && linkPath === currentPath) {
+            link.classList.add('active-menu');
+          }
+          // 만약 홈페이지(index.html)인데 주소가 그냥 '/' 로 끝나는 경우도 처리
+          else if (currentPath === '' && linkPath === 'index.html') {
+             link.classList.add('active-menu');
+          }
+        });
+    
+        // --- 메뉴 토글 ---
+        const toggleBtn = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu');
+        if (toggleBtn && menu) {
+          toggleBtn.addEventListener('click', function () {
+            menu.classList.toggle('menu-open');
+        });
+      }
+    });
+    </script>
+
+</body>
+</html>
