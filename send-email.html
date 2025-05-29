@@ -241,7 +241,7 @@
     
         if (img && img.getAttribute('data-cid')) {
           const cid = img.getAttribute('data-cid');
-          emailBodyHtml += `<div style="margin:1em 0; text-align:center;"><img src="cid:${cid}" style="max-width:100%; display:inline-block;" /></div>`;
+          emailBodyHtml += `<div style="margin:1em 0; text-align:left;"><img src="cid:${cid}" style="max-width:100%; display:inline-block;" /></div>`;
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
           const textContent = inputs[0].value.replace(/\n/g, '<br>'); 
           emailBodyHtml += `<p style="margin:1em 0; line-height:1.6;">${textContent}</p>`;
@@ -321,7 +321,7 @@
           const attachments = window.imageAttachments || [];
           const attachment = attachments.find(a => a.cid === cid);
           if (attachment) {
-            emailBodyHtml += `<div style="margin:1em 0; text-align:center;"><img src="${attachment.dataURL}" style="max-width:100%; display:inline-block;" /></div>`;
+            emailBodyHtml += `<div style="margin:1em 0; text-align:left;"><img src="${attachment.dataURL}" style="max-width:100%; display:inline-block;" /></div>`;
           }
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
           const textContent = inputs[0].value.replace(/\n/g, '<br>');
