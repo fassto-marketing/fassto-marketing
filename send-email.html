@@ -8,8 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
     <link rel="stylesheet" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       
     </style>  
@@ -91,6 +89,13 @@
         </div>
         <textarea class="w-full border p-2 rounded" placeholder="내용 입력"></textarea>
       `;
+      const textarea = block.querySelector('textarea');
+
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto'; // 높이를 'auto'로 설정하여 내용에 맞게 줄어들 수 있도록 합니다.
+        this.style.height = (this.scrollHeight) + 'px'; // 스크롤 높이만큼 textarea의 높이를 설정합니다.
+      });
+    
       document.getElementById('builder').appendChild(block);
     }
 
@@ -219,10 +224,16 @@
       // 수신자 이메일 여러 개 처리 (엑셀에서 붙여넣은 값 처리)
       const recipients = recipientsRaw
         .split(/[\s,;]+/)
-        .filter(email => email.includes('@'));
+        .map(email => email.trim())
+        .filter(email => email.includes('@') && email.length > 3);
+    
+      if (recipients.length === 0) {
+        alert('유효한 수신자 이메일 주소를 입력해주세요.');
+        return;
+      }
     
       const blocks = document.querySelectorAll('#builder > div');
-      let html = '';
+      let emailBodyHtml = ''; 
     
       blocks.forEach(block => {
         const inputs = block.querySelectorAll('input, textarea');
@@ -230,32 +241,61 @@
     
         if (img && img.getAttribute('data-cid')) {
           const cid = img.getAttribute('data-cid');
-          html += `<img src="cid:${cid}" style="max-width:100%;margin:1em 0;" />`;
+          emailBodyHtml += `<div style="margin:1em 0; text-align:center;"><img src="cid:${cid}" style="max-width:100%; display:inline-block;" /></div>`;
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
-          html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
-        } else if (inputs.length === 2) {
+          const textContent = inputs[0].value.replace(/\n/g, '<br>'); 
+          emailBodyHtml += `<p style="margin:1em 0; line-height:1.6;">${textContent}</p>`;
+        } else if (inputs.length === 2) { 
           const text = inputs[0].value;
           const url = inputs[1].value;
-          html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
+          emailBodyHtml += `<div style="margin:1em 0; text-align:left;"><a href="${url}" style="background:#00855B; color:white; padding:10px 20px; text-decoration:none; border-radius:4px; display:inline-block; font-weight:bold;">${text}</a></div>`;
         }
       });
     
-      // 🔗 Netlify function 호출
+      const emailFooterHtml = `
+        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eeeeee; font-size: 12px; color: #888888; text-align: center; font-family: Arial, sans-serif; line-height: 1.5;">
+          <p style="margin: 5px 0;"><strong>파스토 FASSTO</strong></p>
+          <p style="margin: 5px 0;">hello@fassto.com</p>
+          <p style="margin: 5px 0;">서울특별시 강남구 학동로45길 3 성우빌딩 3층 | 1566-3033</p>
+          <p style="margin: 10px 0;"><a href="https://fassto.channel.io/lounge" style="color: #888888; text-decoration: underline;">채팅상담</a></p>
+        </div>
+      `;
+    
+      const fullEmailHtml = emailBodyHtml + emailFooterHtml;
+    
       fetch('/.netlify/functions/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, recipients, html, attachments: window.imageAttachments })
+        body: JSON.stringify({ subject, recipients, html: fullEmailHtml, attachments: window.imageAttachments || [] })
       })
       .then(response => {
-        if (!response.ok) throw new Error("발송 실패");
+        if (!response.ok) {
+          return response.text().then(text => {
+            let errorMsg = "발송 실패";
+            try {
+              const errData = JSON.parse(text);
+              errorMsg = errData.error || errData.message || `서버 응답: ${text || response.statusText}`;
+            } catch (e) {
+              errorMsg = `서버 응답: ${text || response.statusText}`;
+            }
+            throw new Error(errorMsg);
+          });
+        }
         return response.json();
       })
       .then(data => {
-        alert(`📨 ${data.successCount}명에게 이메일이 발송되었습니다!`);
+        alert(`📨 ${data.successCount}명에게 이메일이 발송되었습니다! (실패: ${data.failureCount || 0}명)`);
+    
+        document.getElementById('email-subject').value = '';
+        document.getElementById('email-recipient').value = '';
+        document.getElementById('builder').innerHTML = ''; 
+        if (window.imageAttachments) {
+          window.imageAttachments = [];
+        }
       })
       .catch(err => {
-        console.error(err);
-        alert('이메일 발송 중 오류가 발생했습니다.');
+        console.error('이메일 발송 오류:', err);
+        alert(`이메일 발송 중 오류가 발생했습니다: ${err.message}`);
       });
     }
 
@@ -270,7 +310,7 @@
     <script>
     function previewEmail() {
       const blocks = document.querySelectorAll('#builder > div');
-      let html = '';
+      let emailBodyHtml = '';
     
       blocks.forEach(block => {
         const inputs = block.querySelectorAll('input, textarea');
@@ -278,29 +318,48 @@
     
         if (img && img.getAttribute('data-cid')) {
           const cid = img.getAttribute('data-cid');
-          const attachment = window.imageAttachments.find(a => a.cid === cid);
+          const attachments = window.imageAttachments || [];
+          const attachment = attachments.find(a => a.cid === cid);
           if (attachment) {
-            html += `<img src="${attachment.dataURL}" style="max-width:100%;margin:1em 0;" />`;
+            emailBodyHtml += `<div style="margin:1em 0; text-align:center;"><img src="${attachment.dataURL}" style="max-width:100%; display:inline-block;" /></div>`;
           }
         } else if (inputs.length === 1 && inputs[0].tagName === 'TEXTAREA') {
-          html += `<p style="margin:1em 0;">${inputs[0].value}</p>`;
+          const textContent = inputs[0].value.replace(/\n/g, '<br>');
+          emailBodyHtml += `<p style="margin:1em 0; line-height:1.6;">${textContent}</p>`;
         } else if (inputs.length === 2) {
           const text = inputs[0].value;
           const url = inputs[1].value;
-          html += `<a href="${url}" style="background:#00855B;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin:1em 0;">${text}</a>`;
+          emailBodyHtml += `<div style="margin:1em 0; text-align:left;"><a href="${url}" style="background:#00855B; color:white; padding:10px 20px; text-decoration:none; border-radius:4px; display:inline-block; font-weight:bold;">${text}</a></div>`;
         }
       });
     
-      // 팝업창에 HTML 출력
+      const emailFooterHtml = `
+        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eeeeee; font-size: 12px; color: #888888; text-align: center; font-family: Arial, sans-serif; line-height: 1.5;">
+          <p style="margin: 5px 0;"><strong>파스토 FASSTO</strong></p>
+          <p style="margin: 5px 0;">hello@fassto.com</p>
+          <p style="margin: 5px 0;">서울특별시 강남구 학동로45길 3 성우빌딩 3층 | 1566-3033</p>
+          <p style="margin: 10px 0;"><a href="https://fassto.channel.io/lounge" style="color: #888888; text-decoration: underline;">채팅상담</a></p>
+        </div>
+      `;
+    
+      const fullEmailHtml = emailBodyHtml + emailFooterHtml;
+    
       const previewWindow = window.open('', '_blank', 'width=800,height=600');
       previewWindow.document.write(`
+        <!DOCTYPE html>
         <html>
-          <head><title>이메일 미리보기</title></head>
-          <body style="font-family:sans-serif;padding:2em;">
-            ${html}
+          <head>
+            <meta charset="UTF-8">
+            <title>이메일 미리보기</title>
+          </head>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; padding:20px; margin:0; background-color:#f4f4f4;">
+            <div style="max-width: 700px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+              ${fullEmailHtml}
+            </div>
           </body>
         </html>
       `);
+      previewWindow.document.close();
     }
     </script>
 
