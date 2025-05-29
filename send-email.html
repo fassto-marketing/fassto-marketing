@@ -89,6 +89,13 @@
         </div>
         <textarea class="w-full border p-2 rounded" placeholder="내용 입력"></textarea>
       `;
+      const textarea = block.querySelector('textarea');
+
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto'; // 높이를 'auto'로 설정하여 내용에 맞게 줄어들 수 있도록 합니다.
+        this.style.height = (this.scrollHeight) + 'px'; // 스크롤 높이만큼 textarea의 높이를 설정합니다.
+      });
+
       document.getElementById('builder').appendChild(block);
     }
 
