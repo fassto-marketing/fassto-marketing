@@ -1089,6 +1089,30 @@
     
     // 초기 미리보기 업데이트
     updatePreview();
+
+    // 이미지 다운로드 버튼 클릭 시, 미리보기 영역을 이미지로 저장
+    document.getElementById('downloadButton').addEventListener('click', function() {
+      // 0.2초(200ms) 기다렸다가 이미지 저장을 시작합니다.
+      setTimeout(function() {
+        var preview = document.getElementById('preview');
+        var fileNameInput = document.getElementById('fileName');
+        var fileName = fileNameInput ? fileNameInput.value : 'notice_image';
+    
+        // domtoimage를 사용하여 preview 영역을 이미지로 변환
+        domtoimage.toBlob(preview)
+          .then(function(blob) {
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName + '.png';
+            link.click();
+          })
+          .catch(function(error) {
+            alert('이미지 저장에 실패했습니다. 다시 시도해 주세요.');
+            console.error(error);
+          });
+      }, 200); // 200ms(0.2초) 대기
+    });
+
   </script>
 
   <script>
